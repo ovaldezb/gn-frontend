@@ -1,9 +1,10 @@
 import React, { Component } from "react";
 import SimpleReactValidator from "simple-react-validator";
+//import { Link } from "react-router-dom";
 import { Redirect } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import AuthService from "../services/auth.service";
-import Header from "./Header";
+import swal from "sweetalert";
 
 class Login extends Component {
   usernameRef = React.createRef();
@@ -39,16 +40,25 @@ class Login extends Component {
   onSubmit = (event) => {
     event.preventDefault();
     if (this.validator.allValid()) {
-      AuthService.login(this.state.username, this.state.password).then(
-        (res) => {
+      AuthService.login(this.state.username, this.state.password)
+        .then((res) => {
+            if(res!== 'error'){
+              this.setState({
+                status: "success"
+              });
+            }else{
+              swal("Ocurrio un error","Verifique su usario y contraseña",'error');
+            }
+        }).catch((err) => {
+          console.log(err);
           this.setState({
-            status: "success",
+            status: "error"
           });
-        }
-      );
+
+        });
     } else {
       this.setState({
-        status: "failed",
+        status: "error"
       });
       this.validator.showMessages();
       this.forceUpdate();
@@ -57,12 +67,10 @@ class Login extends Component {
 
   render() {
     if (this.state.status === "success") {
-      console.log(this.state.status);
       return <Redirect to="/principal" />;
     }
     return (
       <React.Fragment>
-        <Header currentUSer={null} />
         <div className="container d-flex justify-content-center">
           <div className="col-md-6">
             <div className="card card-content align-items-center">

@@ -3,20 +3,50 @@ label {
   margin-top: 10px;
 }
 
-.card-container.card {
-  max-width: 350px !important;
-  padding: 40px 40px;
+.center {
+  width: 75%;
+  margin: 0px auto;
+  text-align: center
 }
 
-.card {
-  background-color: #f7f7f7;
-  padding: 20px 25px 30px;
-  margin: 0 auto 25px;
-  margin-top: 50px;
-  -moz-border-radius: 2px;
-  -webkit-border-radius: 2px;
-  border-radius: 2px;
-  -moz-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
-  -webkit-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
-  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+#footer {
+  background: #f7f7f7 !important;
+  width: 100%;
+  height: 70px;
+  line-height: 70px;
+  color: #444;
+  left: 0px !important;
+  bottom: 0px !important;
+  margin: 0 auto !important;
+  position: fixed;
+}
+
+.active{
+  border-bottom:2px solid #3cb2d3;  
+  text-decoration: solid;
+  color: #37f326;
+}
+
+.tbl-lesshead{
+  margin-top: -16px;
+}
+
+.bg-1{
+  background-color: #0cbdee;
+}
+
+.bg-1-soft{
+  background-color: #3cb2d3;
+}
+
+.escaso{
+background-color: #f50707;
+}
+
+.necesario{
+  background-color: rgb(243, 247, 26);
+}
+
+.suficiente{
+  background-color: rgb(27, 247, 7);
 }
