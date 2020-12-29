@@ -1,6 +1,28 @@
+:root{
+  --primary-color: #047aed;
+  --secondary-color: #e2e8ee;
+}
+
+body {
+  font-family: 'Lato', sans-serif;
+  color: #333;
+  line-height: 1.6;
+}
+
+ul {
+  list-style-type: none;
+}
+
 label {
   display: block;
   margin-top: 10px;
+}
+
+h1,
+h2 {
+  font-weight: 300;
+  line-height: 1.2;
+  margin: 10px 0;
 }
 
 .center {
@@ -8,7 +30,7 @@ label {
   margin: 0px auto;
   text-align: center
 }
-
+/* Footer */
 #footer {
   background: #f7f7f7 !important;
   width: 100%;
@@ -21,6 +43,82 @@ label {
   position: fixed;
 }
 
+/* Barra  */
+.barnav{
+  background-color: var(--secondary-color);
+  color: rgb(34, 89, 238);
+  height: 70px;
+  margin: 10px 0;
+}
+
+.barnav ul {
+  display: flex;
+}
+
+.barnav a {
+  color: #07f51b;
+  padding: 10px;
+  margin: 10px 5px;
+}
+
+.barnav a:hover {
+  color: #f50707;
+}
+
+.barnav .flex-gn {
+  justify-content: space-between;
+}
+
+.flex-gn{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.showcase-form .form-control {
+  margin: 10px 0;
+  border: 0px;
+}
+.form-control legend{
+  font-size: 14px;
+}
+
+.legenda{
+  margin-bottom: -20px !important;
+}
+
+.showcase-form input[type='text'],
+.showcase-form input[type='email'],
+.showcase-form input[type='number'],
+.showcase-form input[type='password'],
+.selector {
+  border: 0;
+  border-bottom: 1px solid #b4becb;
+  width: 100%;
+  padding: 3px;
+  font-size: 16px;
+}
+
+.showcase-form input:focus {
+  outline: none;
+}
+
+.showcase::before,
+.showcase::after {
+  content: '';
+  position: absolute;
+  height: 100px;
+  bottom: -70px;
+  right: 0;
+  left: 0;
+  background: #fff;
+  transform: skewY(-3deg);
+  -webkit-transform: skewY(-3deg);
+  -moz-transform: skewY(-3deg);
+  -ms-transform: skewY(-3deg);
+}
+
 .active{
   border-bottom:2px solid #3cb2d3;  
   text-decoration: solid;
@@ -28,7 +126,7 @@ label {
 }
 
 .tbl-lesshead{
-  margin-top: -16px;
+  margin-top: -15px !important;
 }
 
 .bg-1{
@@ -38,7 +136,7 @@ label {
 .bg-1-soft{
   background-color: #3cb2d3;
 }
-
+/* colores renglores tabla */
 .escaso{
 background-color: #f50707;
 }
@@ -49,4 +147,8 @@ background-color: #f50707;
 
 .suficiente{
   background-color: rgb(27, 247, 7);
+}
+
+.selected{
+  background-color: #079cc5;
 }

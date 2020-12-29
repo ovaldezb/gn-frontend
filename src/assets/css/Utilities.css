@@ -1,0 +1,84 @@
+.container-gn {
+    max-width: 1200px;
+    margin: 0 auto;
+    overflow: auto;
+    padding: 0 40px;
+  }
+  
+  .card {
+    background-color: #fff;
+    color: #333;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    margin: 10px;
+  }
+  
+  .btn {
+    display: inline-block;
+    padding: 10px 30px;
+    cursor: pointer;
+    background: #047aed;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+  }
+  
+  .btn-outline {
+    background-color: transparent;
+    border: 1px #fff solid;
+  }
+  
+  .btn:hover {
+    transform: scale(0.98);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+
+  .grid-2-3 {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+
+  .grid-5 {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+
+  .table-ovfl{
+      height: 405px;
+      overflow: auto;
+  }
+
+  .table-ovfl-user{
+    height: 300px;
+    overflow: auto;
+}
+
+  .pointer{
+      cursor: pointer;
+  }

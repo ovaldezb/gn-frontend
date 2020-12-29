@@ -6,16 +6,18 @@ import Register from "./component/Register";
 import Footer from "./component/Footer";
 import Materiaprima from './component/Materiaprima';
 import Productoterminado from './component/Productoterminado'
+import Usuarios from "./component/Usuarios";
+import Testpag from './component/Testpag';
+import Bitacora from "./component/Bitacora";
+import Ordenfabricacion from './component/Ordenfabricacion';
 
 class Router extends Component {
-  
 
   render() {
     
     return (
       <BrowserRouter>
         {/**Poner el header */}
-        
         <Switch>
           <Route exact path="/" component={Login} />
           <Route exact path="/principal" component={Principal} />
@@ -23,6 +25,10 @@ class Router extends Component {
           <Route exact path="/prodterminado" component={Productoterminado} />
           <Route exact path="/login" component={Login} />
           <Route exact path="/signup" component={Register} />
+          <Route exact path="/usuarios" component={Usuarios} />
+          <Route exact path="/pag" component={Testpag} />
+          <Route exact path="/bitacora" component={Bitacora} />
+          <Route exact path="/ordenfabricacion" component={Ordenfabricacion} />
         </Switch>
         <div className="row"></div>
         <div className="clearfix"></div>

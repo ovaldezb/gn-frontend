@@ -42,6 +42,7 @@ class Login extends Component {
     if (this.validator.allValid()) {
       AuthService.login(this.state.username, this.state.password)
         .then((res) => {
+          console.log(res);
             if(res!== 'error'){
               this.setState({
                 status: "success"
