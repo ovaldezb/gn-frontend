@@ -35,19 +35,23 @@ export default class Header extends Component {
                     <NavLink
                       className="nav-link"
                       activeClassName="active"
-                      to={"/principal"}
-                    >
-                      Materia Prima
+                      to={"/principal"}>
+                      MP
+                    </NavLink>
+                  </li>
+                  <li className="nav-item">
+                    <NavLink className="nav-link" to={"/proddispon"}>
+                      PD
                     </NavLink>
                   </li>
                   <li className="nav-item">
                     <NavLink className="nav-link" to={"/ordenfabricacion"}>
-                      Órdenes de Fabricación
+                      OF
                     </NavLink>
                   </li>
                   <li className="nav-item">
                     <NavLink className="nav-link" to={"/prodterminado"}>
-                      Producto Terminado
+                      PT
                     </NavLink>
                   </li>
                   <li className="nav-item">

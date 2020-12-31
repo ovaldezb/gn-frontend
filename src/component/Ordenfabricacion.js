@@ -188,16 +188,18 @@ export default class Ordenfabricacion extends Component {
         return (
             <React.Fragment>
                 <Header/>
-            <Addordenfab cancelar={this.cancelarAdd} matprima={this.state.ordenfab} />
+                <Addordenfab cancelar={this.cancelarAdd} matprima={this.state.ordenfab} />
+              
             </React.Fragment>
             )
 
             ;
       }else {
       return (
-        <div className="container">
-            <Header />
-        <div className="barnav">
+        <React.Fragment>
+          <Header />
+          <div className="container">
+          <div className="barnav">
               <div className="container flex-gn">
                 <div>
                 </div>
@@ -210,9 +212,10 @@ export default class Ordenfabricacion extends Component {
                   </ul>
                 </nav>
               </div>
-            </div>
-        <h1 className="center">No hay Ordenes de Fabricación para mostrar</h1>
-      </div>
+          </div>
+          <h1 className="center">No hay Ordenes de Fabricación para mostrar</h1>
+          </div>
+        </React.Fragment>
       );
     }
   }

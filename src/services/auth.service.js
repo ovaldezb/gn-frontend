@@ -7,7 +7,7 @@ class AuthService{
     url = Global.url;
     
     login(username,password){
-        console.log('En el login');
+        //console.log('En el login');
         const loginRequest = {
             username:username,
             password:password

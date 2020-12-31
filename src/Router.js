@@ -10,6 +10,7 @@ import Usuarios from "./component/Usuarios";
 import Testpag from './component/Testpag';
 import Bitacora from "./component/Bitacora";
 import Ordenfabricacion from './component/Ordenfabricacion';
+import Proddisponible from './component/Proddisponible';
 
 class Router extends Component {
 
@@ -29,6 +30,7 @@ class Router extends Component {
           <Route exact path="/pag" component={Testpag} />
           <Route exact path="/bitacora" component={Bitacora} />
           <Route exact path="/ordenfabricacion" component={Ordenfabricacion} />
+          <Route exact path="/proddispon" component={Proddisponible} />
         </Switch>
         <div className="row"></div>
         <div className="clearfix"></div>

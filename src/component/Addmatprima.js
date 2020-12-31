@@ -53,7 +53,6 @@ export default class Addmatprima extends Component {
             required:'requerido'
         }
     });
-   
   }
 
   componentWillUnmount(){
@@ -78,7 +77,7 @@ export default class Addmatprima extends Component {
                 necesario:this.props.matprima.necesario
             }
         });
-        //console.log(this.props.matprima);
+
         if(!this.props.tipo){
           this.btnName = "Actualizar";
           this.idMatPrima = this.props.matprima.id;
@@ -87,7 +86,6 @@ export default class Addmatprima extends Component {
           });
           
         }
-
         
     }
 

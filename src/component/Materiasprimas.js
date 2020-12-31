@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import Paginacion from './Paginacion';
 import authHeader from "../services/auth-header";
+import authServices from '../services/auth.service';
 import axios from "axios";
 import Global from "../Global";
 import "moment/locale/es-mx";
@@ -18,10 +19,20 @@ export default class Materiasprimas extends Component {
   isAdd = true;
   idMatprim = "";
   filterRef = React.createRef();
-  idSelMp = 0;
+  //idSelMp = 0;
   displayAdd = false;
   newItem=false;
-
+  center = {textAlign:"center"}
+  right = {textAlign:"right"}
+  left = {textAlign:"left"}
+  col1 = { width: 20 };
+  col2 = { width: 140 };
+  col3 = { width: 70, textAlign: "center" };
+  col4 = { width: 96 };
+  col5 = { width: 100 };
+  col6 = { width: 150 };
+  col7 = { width: 150 };
+  col8 = { width: 100 };
   state = {
     lstMatPrim: [],
     pageOfItems: [],
@@ -32,13 +43,15 @@ export default class Materiasprimas extends Component {
     matprima:{}
   };
 
+  
+
   componentDidMount() {
     this.loadMatPrim();
   }
 
   loadMatPrim() {
     axios
-      .get(this.url + "matprima", { headers: authHeader() })
+      .get(this.url + "matprima", { headers: authHeader() },{ responseType: 'application/json' })
       .then((res) => {
         if (res.data.length > 0) {
           this.setState({
@@ -47,7 +60,15 @@ export default class Materiasprimas extends Component {
         }
       })
       .catch((err) => {
-        console.log(err);
+        if(err.message.includes("401")){
+          this.setState({
+            status:'logout'
+          });
+          authServices.logout();
+          swal("La sesión ha caducado","Por favor vuélvase a conectar","warning");
+        }else{
+          swal("Ha ocurrido un error, contacte al Administrador",err.message,"error");
+        }
       });
   }
 
@@ -93,16 +114,6 @@ export default class Materiasprimas extends Component {
   };
 
   updateMp = () =>{
-    
-    /*axios.get(this.url+'matprima/'+this.state.lstMatPrim[this.state.idSelMp].id,{ headers: authHeader() })
-      .then(res=>{
-          this.setState({
-              matprima:res.data
-          });
-          this.displayAdd = true;
-          this.isAdd = false;
-          this.forceUpdate();
-      });*/
       this.setState({
         matprima:this.state.lstMatPrim[this.state.idSelMp]
       });
@@ -129,7 +140,7 @@ export default class Materiasprimas extends Component {
                 icon: "success",
               });
               this.loadMatPrim();
-              console.log(this.state.lstMatPrim);
+              
               this.forceUpdate();
             }).catch(
               err =>{
@@ -170,20 +181,13 @@ export default class Materiasprimas extends Component {
   onChangePage = (pageOfItems,page) => {
     // update state with new page of items
     this.setState({ pageOfItems: pageOfItems, page:page });
-}
+  }
 
   render() {
     if (this.state.status === "go") {
       return <Redirect to={"/materiaprima/" + this.idMatprim} />;
     }
-    const col1 = { width: 20 };
-    const col2 = { width: 100 };
-    const col3 = { width: 96, textAlign: "center" };
-    const col4 = { width: 96 };
-    const col5 = { width: 100 };
-    const col6 = { width: 150 };
-    const col7 = { width: 150 };
-    const col8 = { width: 150 };
+    
     var style = {};
     var styleCell = {};
     var styleFecCad = {};
@@ -204,10 +208,9 @@ export default class Materiasprimas extends Component {
         }
         var fc = momento(matprim.fechaCaducidad,'MM-DD-YYYY').format('YYYY-MM-DDTHH:mm:ss');
         
-        //var fecRef = new Date(today.setMonth(today.getMonth()+4));
         var fecCad = new Date(momento(matprim.fechaCaducidad,'MM-DD-YYYY H:mm:ss'));
         var totalDaysBetwn = (fecCad.getTime() - today.getTime())/(1000*60*60*24);
-        //today = new Date();
+        
         if(totalDaysBetwn > 30){
           styleFecCad = 'suficiente';
         }else if(totalDaysBetwn > 15 && totalDaysBetwn <= 30){
@@ -218,14 +221,14 @@ export default class Materiasprimas extends Component {
 
         return (
           <tr key={i} onDoubleClick={() => this.dblClick(i)} onClick={() => {this.selectRow(i); }} className={style} >
-            <td style={col1}>{((this.state.page-1)*10) + i+1}</td>
-            <td style={col2}>{matprim.descripcion}</td>
-            <td className={styleCell} style={col3}>{matprim.cantidad}</td>
-            <td style={col4}>{matprim.unidad.unidadMedida}</td>
-            <td style={col5}>{matprim.codigo}</td>
-            <td style={col6}>{matprim.proveedor}</td>
-            <td style={col7}>{momento(matprim.fechaEntrada,'MM-DD-YYYY').format('DD MMMM YYYY')}</td>
-            <td className={styleFecCad} style={col7}><Moment fromNow>{fc}</Moment></td>
+            <td style={this.col1}>{((this.state.page-1)*10) + i+1}</td>
+            <td style={this.col2}>{matprim.descripcion}</td>
+            <td className={styleCell} style={this.col3}>{matprim.cantidad}</td>
+            <td style={this.col4}>{matprim.unidad.unidadMedida}</td>
+            <td style={this.col5}>{matprim.codigo}</td>
+            <td style={this.col6}>{matprim.proveedor}</td>
+            <td style={this.col7}>{momento(matprim.fechaEntrada,'MM-DD-YYYY').format('DD MMMM YYYY')}</td>
+            <td className={styleFecCad} style={this.col7}><Moment fromNow>{fc}</Moment></td>
           </tr>
         );
       });
@@ -267,37 +270,37 @@ export default class Materiasprimas extends Component {
               </div>
 
               <table className="table table-bordered">
+                <col width="5%" textAlign="center"/>
+                <col width="18%" textAlign="center"/>
+                <col width="8%"/>
+                <col width="11%"/>
+                <col width="13%"/>
+                <col width="11%"/>
+                <col width="15%"/>
+                <col width="20%"/>
                 <thead className="thead-light">
                   <tr>
-                    <th scope="col" style={col1}>
-                      #
-                    </th>
-                    <th scope="col" style={col2}>
-                      Descripción
-                    </th>
-                    <th scope="col" style={col3}>
-                      Cantidad
-                    </th>
-                    <th scope="col" style={col4}>
-                      Unidad
-                    </th>
-                    <th scope="col" style={col5}>
-                      Código
-                    </th>
-                    <th scope="col" style={col6}>
-                      Proveedor
-                    </th>
-                    <th scope="col" style={col7}>
-                      Fecha Entrada{" "}
-                    </th>
-                    <th scope="col" style={col8}>
-                      Días para Cauducar
-                    </th>
+                    <th>#</th>
+                    <th style={this.center}>Descripción</th>
+                    <th style={this.center}>Cantidad</th>
+                    <th style={this.center}>Unidad</th>
+                    <th style={this.center}>Código</th>
+                    <th style={this.center}>Proveedor</th>
+                    <th style={this.center}>Fecha Entrada</th>
+                    <th style={this.center}>Caducidad</th>
                   </tr>
                 </thead>
               </table>
               <div className="table-ovfl tbl-lesshead">
-                <table className="table" id="materiaprima">
+                <table className="table table-bordered" id="materiaprima">
+                  <col width="5%" textAlign="center"/>
+                  <col width="17%" textAlign="center"/>
+                  <col width="10%"/>
+                  <col width="10%"/>
+                  <col width="10%"/>
+                  <col width="17%"/>
+                  <col width="16%"/>
+                  <col width="13%"/>
                   <tbody>{lstMp}</tbody>
                 </table>              
               </div>
