@@ -264,7 +264,7 @@ export default class Usuarios extends Component {
         <React.Fragment>
           <Header />
           <form onSubmit={this.submitFormulario} onChange={this.onChangeFormulario}>
-            <div className="container-gn grid-2-3">
+            <div className="container-gn grid-2-1">
               <div className="showcase-form card">
                 <div className="barnav">
                     <div className="container flex-gn">

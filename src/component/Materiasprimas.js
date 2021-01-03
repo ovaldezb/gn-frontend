@@ -13,6 +13,7 @@ import Addmatprima from "./Addmatprima";
 import swal from "sweetalert";
 import Bitacora from '../services/bitacora-service';
 import Moment from 'react-moment';
+import NumberFormat from 'react-number-format';
 
 export default class Materiasprimas extends Component {
   url = Global.url;
@@ -114,12 +115,15 @@ export default class Materiasprimas extends Component {
   };
 
   updateMp = () =>{
+    let i = ((this.state.page-1)*10)+ this.state.idSelMp
       this.setState({
-        matprima:this.state.lstMatPrim[this.state.idSelMp]
+        matprima:this.state.lstMatPrim[i]
       });
-
       this.displayAdd = true;
       this.isAdd = false;
+      this.setState({
+        idSelMp: -1
+      });
   }
 
   deleteMp = () =>{
@@ -152,14 +156,10 @@ export default class Materiasprimas extends Component {
   }
 
   updateLstMp(matprima){
-    let lstTmp = this.state.lstMatPrim; 
-    let matprimant = this.state.lstMatPrim[this.state.idSelMp];
-    lstTmp[this.state.idSelMp] = matprima;
-    this.setState({
-      lstMatPrim:lstTmp
-    });
+    let matprimant = this.state.lstMatPrim[((this.state.page-1)*10)+ this.state.idSelMp];
     Bitacora(Global.UPDT_MATPRIM,JSON.stringify(matprimant),JSON.stringify(matprima));
     this.isAdd = true;
+    this.loadMatPrim();
   }
 
   cancelarAdd = (matprima) => {
@@ -222,8 +222,8 @@ export default class Materiasprimas extends Component {
         return (
           <tr key={i} onDoubleClick={() => this.dblClick(i)} onClick={() => {this.selectRow(i); }} className={style} >
             <td style={this.col1}>{((this.state.page-1)*10) + i+1}</td>
-            <td style={this.col2}>{matprim.descripcion}</td>
-            <td className={styleCell} style={this.col3}>{matprim.cantidad}</td>
+            <td style={this.left}>{matprim.descripcion}</td>
+            <td className={styleCell} style={this.col3}><NumberFormat value={Number(matprim.cantidad).toFixed(2)} displayType={'text'} thousandSeparator={true} /></td>
             <td style={this.col4}>{matprim.unidad.unidadMedida}</td>
             <td style={this.col5}>{matprim.codigo}</td>
             <td style={this.col6}>{matprim.proveedor}</td>
@@ -269,15 +269,15 @@ export default class Materiasprimas extends Component {
                 </div>
               </div>
 
-              <table className="table table-bordered">
-                <col width="5%" textAlign="center"/>
-                <col width="18%" textAlign="center"/>
+              <table className="table table-bordered header-font">
+                <col width="5%"/>
+                <col width="23%"/>
                 <col width="8%"/>
-                <col width="11%"/>
-                <col width="13%"/>
-                <col width="11%"/>
+                <col width="9%"/>
+                <col width="12%"/>
+                <col width="17%"/>
                 <col width="15%"/>
-                <col width="20%"/>
+                <col width="11%"/>
                 <thead className="thead-light">
                   <tr>
                     <th>#</th>
@@ -292,15 +292,15 @@ export default class Materiasprimas extends Component {
                 </thead>
               </table>
               <div className="table-ovfl tbl-lesshead">
-                <table className="table table-bordered" id="materiaprima">
-                  <col width="5%" textAlign="center"/>
-                  <col width="17%" textAlign="center"/>
+                <table className="table table-bordered header-font" id="materiaprima">
+                  <col width="5%"/>
+                  <col width="24%"/>
+                  <col width="8%"/>
                   <col width="10%"/>
-                  <col width="10%"/>
-                  <col width="10%"/>
-                  <col width="17%"/>
+                  <col width="8%"/>
+                  <col width="18%"/>
                   <col width="16%"/>
-                  <col width="13%"/>
+                  <col width="11%"/>
                   <tbody>{lstMp}</tbody>
                 </table>              
               </div>

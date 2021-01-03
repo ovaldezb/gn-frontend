@@ -25,6 +25,10 @@ h2 {
   margin: 10px 0;
 }
 
+textarea{
+  width: 480px;
+}
+
 .center {
   width: 75%;
   margin: 0px auto;
@@ -89,6 +93,7 @@ h2 {
 }
 
 .showcase-form input[type='text'],
+.showcase-form input[type='textarea'],
 .showcase-form input[type='email'],
 .showcase-form input[type='number'],
 .showcase-form input[type='password'],
@@ -123,10 +128,6 @@ h2 {
   border-bottom:2px solid #3cb2d3;  
   text-decoration: solid;
   color: #37f326;
-}
-
-.tbl-lesshead{
-  margin-top: -15px !important;
 }
 
 .bg-1{

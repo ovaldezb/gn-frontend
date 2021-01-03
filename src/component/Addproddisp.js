@@ -8,6 +8,7 @@ import SimpleReactValidator from 'simple-react-validator'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faPlusCircle, faMinusCircle,  faEraser} from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
+import Bitacora from '../services/bitacora-service';
 
 export default class Addproddisp extends Component {
     style = {};
@@ -32,7 +33,6 @@ export default class Addproddisp extends Component {
     idPrdDisp = '';
     isUpdt=false;
     state = {
-        //proddisp: {}, //Este es el que se va enviar
         codigo:'',
         desc:'',
         unidad:'', 
@@ -203,6 +203,7 @@ export default class Addproddisp extends Component {
             .then(res =>{
               this.props.cancelar(prdDispSave);
               swal('Se inserto correctamente el Producto',prdDispSave.nombre,'success');
+              Bitacora(Global.ADD_PRDDISP,'',JSON.stringify(prdDispSave));
             })
             .catch(err=>{
 
@@ -210,8 +211,11 @@ export default class Addproddisp extends Component {
         }else{
             Axios.put(Global.url+'prodisp/'+this.idPrdDisp,prdDispSave,{ headers: authHeader() })
             .then(res =>{
-              swal('Se actualizo correctamente el Producto',prdDispSave.nombre,'success');
-              this.props.cancelar(res.data);
+                console.log(res.data.id);
+                if(res.data.id){
+                    swal('Se actualizo correctamente el Producto',prdDispSave.nombre,'success');
+                    this.props.cancelar(res.data);
+                }
             })
             .catch(err=>{
 
@@ -265,7 +269,6 @@ export default class Addproddisp extends Component {
   }
 
   selUpdtMatPrim = (i) =>{
-      console.log(this.state.lstMatPrim,i);
     this.setState({
         codigo:this.state.lstMatPrim[i].materiaprimadisponible.codigo,
         desc:this.state.lstMatPrim[i].materiaprimadisponible.descripcion,
@@ -316,7 +319,7 @@ export default class Addproddisp extends Component {
       <form onSubmit={this.onSubmit} onChange={this.onSubmit}>
         <div className="container-ng">
           <div className="showcase-form card">
-            <div className="grid-2-3">
+            <div className="grid-2-1">
               <div className="form-control">
                 <input type="text" name="nombre" placeholder="Nombre Producto" ref={this.nombreRef} value={this.state.nombre}  required/>
                 {this.validator.message('nombre',this.state.nombre,'required')}
@@ -380,12 +383,12 @@ export default class Addproddisp extends Component {
             }
           </div>
           <div className="showcase-form card">
-            <table className="table tab-header table-dark">
+            <table className="table table-dark table-bordered">
+                <col width="6%"/>
+                <col width="21%"/>
+                <col width="45%"/>
                 <col width="15%"/>
-                <col width="25%"/>
-                <col width="20"/>
-                <col width="20%"/>
-                <col width="20%"/>
+                <col width="13%"/>
               <thead>
                 <tr>
                   <td>#</td>
@@ -397,7 +400,7 @@ export default class Addproddisp extends Component {
               </thead>
             </table>
             <div className="table-ovfl-prddisp">
-                <table className="table">
+                <table className="table table-bordered tbl-lesshead">
                     <tbody>
                     {rows}
                     </tbody>

@@ -28,8 +28,6 @@ export default class Addmatprima extends Component {
   claveRef = React.createRef();
   loteRef = React.createRef();
   proveedorRef = React.createRef();
-  fechaEntradaRef = React.createRef();
-  fechaCaducidadRef = React.createRef();
   observacionesRef = React.createRef();
   escasoRef = React.createRef();
   necesarioRef = React.createRef();
@@ -199,19 +197,26 @@ export default class Addmatprima extends Component {
   render() {
       const matprima = this.state.materiaPrima;
       const fechaEntrada = matprima.fechaEntrada ? Moment(matprima.fechaEntrada,'MM-DD-YYYY').format('DD/MM/YYYY') : '';
-      
       const fechaCaducidad = matprima.fechaCaducidad ? Moment(matprima.fechaCaducidad,'MM-DD-YYYY').format('DD/MM/YYYY') : '';
-      
+      const unidadSel = matprima.unidad;
       if(this.state.unidades.length > 0){
           var optnLst = this.state.unidades.map((unidad,i)=>{
-            return(
-                <option key={i} value={i}>{unidad.unidadMedida}</option>
-            );
+            if(unidadSel !== undefined ){
+              if(unidad.unidadMedida === unidadSel.unidadMedida){
+                return <option key={i} value={i} selected>{unidad.unidadMedida}</option>
+              }else{
+                return <option key={i} value={i}>{unidad.unidadMedida}</option>
+              }
+            }else{
+              return(
+                <div></div>
+              );
+            }
           });
       }
     return (
       <form onSubmit={this.enviarFormulario} onChange={this.enviarFormulario}>
-        <div className="container-ng grid">
+        <div className=" grid">
           <div>
             <div className="showcase-form card">
               <div className="form-control">
@@ -264,7 +269,7 @@ export default class Addmatprima extends Component {
                   format="l"
                   placeholder="Fecha Caducidad"
                   dayPickerProps={{
-                    locale: "it",
+                    locale: "es",
                     localeUtils: MomentLocaleUtils,
                   }}
                   onDayChange={day =>{this.selectDayCad(day)}}

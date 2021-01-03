@@ -10,7 +10,15 @@ var Global = {
 	ADD_OF:'ADD_OF',
 	UPDT_OF:'UPDT_OF',
     DEL_OF:'DEL_OF',
-    HTTP_OK:200
+    ADD_PRDDISP:'ADD_PRDDISP',
+	UPDT_PRDDISP:'UPDT_PRDDISP',
+	DEL_PRDDISP:'DEL_PRDDISP',
+    HTTP_OK:200,
+    OK:'OK',
+    ERROR:'ERROR',
+    TEP:'TEP',
+    DRAFT:'DRAFT',
+    CMPLT:'CMPLT'
 };
 
 export default Global

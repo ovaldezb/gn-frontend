@@ -20,7 +20,7 @@ export default function bitacora(actividad,valPrevio, valActual){
     
     Axios.post(url+'bitacora',bitacora_event,{headers:authHeader()})
         .then(res =>{
-            //console.log('Se guardo');
+            //console.log('Se guardo',res.data);
         })
         .catch(err=>{
             console.log(err);

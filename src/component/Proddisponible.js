@@ -4,7 +4,7 @@ import Global from '../Global';
 import authHeader from "../services/auth-header";
 import authServices from '../services/auth.service';
 import swal from "sweetalert";
-//import Bitacora from '../services/bitacora-service';
+import Bitacora from '../services/bitacora-service';
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faPlusSquare, faEdit,  faTrash,} from "@fortawesome/free-solid-svg-icons";
@@ -74,11 +74,12 @@ export default class Proddisponible extends Component {
 
   updateLstPd(prddisp){
     let lstTmp = this.state.lstPrdDisp; 
+    let prddispAnt = this.state.lstPrdDisp[this.state.idSelPd];
     lstTmp[this.state.idSelPd] = prddisp;
     this.setState({
       lstPrdDisp:lstTmp
     });
-    //Bitacora(Global.UPDT_MATPRIM,JSON.stringify(matprimant),JSON.stringify(prddisp));
+    Bitacora(Global.UPDT_PRDDISP,JSON.stringify(prddispAnt),JSON.stringify(prddisp));
     this.isAdd = true;
   }
 
@@ -109,8 +110,8 @@ export default class Proddisponible extends Component {
         if (willDelete) {
           Axios.delete(Global.url+'prodisp/'+this.state.lstPrdDisp[this.state.idSelPd].id,{ headers: authHeader() })
               .then(res=>{
-                //var mp = this.state.lstMatPrim[this.state.idSelMp];
-                //Bitacora(Global.DEL_MATPRIM,JSON.stringify(mp),'');
+                var pd = this.state.lstPrdDisp[this.state.idSelPd];
+                Bitacora(Global.DEL_PRDDISP,JSON.stringify(pd),'');
                 swal("El Producto ha sido eliminado!", {
                   icon: "success",
                 });

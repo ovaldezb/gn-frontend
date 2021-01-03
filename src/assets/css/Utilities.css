@@ -33,6 +33,11 @@
   transform: scale(0.98);
 }
 
+.btn:disabled{
+  background-color:grey;
+  cursor: not-allowed;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -42,9 +47,18 @@
   height: 100%;
 }
 
-.grid-2-3 {
+.grid-2-1 {
   display: grid;
   grid-template-columns: 2fr 1fr;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.grid-1-2 {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
   gap: 20px;
   justify-content: center;
   align-items: center;
@@ -69,6 +83,14 @@
   height: 100%;
 }
 
+.tbl-lesshead-1{
+  margin-bottom: -1px !important;
+}
+
+.tbl-lesshead{
+  margin-top: -15px !important;
+}
+
 .table-ovfl {
   height: 405px;
   overflow: auto;
@@ -76,6 +98,11 @@
 
 .table-ovfl-user {
   height: 300px;
+  overflow: auto;
+}
+
+.table-ovfl-of-val{
+  height: 250px;
   overflow: auto;
 }
 
@@ -91,4 +118,13 @@
 
 .pointer {
   cursor: pointer;
+} 
+
+.header-font {
+  font-size: 14px;
+  text-align: center  ;
+}
+
+.table-lst {
+  font-size: 14px;
 }
