@@ -53,39 +53,35 @@ export default class Addmatprima extends Component {
     });
   }
 
-  componentWillUnmount(){
+  componentDidMount(){
+    this.setState({
+      materiaPrima:{}
+    });
+      Axios.get(this.url+'unidad',{ headers: authHeader() })
+      .then(
+          res =>{
+              this.setState({
+                  unidades:res.data
+              });
+          }
+      );
+
       this.setState({
-        materiaPrima:{}
+          materiaPrima:{
+              escaso:this.props.matprima.escaso,
+              necesario:this.props.matprima.necesario
+          }
       });
-  }
 
-    componentDidMount(){
-        Axios.get(this.url+'unidad',{ headers: authHeader() })
-        .then(
-            res =>{
-                this.setState({
-                    unidades:res.data
-                });
-            }
-        );
-
+      if(!this.props.tipo){
+        this.btnName = "Actualizar";
+        this.idMatPrima = this.props.matprima.id;
         this.setState({
-            materiaPrima:{
-                escaso:this.props.matprima.escaso,
-                necesario:this.props.matprima.necesario
-            }
+          materiaPrima: this.props.matprima
         });
-
-        if(!this.props.tipo){
-          this.btnName = "Actualizar";
-          this.idMatPrima = this.props.matprima.id;
-          this.setState({
-            materiaPrima: this.props.matprima
-          });
-          
-        }
         
-    }
+      } 
+  }
 
   selectDayEnt = (day) => {
       Moment.locale('es-mx');

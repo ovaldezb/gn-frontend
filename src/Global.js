@@ -18,7 +18,8 @@ var Global = {
     ERROR:'ERROR',
     TEP:'TEP',
     DRAFT:'DRAFT',
-    CMPLT:'CMPLT'
+    CMPLT:'CMPLT',
+    WTDEL:'WTDEL'
 };
 
 export default Global
