@@ -63,7 +63,7 @@ export default class Ordenfabricacion extends Component {
 
   completeOF = () =>{
     swal({
-      title: "Desea completar la OF del lote: "+this.state.lstOF[this.state.idSelOf].lote+"?",
+      title: "Desea completar la OF del lote: "+this.state.lstOF[((this.state.page-1)*10)+this.state.idSelOf].lote+"?",
       text: "Una vez completado pasará a PT",
       icon: "warning",
       buttons: true,
@@ -71,7 +71,7 @@ export default class Ordenfabricacion extends Component {
     })
     .then((willDelete) => {
       if (willDelete) {
-        axios.put(Global.url+'ordenfab/complete/'+this.state.lstOF[this.state.idSelOf].id,{ headers: authHeader() })
+        axios.put(Global.url+'ordenfab/complete/'+this.state.lstOF[((this.state.page-1)*10)+this.state.idSelOf].id,{ headers: authHeader() })
             .then(res=>{
               //var mp = this.state.lstMatPrim[this.state.idSelMp];
               //Bitacora(Global.DEL_MATPRIM,JSON.stringify(mp),'');
@@ -79,7 +79,6 @@ export default class Ordenfabricacion extends Component {
                 icon: "success",
               });
               this.loadAllOFs();
-              //this.forceUpdate();
             }).catch(
               err =>{
                 console.log('Error '+err.message);

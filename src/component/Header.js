@@ -26,16 +26,12 @@ export default class Header extends Component {
     if(currentUser){
     return (
       <header>
-        <div className="container">
-          <nav className="navbar navbar-expand-lg navbar-light bg-light">
+          <nav className="navbar navbar-expand-lg nav-bg">
             <Link to="/#" className="navbar-brand"><img src={logo} alt="Grupo Nordan" height="80" /></Link>
               <div className="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul className="navbar-nav mr-auto">
                   <li className="nav-item">
-                    <NavLink
-                      className="nav-link"
-                      activeClassName="active"
-                      to={"/principal"}>
+                    <NavLink className="nav-link" activeClassName="active" to={"/principal"}>
                       MP
                     </NavLink>
                   </li>
@@ -81,9 +77,7 @@ export default class Header extends Component {
                   </NavLink>
                 </form>
               </div>
-            
           </nav>
-        </div>
       </header>
     );
     }else{

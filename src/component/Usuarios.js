@@ -1,235 +1,247 @@
 import Axios from "axios";
 import React, { Component } from "react";
-import {  Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Global from "../Global";
-import Header from "./Header";
-import SimpleReactValidator from 'simple-react-validator';
-import authHeader from '../services/auth-header';
+import SimpleReactValidator from "simple-react-validator";
+import authHeader from "../services/auth-header";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit,faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import swal from "sweetalert";
-import Bitacora from '../services/bitacora-service';
+import Bitacora from "../services/bitacora-service";
+import Paginacion from "./Paginacion";
 
 export default class Usuarios extends Component {
-  url = Global.url;
   nombreRef = React.createRef();
   apellidoRef = React.createRef();
   usernameRef = React.createRef();
-  emailRef = React.createRef();
+  //emailRef = React.createRef();
   passwordRef = React.createRef();
   passwordverifRef = React.createRef();
-  noempleadoRef = React.createRef();
-  rolesRef = React.createRef();
   estatusRef = React.createRef();
+  areaRef = React.createRef();
+  filterRef = React.createRef();
 
   state = {
     lstUsers: [],
-    lstRoles:[],
-    usuario:{},
-    usuarioPrevio:{},
+    lstAreas: [],
+    usuario: { activo: false },
+    usuarioPrevio: {},
     idSelMp: -1,
-    btnNombre:'Enviar'
+    btnNombre: "Enviar",
+    pageOfItems: [],
+    page: 1,
+    filtro: "",
   };
 
-  constructor(){
+  constructor() {
     super();
     this.validator = new SimpleReactValidator({
-        messages:{
-            required:'requerido'
-        }
+      messages: {
+        required: "requerido",
+      },
     });
   }
 
   componentDidMount() {
     this.getListUsers();
-    this.getAllRoles();
+    this.getAreas();
   }
 
   getListUsers() {
-     Axios.get(this.url + "usuario",{ headers: authHeader() })
-       .then((res) => {
-         if (res.data.length > 0) {
-           this.setState({
-             lstUsers: res.data,
-           });
-         }
-       })
-       .catch((err) => {
-         console.log(err);
-       });
-  }
-
-  getAllRoles(){
-    Axios.get(this.url + "role",{ headers: authHeader() })
-    .then((res) => {
-      if (res.data.length > 0) {
-        this.setState({
-            lstRoles: res.data,
-        });
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-  }
-
-  onChangeFormulario = (event) =>{
-    event.preventDefault();
-    let user = {
-        nombre:this.nombreRef.current.value,
-        apellido:this.apellidoRef.current.value,
-        username:this.usernameRef.current.value,
-        email:this.emailRef.current.value,
-        roles:[{'id':this.rolesRef.current.value}],
-        password:this.passwordRef.current.value,
-        noEmpleado:this.noempleadoRef.current.value,
-        activo:this.estatusRef.current.value
-    };
-
-    this.setState({
-        usuario:user
-    });
-  }
-
-  submitFormulario = (event) =>{
-    event.preventDefault();
-    let lstTmp = this.state.lstUsers;
-    let user = {
-        nombre:this.nombreRef.current.value,
-        apellido:this.apellidoRef.current.value,
-        username:this.usernameRef.current.value,
-        email:this.emailRef.current.value,
-        roles:[{'id':this.rolesRef.current.value}],
-        password:this.passwordRef.current.value,
-        noEmpleado:this.noempleadoRef.current.value,
-        activo:this.estatusRef.current.value
-    };
-
-    this.setState({
-        usuario:user
-    });
-    if(this.validator.allValid()){
-        if(this.state.btnNombre === 'Enviar'){
-            Axios.post(this.url+'auth/signup',this.state.usuario,{ headers: authHeader() })
-            .then(res =>{
-                console.log(res);
-                if(res.status === 200){
-                    Bitacora(Global.ADD_USER,'',JSON.stringify(res.data));
-                    lstTmp.push(res.data);
-                    this.setState({
-                        lstUsers:lstTmp,
-                        usuario:{
-                            nombre:'',
-                            apellido:'',
-                            email:'',
-                            noEmpleado:'',
-                            username:'',
-                            password:'',
-                            passwordrepeat:'',
-                            activo:true,
-                            roles:[]
-                        }
-                    });
-                    swal('Se ha insertado el usuario correctamente','','success');
-                }
-            })
-            .catch(err=>{
-                swal('Ocurrio un error al crear el usuario','Error','error');
-            });
-        }else{
-            Axios.put(this.url+'usuario/'+this.state.lstUsers[this.state.idSelMp].id,this.state.usuario,{ headers: authHeader() })
-            .then(res =>{
-                if(res.status === 200){
-                    lstTmp[this.state.idSelMp] = res.data;
-                    
-                    Bitacora(Global.UPDT_USER,JSON.stringify( this.state.usuarioPrevio),JSON.stringify(res.data));
-                    this.setState({
-                        lstUsers:lstTmp,
-                        usuario:{
-                            nombre:'',
-                            apellido:'',
-                            email:'',
-                            noEmpleado:'',
-                            username:'',
-                            password:'',
-                            passwordrepeat:'',
-                            activo:true
-                        },
-                        btnNombre:'Enviar'
-                    });
-                    swal('Se actualizo el usuario correctamente','','success');
-                }
-            })
-            .catch(err=>{
-                swal('Ocurrio un error al crear el usuario','Error','error');
-            });
+    Axios.get(Global.url + "usuario", { headers: authHeader() })
+      .then((res) => {
+        if (res.data.length > 0) {
+          this.setState({
+            lstUsers: res.data,
+          });
         }
-    }else{
-        this.validator.showMessages();
-        this.forceUpdate();
-    }
-  }
-
-  updatePopulateUser = () =>{
-      if(this.state.idSelMp !==-1){
-        this.setState({
-            usuario:this.state.lstUsers[this.state.idSelMp],
-            usuarioPrevio:this.state.lstUsers[this.state.idSelMp],
-            btnNombre:'Actualizar'
-        });
-        
-        let sel = document.getElementById("estatus");
-        sel.value = this.state.lstUsers[this.state.idSelMp].activo;
-        let roles = document.getElementById('roles');
-        roles.value = this.state.lstUsers[this.state.idSelMp].roles[0].id;
-
-      }
-  }
-
-  deleteUser = () =>{
-    swal({
-        title: "Estas seguro?",
-        text: "Una vez eliminado, no se podrá recuperar la Materia Prima",
-        icon: "warning",
-        buttons: true,
-        dangerMode: true,
       })
-      .then((willDelete) => {
-        if (willDelete) {
-          Axios.delete(this.url+'usuario/'+this.state.lstUsers[this.state.idSelMp].id,{ headers: authHeader() })
-            .then(res=>{
-                if(res.state === 200){
-                    Bitacora(Global.ADD_USER,JSON.stringify(this.state.lstUsers[this.state.idSelMp]),'');
-                    this.state.lstUsers.splice(this.state.idSelMp,1);
-                    swal("El usuario ha sido eliminad!", {icon: "success",});
-                    this.setState({
-                        idSelMp:-1
-                    });
-                }
-            //this.forceUpdate();
-                }).catch(
-                err =>{
-                    console.log('Error '+err.message);
-                });
-            } 
+      .catch((err) => {
+        console.log(err);
       });
   }
 
-  clearForm = ()=>{
-    this.setState({
-        usuario:{
-            nombre:'',
-            apellido:'',
-            email:'',
-            noEmpleado:'',
-            username:'',
-            password:'',
-            passwordrepeat:'',
-            activo:true
-        },
-        btnNombre:'Enviar'
-    });
+  getAreas() {
+    Axios.get(Global.url + "utils/areas", { headers: authHeader() })
+      .then((res) => {
+        this.setState({
+          lstAreas: res.data,
+        });
+      })
+      .catch((err) => {});
   }
+
+  onChangeFormulario = (event) => {
+    event.preventDefault();
+
+    let user = {
+      nombre: this.nombreRef.current.value,
+      apellido: this.apellidoRef.current.value,
+      username: this.usernameRef.current.value,
+      password: this.passwordRef.current.value,
+      area: { id: this.areaRef.current.value },
+      activo: this.estatusRef.current.checked,
+    };
+
+    this.setState({
+      usuario: user,
+    });
+    console.log(
+      "cambio",
+      this.state.usuario.activo,
+      this.estatusRef.current.checked
+    );
+  };
+
+  submitFormulario = (event) => {
+    event.preventDefault();
+    let user = {
+      nombre: this.nombreRef.current.value,
+      apellido: this.apellidoRef.current.value,
+      username: this.usernameRef.current.value,
+      password: this.passwordRef.current.value,
+      area: { id: this.areaRef.current.value },
+      activo: this.estatusRef.current.checked,
+    };
+
+    this.setState({
+      usuario: user,
+    });
+    if (this.validator.allValid()) {
+      if (this.state.btnNombre === "Enviar") {
+        Axios.post(Global.url + "auth/signup", this.state.usuario, {
+          headers: authHeader(),
+        })
+          .then((res) => {
+            console.log(res);
+            if (res.status === 200) {
+              Bitacora(Global.ADD_USER, "", JSON.stringify(res.data));
+              //lstTmp.push(res.data);
+              this.getListUsers();
+              this.clearForm();
+              swal("Se ha insertado el usuario correctamente", "", "success");
+            }
+          })
+          .catch((err) => {
+            swal("Ocurrio un error al crear el usuario", "Error", "error");
+          });
+      } else {
+        Axios.put(
+          Global.url +
+            "usuario/" +
+            this.state.lstUsers[(this.state.page - 1) * 10 + this.state.idSelMp]
+              .id,
+          this.state.usuario,
+          { headers: authHeader() }
+        )
+          .then((res) => {
+            if (res.status === 200) {
+              //lstTmp[this.state.idSelMp] = res.data;
+              this.getListUsers();
+              Bitacora(
+                Global.UPDT_USER,
+                JSON.stringify(this.state.usuarioPrevio),
+                JSON.stringify(res.data)
+              );
+              this.clearForm();
+              swal("Se actualizo el usuario correctamente", "", "success");
+            }
+          })
+          .catch((err) => {
+            swal("Ocurrio un error al crear el usuario", "Error", "error");
+          });
+      }
+    } else {
+      this.validator.showMessages();
+      this.forceUpdate();
+    }
+  };
+
+  updatePopulateUser = () => {
+    if (this.state.idSelMp !== -1) {
+      this.setState({
+        usuario: this.state.lstUsers[
+          (this.state.page - 1) * 10 + this.state.idSelMp
+        ],
+        usuarioPrevio: this.state.lstUsers[
+          (this.state.page - 1) * 10 + this.state.idSelMp
+        ],
+        btnNombre: "Actualizar",
+      });
+
+      let sel = document.getElementById("estatus");
+      sel.checked = this.state.lstUsers[this.state.idSelMp].activo;
+      let area = document.getElementById("area");
+      area.value = this.state.lstUsers[this.state.idSelMp].area.id;
+    }
+  };
+
+  deleteUser = () => {
+    swal({
+      title: "Estas seguro?",
+      text: "Una vez eliminado, no se podrá recuperar el usuario",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    }).then((willDelete) => {
+      if (willDelete) {
+        Axios.delete(
+          Global.url +
+            "usuario/" +
+            this.state.lstUsers[(this.state.page - 1) * 10 + this.state.idSelMp]
+              .id,
+          { headers: authHeader() }
+        )
+          .then((res) => {
+            console.log(res.status);
+            if (res.status === Global.HTTP_OK) {
+              Bitacora(
+                Global.ADD_USER,
+                JSON.stringify(
+                  this.state.lstUsers[
+                    (this.state.page - 1) * 10 + this.state.idSelMp
+                  ]
+                ),
+                ""
+              );
+              //this.state.lstUsers.splice(this.state.idSelMp,1);
+              this.getListUsers();
+              swal("El usuario ha sido eliminado!", { icon: "success" });
+              this.setState({
+                idSelMp: -1,
+              });
+            }
+          })
+          .catch((err) => {
+            console.log("Error " + err.message);
+          });
+      }
+    });
+  };
+
+  clearForm = () => {
+    this.setState({
+      usuario: {
+        nombre: "",
+        apellido: "",
+        area: "",
+        username: "",
+        password: "",
+        passwordrepeat: "",
+        activo: false,
+      },
+      btnNombre: "Enviar",
+    });
+    let estatus = document.getElementById("estatus");
+    estatus.checked = false;
+    let area = document.getElementById("area");
+    area.value = this.state.lstAreas[0].id;
+  };
+
+  onChangePage = (pageOfItems, page) => {
+    // update state with new page of items
+    this.setState({ pageOfItems: pageOfItems, page: page });
+  };
 
   selectRow = (i) => {
     this.setState({
@@ -237,125 +249,204 @@ export default class Usuarios extends Component {
     });
   };
 
-    render() {
-        const usuario = this.state.usuario;
-        var style = {};
-        var rowsRoles = this.state.lstRoles.map((role,i)=>{
-            return <option key={i} value={role.id}>{role.label}</option>
-        });
-        var rows = this.state.lstUsers.map((user,i)=>{
-            if (this.state.idSelMp === i) {
-                style = "selected pointer";
-              }else{
-                style = "pointer";
-              }
-            return (
-                <tr key={i} onClick={() => {
-                    this.selectRow(i);}}  onDoubleClick={()=>{this.updatePopulateUser()}} className={style}>
-                    <td>{i+1}</td>
-                    <td>{user.nombre}</td>
-                    <td>{user.apellido}</td>
-                    <td>{user.username}</td>
-                    <td>{user.activo?'Activo':'Inactivo'}</td>
-                </tr>
-            );
-        });
-        return (
-        <React.Fragment>
-          <Header />
-          <form onSubmit={this.submitFormulario} onChange={this.onChangeFormulario}>
-            <div className="container-gn grid-2-1">
-              <div className="showcase-form card">
-                <div className="barnav">
-                    <div className="container flex-gn">
-                        <div></div>
-                        <nav>
-                            <ul>
-                                <li>
-                                    <Link to="#" onClick={this.updatePopulateUser}>
-                                    <FontAwesomeIcon icon={faEdit} />
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link to="#" onClick={this.deleteUser} >
-                                    <FontAwesomeIcon icon={faTrash} />
-                                    </Link>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
-                </div>
-                <table className="table">
-                    <thead>
-                        <tr>
-                            <td>#</td>
-                            <td>Nombre</td>
-                            <td>Apellido</td>
-                            <td>Usuario</td>
-                            <td>Estatus</td>
-                        </tr>
-                    </thead>
-                </table>
-                <div className="table-ovfl-user">
-                    <table className="table">
-                        <tbody>
-                        {rows}
-                        </tbody>
-                    </table>
-                </div>
+  filter = () => {
+    var filter = this.filterRef.current.value;
+    var td, found, i, j;
+    var tabla = document.getElementById("usuarios");
+
+    for (i = 0; i < tabla.rows.length; i++) {
+      td = tabla.rows[i].cells;
+      /*var tdArray = new Array(td);
+      tdArray.forEach(element => {
+          console.log(element[0]);
+      });*/
+      for (j = 0; j < td.length; j++) {
+        if (td[j].innerHTML.toUpperCase().indexOf(filter.toUpperCase()) > -1) {
+          found = true;
+        }
+      }
+      if (found) {
+        tabla.rows[i].style.display = "";
+        found = false;
+      } else {
+        tabla.rows[i].style.display = "none";
+      }
+    }
+  };
+
+  render() {
+    const usuario = this.state.usuario;
+    var style = {};
+
+    var rows = this.state.pageOfItems.map((user, i) => {
+      if (this.state.idSelMp === i) {
+        style = "selected pointer";
+      } else {
+        style = "pointer";
+      }
+      return (
+        <tr
+          key={i}
+          onClick={() => {
+            this.selectRow(i);
+          }}
+          onDoubleClick={() => {
+            this.updatePopulateUser();
+          }}
+          className={style}
+        >
+          <td>
+            {user.nombre} {user.apellido}
+          </td>
+          <td>{user.username}</td>
+          <td>{user.area.name}</td>
+          <td>{user.activo ? "Activo" : "Inactivo"}</td>
+        </tr>
+      );
+    });
+    return (
+      <React.Fragment>
+        <form onSubmit={this.submitFormulario} onChange={this.onChangeFormulario}>
+          <div className="container-gn grid-1-2">
+            <div className="showcase-form card">
+              <div className="form-control">
+                <input type="text" name="nombre" placeholder="Nombre" ref={this.nombreRef} defaultValue={usuario.nombre} value={usuario.nombre} />
+                {this.validator.message("nombre",this.state.usuario.nombre,"required")}
               </div>
-              <div className="showcase-form card">
-                <div className="form-control">
-                    <input type="text" name="nombre" placeholder="Nombre" ref={this.nombreRef} defaultValue={usuario.nombre} value={usuario.nombre} required/>
-                    {this.validator.message('nombre',this.state.usuario.nombre,'required')}
-                </div>
-                <div className="form-control">
-                    <input type="text" name="apellido" placeholder="Apellido" ref={this.apellidoRef} defaultValue={usuario.apellido} value={usuario.apellido} required/>
-                    {this.validator.message('apellido',this.state.usuario.apellido,'required')}
-                </div>
-                <div className="form-control">
-                    <input type="email" name="correo" placeholder="Correo Electrónico" ref={this.emailRef} defaultValue={usuario.email} value={usuario.email} />
-                </div>
-                <div className="form-control">
-                    <input type="text" name="noempleado" placeholder="No Empleado" ref={this.noempleadoRef} defaultValue={usuario.noEmpleado} value={usuario.noEmpleado} />
-                </div>
-                <div className="container grid">
-                    <label className="label">Estatus:</label>
-                    <div className="">
-                        <select ref={this.estatusRef} id="estatus">
-                            <option value="true">Activo</option>
-                            <option value="false">Inactivo</option>
-                        </select>
-                    </div>
-                </div>
-                <div className="container grid">
-                    <label className="label">Tipo:</label>
-                        <select  ref={this.rolesRef} id="roles">
-                        {rowsRoles}
-                        </select>
-                </div>
-                
-                <div className="form-control">
-                    <input type="text"  placeholder="username" ref={this.usernameRef} defaultValue={usuario.username}  value={usuario.username} required/>
-                    {this.validator.message('username',this.state.usuario.username,'required')}
-                </div>
-                <div className="container grid ">
-                    <div className="form-control">    
-                        <input type="password" name="password" placeholder="Contraseña" ref={this.passwordRef}  value={usuario.password} />
-                    </div>
-                    <div className="form-control">
-                        <input type="password" name="passwordrepeat" placeholder="Confirmar Contraseña" ref={this.passwordverifRef} value={usuario.passwordrepeat} />
-                    </div>
-                </div>
-                <div className="container grid">
-                    <input type="submit" value={this.state.btnNombre} className="btn btn-primary" />
-                    <input type="submit" value="Cancelar" className="btn btn-primary" onClick={this.clearForm} />
-                </div>
+              <div className="form-control">
+                <input type="text" name="apellido" placeholder="Apellido" ref={this.apellidoRef} defaultValue={usuario.apellido} value={usuario.apellido} />
+                {this.validator.message(
+                  "apellido",
+                  this.state.usuario.apellido,
+                  "required"
+                )}
+              </div>
+              <div className="container grid-1-3">
+                <label className="label">Area:</label>
+                <select name="area" id="area" className="custom-select" ref={this.areaRef}>
+                  {this.state.lstAreas.map((area, i) => {
+                    return (
+                      <option key={i} value={area.id}>
+                        {area.name}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+              <div className="container grid-1-2">
+                <label className="label">Estatus:</label>
+                <label className="switch">
+                  <input
+                    type="checkbox"
+                    ref={this.estatusRef}
+                    value={this.state.usuario.activo}
+                    id="estatus"
+                  />
+                  <span class="slider round"></span>
+                </label>
+              </div>
+              <div className="form-control">
+                <input
+                  type="text"
+                  placeholder="username"
+                  ref={this.usernameRef}
+                  defaultValue={usuario.username}
+                  value={usuario.username}
+                />
+                {this.validator.message(
+                  "username",
+                  this.state.usuario.username,
+                  "required"
+                )}
+              </div>
+
+              <div className="form-control">
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="Contraseña"
+                  ref={this.passwordRef}
+                  value={usuario.password}
+                />
+              </div>
+              <div className="form-control">
+                <input
+                  type="password"
+                  name="passwordrepeat"
+                  placeholder="Confirmar Contraseña"
+                  ref={this.passwordverifRef}
+                  value={usuario.passwordrepeat}
+                />
               </div>
             </div>
-          </form>
-        </React.Fragment>
-      );
-    
+            <div className="showcase-form card">
+              <div className="barnav">
+                <div className="container flex-gn">
+                  <ul>
+                    <li>Filtro:&nbsp;</li>
+                    <li>
+                      <input
+                        type="text"
+                        name="filtro"
+                        ref={this.filterRef}
+                        onKeyUp={this.filter}
+                      />
+                    </li>
+                  </ul>
+                  <nav>
+                    <ul>
+                      <li>
+                        <Link to="#" onClick={this.updatePopulateUser}>
+                          <FontAwesomeIcon icon={faEdit} />
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="#" onClick={this.deleteUser}>
+                          <FontAwesomeIcon icon={faTrash} />
+                        </Link>
+                      </li>
+                    </ul>
+                  </nav>
+                </div>
+              </div>
+              <table className="table table-bordered table-dark center">
+                <col width="26%" />
+                <col width="22%" />
+                <col width="37%" />
+                <col width="15%" />
+                <thead className="thead-light">
+                  <tr>
+                    <td>Nombre</td>
+                    <td>Usuario</td>
+                    <td>Area</td>
+                    <td>Estatus</td>
+                  </tr>
+                </thead>
+              </table>
+              <div className="table-ovfl-user tbl-lesshead">
+                <table className="table table-hover" id="usuarios">
+                  <col width="26%" />
+                  <col width="22%" />
+                  <col width="37%" />
+                  <col width="15%" />
+                  <tbody>{rows}</tbody>
+                </table>
+              </div>
+              <div className="center paginacio-marg-top">
+                <Paginacion
+                  items={this.state.lstUsers}
+                  onChangePage={this.onChangePage}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="grid">
+          <button className="btn btn-success" onClick={this.submitFormulario}>{this.state.btnNombre}</button>
+          <button className="btn btn-danger" onClick={this.clearForm}>Limpiar</button>
+        </div>
+        </form>
+        
+      </React.Fragment>
+    );
   }
 }

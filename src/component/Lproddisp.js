@@ -1,9 +1,9 @@
 import React, { Component } from "react";
-import Header from "./Header";
-import Ordenfabricacion from "./Ordenfabricacion";
-import Menu from "./Menu";
+import Header from './Header';
+import Menu from './Menu';
+import Ordenfabricacion from './Ordenfabricacion';
 
-export default class Lordenfab extends Component {
+export default class Lproddisp extends Component {
   render() {
     return (
       <React.Fragment>

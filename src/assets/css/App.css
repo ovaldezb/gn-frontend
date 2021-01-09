@@ -151,5 +151,111 @@ background-color: #f50707;
 }
 
 .selected{
-  background-color: #079cc5;
+  background-color: #079cc5 !important ;
+}
+
+/* Formulario */
+.contenedor{
+  width: 100%;
+  padding: 15px;
+  background: url(../images/health-industry-cta.jpg);
+  background-size: cover;
+  background-clip: fixed;
+  height: 650px;
+}
+
+.formulario{
+  
+  margin-top: 150px;
+  padding: 3px;
+  width: 45%;
+  margin-left: 400px;
+  opacity: 1;
+}
+
+.titulo{
+  text-align: center;
+  color: #060411;
+}
+
+.formulario input[type="text"],
+.formulario input[type="password"] {
+  font-size: 20px;
+  width: 92%;
+  padding: 10px;
+  border: none;
+}
+
+.input-contenedor{
+  margin-bottom: 15px;
+  border: 1px solid #aaa;
+  background: white;
+}
+
+.icon{
+  min-width: 50px;
+  text-align: center;
+  color: rgba(20, 17, 37, 0.6);
+}
+
+.button{
+  border: none;
+  width: 100%;
+  color: white;
+  font-size: 20px;
+  background:#1a2537 ;
+  padding: 10px 20px;
+  border-radius: 5px;
+}
+
+.button:hover{
+  background: cadetblue;
+}
+
+.formulario input[type="text"]:focus,
+.formulario input[type="password"]:focus{
+  border: lightblue;
+  background: rgb(230, 225, 226);
+}
+
+/* Menu */
+.menu{
+  width: 15em;
+  background: #415c86;
+  height: 600px;
+}
+
+.menu ul{
+  list-style: none;
+  line-height: 42px;
+  padding-left: 0;
+  margin-top: 4px;
+  width: 15em;
+}
+
+.menu ul li{
+  box-shadow: 3px 0 rgb(8, 27, 116) inset;
+  margin-bottom: 5px;
+  padding-left: 1.5em;
+  transition: .5s;
+  -o-transition: 1s;
+  -webkit-transition:  .5s linear;
+  -webkit-transform:translate3d(0,0,0);
+}
+
+.menu ul li:hover{
+  box-shadow: 15em 0 rgba(255, 255, 255, 0.2) inset;  
+  
+}
+
+.menu a{
+  display: block;
+  text-decoration: none;
+  color: #ddd;
+  width: 100%;
+}
+
+.menu a:hover{
+  text-decoration: none;
+  color: rgb(139, 250, 102);
 }

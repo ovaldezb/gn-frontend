@@ -11,6 +11,7 @@ import {faPlusSquare, faEdit,  faTrash,} from "@fortawesome/free-solid-svg-icons
 import Paginacion from './Paginacion';
 import Addproddisp from './Addproddisp'
 import Header from './Header';
+import Menu from './Menu';
 
 export default class Proddisponible extends Component {
   displayAdd = false;
@@ -184,8 +185,7 @@ export default class Proddisponible extends Component {
                     </React.Fragment>
                 }
                 {!this.displayAdd && 
-                    <React.Fragment>
-                      <Header/>
+                  <React.Fragment>
                       <div className="container">
                         <div className="barnav">
                           <div className="container flex-gn">
@@ -213,61 +213,57 @@ export default class Proddisponible extends Component {
                             </ul>
                           </nav>
                         </div>
-                      </div>
-                      <table className="table table-bordered">
-                        <thead className="thead-light">
+                        </div>
+                        <table className="table table-bordered">
+                          <thead className="thead-light">
                             <tr>
                                 <th scope="col" style={this.col1}>#</th>
                                 <th scope="col" style={this.col2}>Nombre</th>
                                 <th scope="col" style={this.col3}>Clave</th>
                             </tr>
-                        </thead>
-                      </table>
-                      <div className="table-ovfl tbl-lesshead">
-                        <table className="table" id="materiaprima">
-                          <tbody>{lstMp}</tbody>
-                        </table>              
+                          </thead>
+                        </table>
+                        <div className="table-ovfl tbl-lesshead">
+                          <table className="table" id="materiaprima">
+                            <tbody>{lstMp}</tbody>
+                          </table>              
+                        </div>
+                        <div className="center">
+                          <Paginacion items={this.state.lstPrdDisp} onChangePage={this.onChangePage} />
+                        </div>
                       </div>
-                      <div className="center">
-                        <Paginacion items={this.state.lstPrdDisp} onChangePage={this.onChangePage} />
-                      </div>
-                    </div>
-                    </React.Fragment>
+                </React.Fragment>
                 }
             </React.Fragment>
         );
     }else if(this.displayAdd){
         return (
             <React.Fragment>
-                <Header/>
-                <div className="container">
+              <div className="container">
                 <Addproddisp cancelar={this.cancelarAdd} proddisp={this.state.proddisp} tipo={this.isAdd}/>
-                </div>
+              </div>
             </React.Fragment>    
         )
         
     }else{
         return (
-            <React.Fragment>
-              <Header/>
+          <React.Fragment>
               <div className="container">
-              <div className="barnav">
-                    <div className="container flex-gn">
-                      <div>
-                      </div>
-                      <nav>
-                        <ul>
-                          <li>
-                            <Link to="#" onClick={this.addPd}><FontAwesomeIcon icon={faPlusSquare} />
-                            </Link>
-                          </li>
-                        </ul>
-                      </nav>
-                    </div>
+                <div className="barnav">
+                  <div className="container flex-gn">
+                    <div></div>
+                    <nav>
+                      <ul>
+                        <li>
+                          <Link to="#" onClick={this.addPd}><FontAwesomeIcon icon={faPlusSquare} /></Link>
+                        </li>
+                      </ul>
+                    </nav>
                   </div>
                 </div>
+              </div>
               <h1 className="center">No hay productos disponibles a mostrar</h1>
-            </React.Fragment>
+          </React.Fragment>
         ); 
     }
   }

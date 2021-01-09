@@ -1,17 +1,17 @@
 import React, { Component } from "react";
-import Header from "./Header";
-import Ordenfabricacion from "./Ordenfabricacion";
-import Menu from "./Menu";
+import Header from './Header';
+import Menu from './Menu';
+import Bitacora from './Bitacora';
 
-export default class Lordenfab extends Component {
+export default class Lbitacora extends Component {
   render() {
     return (
       <React.Fragment>
         <Header />
         <div className="grid-main">
-          <Menu />
+          <Menu/>
           <div className="container-gn">
-            <Ordenfabricacion />
+            <Bitacora/>
           </div>
         </div>
       </React.Fragment>

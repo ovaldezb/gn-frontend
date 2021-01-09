@@ -5,34 +5,32 @@ import Principal from "./component/Principal";
 import Register from "./component/Register";
 import Footer from "./component/Footer";
 import Materiaprima from './component/Materiaprima';
-import Productoterminado from './component/Productoterminado'
-import Usuarios from "./component/Usuarios";
 import Testpag from './component/Testpag';
-import Bitacora from "./component/Bitacora";
-import Proddisponible from './component/Proddisponible';
 import Lordenfab from "./component/Lordenfab";
+import Lprodterm from "./component/Lprodterm";
+import Lproddisp from './component/Lproddisp';
+import Lbitacora from "./component/Lbitacora";
+import Lusuarios from './component/Lusuarios';
 
 class Router extends Component {
 
   render() {
-    
     return (
       <BrowserRouter>
-        {/**Poner el header */}
         <Switch>
           <Route exact path="/" component={Login} />
           <Route exact path="/principal" component={Principal} />
           <Route exact path="/materiaprima/:id" component={Materiaprima} />
-          <Route exact path="/prodterminado" component={Productoterminado} />
+          <Route exact path="/prodterminado" component={Lprodterm} />
           <Route exact path="/login" component={Login} />
           <Route exact path="/signup" component={Register} />
-          <Route exact path="/usuarios" component={Usuarios} />
+          <Route exact path="/usuarios" component={Lusuarios} />
           <Route exact path="/pag" component={Testpag} />
-          <Route exact path="/bitacora" component={Bitacora} />
+          <Route exact path="/bitacora" component={Lbitacora} />
           <Route exact path="/ordenfabricacion" component={Lordenfab} />
-          <Route exact path="/proddispon" component={Proddisponible} />
+          <Route exact path="/proddispon" component={Lproddisp} />
         </Switch>
-        <div className="row"></div>
+        
         <div className="clearfix"></div>
         <Footer />
       </BrowserRouter>

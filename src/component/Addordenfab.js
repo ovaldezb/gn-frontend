@@ -1,17 +1,13 @@
 import Axios from "axios";
 import React, { Component } from "react";
-import DayPickerInput from "react-day-picker/DayPickerInput";
 import "react-day-picker/lib/style.css";
-import MomentLocaleUtils, {
-    formatDate,
-    parseDate,
-  } from "react-day-picker/moment";
 import swal from "sweetalert";
 import Global from "../Global";
 import authHeader from "../services/auth-header";
 import SimpleReactValidator from 'simple-react-validator';
 import NumberFormat from 'react-number-format';
 import Moment from 'moment';
+import TextField from '@material-ui/core/TextField';
 
 export default class Addordenfab extends Component {
   ocRef = React.createRef();
@@ -321,31 +317,20 @@ export default class Addordenfab extends Component {
               </div>
               
               <div className="form-control grid">  
-                <DayPickerInput 
-                  name="fechaFab" 
-                    formatDate={formatDate} 
-                    parseDate={parseDate} 
-                    format="l"
-                    placeholder="Fecha de Fabricación" 
-                    dayPickerProps={{
-                        locale: "es",
-                        localeUtils: MomentLocaleUtils,
-                      }}
-                    onDayChange={day =>{this.selectDayFab(day)}}
-                    />
-                    
-                    <DayPickerInput 
-                    name="fechaEnt" 
-                    formatDate={formatDate} 
-                    parseDate={parseDate} 
-                    format="l"
-                    placeholder="Fecha de Entrega" 
-                    dayPickerProps={{
-                      locale: "es",
-                      localeUtils: MomentLocaleUtils,
-                    }}
-                    onDayChange={day =>{this.selectDayEnt(day)}}
-                     />  
+              <TextField id="fechaFab" 
+                  label="Fecha Fabricación"
+                  type="date"
+                  value={new Date()}
+                  onChange={value => this.selectDayFab(value)}
+                  InputLabelProps={{shrink: true}}
+                />
+                <TextField id="fechaFab" 
+                  label="Fecha Entrega"
+                  type="date"
+                  value={new Date()}
+                  onChange={value => this.selectDayEnt(value)}
+                  InputLabelProps={{shrink: true}}
+                />    
               </div>
               <div className="form-control">
                 <textarea placeholder="Observaciones" ref={this.obsRef}></textarea>

@@ -1,10 +1,13 @@
 import React, { Component } from "react";
 import SimpleReactValidator from "simple-react-validator";
 //import { Link } from "react-router-dom";
+import logo from "../assets/images/logo.png";
 import { Redirect } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import AuthService from "../services/auth.service";
 import swal from "sweetalert";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {faUser,faKey} from "@fortawesome/free-solid-svg-icons";
 
 class Login extends Component {
   usernameRef = React.createRef();
@@ -42,7 +45,6 @@ class Login extends Component {
     if (this.validator.allValid()) {
       AuthService.login(this.state.username, this.state.password)
         .then((res) => {
-          console.log(res);
             if(res!== 'error'){
               this.setState({
                 status: "success"
@@ -72,31 +74,32 @@ class Login extends Component {
     }
     return (
       <React.Fragment>
-        <div className="container d-flex justify-content-center">
-          <div className="col-md-6">
-            <div className="card card-content align-items-center">
-              <form onSubmit={this.onSubmit}>
-                <div className="form-group">
-                  <label htmlFor="username">Usuario</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    name="username"
-                    ref={this.usernameRef}
-                    onChange={this.onChangeUserName}
-                  />
-                  {this.validator.message(
-                    "username",
-                    this.state.username,
-                    "required"
-                  )}
+        <header>
+          <nav className="navbar-expand-lg nav-bg bg-light">
+            <img src={logo} alt="Grupo Nordan" height="70" />
+            <div className="collapse navbar-collapse" id="navbarSupportedContent">
+            
+            </div>
+            <form className="form-inline my-2 my-lg-0">
+            <div>Grupo Nordan</div>
+            </form>
+          </nav>
+        </header>
+        <div className="contenedor">
+          <h1 className="titulo">Sistema de Seguimiento de Materia Prima</h1>
+              <form onSubmit={this.onSubmit} className="formulario">
+                <h2 className="titulo">Ingrese</h2>
+                <div className="input-contenedor">
+                  <FontAwesomeIcon icon={faUser} className="icon"/>
+                  <input type="text" placeholder="Usuario" name="username"  ref={this.usernameRef}    onChange={this.onChangeUserName}/>
+                  {this.validator.message("username",this.state.username,"required")}
                 </div>
-                <div className="form-group">
-                  <label htmlFor="password">Password</label>
+                <div className="input-contenedor">
+                <FontAwesomeIcon icon={faKey} className="icon"/>
                   <input
                     type="password"
                     name="password"
-                    className="form-control"
+                    placeholder="Password"
                     ref={this.passwordRef}
                     onChange={this.onChangePassword}
                   />
@@ -106,11 +109,10 @@ class Login extends Component {
                     "required"
                   )}
                 </div>
-                <input type="submit" value="Enviar" className="btn-success" />
+                <input type="submit" value="Enviar" className="button" />
               </form>
             </div>
-          </div>
-        </div>
+        
       </React.Fragment>
     );
   }

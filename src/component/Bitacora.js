@@ -1,7 +1,6 @@
 import Axios from "axios";
 import React, { Component } from "react";
 import Global from "../Global";
-import Header from "./Header";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
@@ -89,11 +88,10 @@ export default class Bitacora extends Component {
             );
         });
     return (
-      <div>
-        <Header />
+      <React.Fragment>
         <div className="container">
           <div className="barnav">
-            <div className="flex-gn">
+            <div className="container-gn flex-gn">
               <ul>
                 <li>
                   <label className="label">Filtro:</label>
@@ -114,28 +112,35 @@ export default class Bitacora extends Component {
             </div>
           </div>
           <table className="table table-bordered" style={width}>
-                <thead className="thead-dark">
-                    <tr>
-                        <th style={head1}>#</th>
-                        <th style={head2}>Usuario</th>
-                        <th style={head3}>Tipo Evento</th>
-                        <th style={head4}>Fecha Evento</th>
-                    </tr>
-                </thead>
-            </table>
+            <col width="5%"/>
+            <col width="25%"/>
+            <col width="35%"/>
+            <col width="35%"/>
+            <thead className="thead-dark">
+                <tr>
+                    <th style={head1}>#</th>
+                    <th style={head2}>Usuario</th>
+                    <th style={head3}>Tipo Evento</th>
+                    <th style={head4}>Fecha Evento</th>
+                </tr>
+            </thead>
+          </table>
             <div className="table-ovfl tbl-lesshead">
                 <table className="table table-bordered" id="bitacora">
-                    <tbody>{rows}</tbody>
+                  <col width="5%"/>
+                  <col width="25%"/>
+                  <col width="35%"/>
+                  <col width="35%"/>
+                  <tbody>{rows}</tbody>
                 </table>
             </div>
             <Paginacion items={this.state.lstBitac} onChangePage={this.onChangePage}/>
         </div>
-      </div>
+      </React.Fragment>
     );
     }else{
         return (
             <React.Fragment>
-                <Header/>
                 <div className="container">
                     <h2 className="center">No hay bitacoras a mostrar</h2>
                 </div>

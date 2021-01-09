@@ -1,9 +1,8 @@
 import React, { Component } from "react";
 import Header from "./Header";
-import Ordenfabricacion from "./Ordenfabricacion";
 import Menu from "./Menu";
-
-export default class Lordenfab extends Component {
+import Usuarios from "./Usuarios";
+export default class Lusuarios extends Component {
   render() {
     return (
       <React.Fragment>
@@ -11,7 +10,7 @@ export default class Lordenfab extends Component {
         <div className="grid-main">
           <Menu />
           <div className="container-gn">
-            <Ordenfabricacion />
+            <Usuarios />
           </div>
         </div>
       </React.Fragment>

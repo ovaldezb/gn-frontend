@@ -1,9 +1,9 @@
 import React, { Component } from "react";
-import Header from "./Header";
-import Ordenfabricacion from "./Ordenfabricacion";
-import Menu from "./Menu";
+import Productoterminado from './Productoterminado';
+import Menu from './Menu';
+import Header from './Header';
 
-export default class Lordenfab extends Component {
+export default class Lprodterm extends Component {
   render() {
     return (
       <React.Fragment>
@@ -11,7 +11,7 @@ export default class Lordenfab extends Component {
         <div className="grid-main">
           <Menu />
           <div className="container-gn">
-            <Ordenfabricacion />
+            <Productoterminado />
           </div>
         </div>
       </React.Fragment>

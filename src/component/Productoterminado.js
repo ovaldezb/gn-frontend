@@ -1,6 +1,4 @@
 import React, { Component } from 'react'
-import Header from './Header'
-//import AuthService from "../services/auth.service";
 import Paginacion from './Paginacion';
 import authHeader from "../services/auth-header";
 import Axios from 'axios';
@@ -83,7 +81,6 @@ export default class Productoterminado extends Component {
       if(this.state.lstPdrTerm.length > 0 ){
         return(
           <React.Fragment>
-            <Header/>
             <div className="container">
               <div className="barnav">
                 <div className="container flex-gn">
@@ -170,7 +167,6 @@ export default class Productoterminado extends Component {
         return (
             <React.Fragment>
                 <div className="container-gn">
-                  <Header />
                   <h2 className="center">No hay producto terminado para mostrar</h2>
                 </div>
             </React.Fragment>
