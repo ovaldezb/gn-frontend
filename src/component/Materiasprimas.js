@@ -86,24 +86,14 @@ export default class Materiasprimas extends Component {
     });
   };
 
-  filter = () => {
+  filtrado = () =>{
     var filter = this.filterRef.current.value;
-    var td, found, i, j;
-    var tabla = document.getElementById("materiaprima");
-    for (i = 0; i < tabla.rows.length; i++) {
-      td = tabla.rows[i].cells;
-      for (j = 0; j < td.length; j++) {
-        if (td[j].innerHTML.toUpperCase().indexOf(filter.toUpperCase()) > -1) {
-          found = true;
-        }
-      }
-      if (found) {
-        tabla.rows[i].style.display = "";
-        found = false;
-      } else {
-        tabla.rows[i].style.display = "none";
-      }
-    }
+    var nvoArray = this.state.lstMatPrim.filter(element =>{
+      return Object.values(element).filter(item=>{ return String(item).includes(filter)}).length > 0 
+    });
+    this.setState({
+      pageOfItems:nvoArray
+    });
   }
 
   addMp = () => {
@@ -117,7 +107,7 @@ export default class Materiasprimas extends Component {
   updateMp = () =>{
     let i = ((this.state.page-1)*10)+ this.state.idSelMp
       this.setState({
-        matprima:this.state.lstMatPrim[i]
+        matprima:this.state.pageOfItems[i]
       });
       this.displayAdd = true;
       this.isAdd = false;
@@ -244,9 +234,10 @@ export default class Materiasprimas extends Component {
                   <ul>
                     <li>Filtro:</li>
                     <li>
-                      <input className="input" type="text" name="filtro" ref={this.filterRef} onKeyUp={this.filter}/>
+                      <input className="input" type="text" name="filtro" ref={this.filterRef} onKeyUp={this.filtrado}/>
                     </li>
                   </ul>
+                  <h2>Materia Prima</h2>
                   <nav>
                     <ul>
                       <li>
@@ -292,7 +283,7 @@ export default class Materiasprimas extends Component {
                 </thead>
               </table>
               <div className="table-ovfl tbl-lesshead">
-                <table className="table table-bordered header-font" id="materiaprima">
+                <table className="table table-bordered table-hover header-font" id="materiaprima">
                   <col width="5%"/>
                   <col width="24%"/>
                   <col width="8%"/>

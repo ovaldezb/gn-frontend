@@ -10,8 +10,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faPlusSquare, faEdit,  faTrash,} from "@fortawesome/free-solid-svg-icons";
 import Paginacion from './Paginacion';
 import Addproddisp from './Addproddisp'
-import Header from './Header';
-import Menu from './Menu';
 
 export default class Proddisponible extends Component {
   displayAdd = false;
@@ -67,7 +65,7 @@ export default class Proddisponible extends Component {
 
   updatePd = () =>{
     this.setState({
-      proddisp:this.state.lstPrdDisp[this.state.idSelPd]
+      proddisp:this.state.pageOfItems[this.state.idSelPd]
     });
     this.displayAdd = true;
     this.isAdd = false;
@@ -127,25 +125,16 @@ export default class Proddisponible extends Component {
       });
   }
 
-  filter = () => {
+  filtrado = () =>{
     var filter = this.filterRef.current.value;
-    var td, found, i, j;
-    var tabla = document.getElementById("productodisponible");
-    for (i = 0; i < tabla.rows.length; i++) {
-      td = tabla.rows[i].cells;
-      for (j = 0; j < td.length; j++) {
-        if (td[j].innerHTML.toUpperCase().indexOf(filter.toUpperCase()) > -1) {
-          found = true;
-        }
-      }
-      if (found) {
-        tabla.rows[i].style.display = "";
-        found = false;
-      } else {
-        tabla.rows[i].style.display = "none";
-      }
-    }
+    var nvoArray = this.state.lstPrdDisp.filter(element =>{
+      return Object.values(element).filter(item=>{ return String(item).includes(filter)}).length > 0 
+    });
+    this.setState({
+      pageOfItems:nvoArray
+    });
   }
+
 
   selectRow = (i) => {
     this.setState({
@@ -176,45 +165,40 @@ export default class Proddisponible extends Component {
         });
         return(
             <React.Fragment>
-                {this.displayAdd && 
-                    <React.Fragment>
-                        <Header/>
-                    <div className="container">
-                    <Addproddisp cancelar={this.cancelarAdd} proddisp={this.state.proddisp} tipo={this.isAdd}/>
-                    </div>
-                    </React.Fragment>
+                {this.displayAdd &&   
+                  <Addproddisp cancelar={this.cancelarAdd} proddisp={this.state.proddisp} tipo={this.isAdd}/>  
                 }
                 {!this.displayAdd && 
                   <React.Fragment>
-                      <div className="container">
                         <div className="barnav">
                           <div className="container flex-gn">
                             <ul>
                               <li>Filtro:</li>
-                              <li><input className="input" type="text" name="filtro" ref={this.filterRef} onKeyUp={this.filter}/></li>
+                              <li><input className="input" type="text" name="filtro" ref={this.filterRef} onKeyUp={this.filtrado}/></li>
                             </ul>
-                          <nav>
-                            <ul>
-                              <li>
-                                <Link to="#" onClick={this.addPd}>
-                                  <FontAwesomeIcon icon={faPlusSquare} />
-                                </Link>
-                              </li>
-                              <li>
-                                <Link to="#" onClick={this.updatePd}>
-                                  <FontAwesomeIcon icon={faEdit} />
-                                </Link>
-                              </li>
-                              <li>
-                                <Link to="#" onClick={this.deletePd} >
-                                  <FontAwesomeIcon icon={faTrash} />
-                                </Link>
-                              </li>
-                            </ul>
-                          </nav>
+                            <h2>Producto Disponible</h2>
+                            <nav>
+                              <ul>
+                                <li>
+                                  <Link to="#" onClick={this.addPd}>
+                                    <FontAwesomeIcon icon={faPlusSquare} />
+                                  </Link>
+                                </li>
+                                <li>
+                                  <Link to="#" onClick={this.updatePd}>
+                                    <FontAwesomeIcon icon={faEdit} />
+                                  </Link>
+                                </li>
+                                <li>
+                                  <Link to="#" onClick={this.deletePd} >
+                                    <FontAwesomeIcon icon={faTrash} />
+                                  </Link>
+                                </li>
+                              </ul>
+                            </nav>
+                          </div>
                         </div>
-                        </div>
-                        <table className="table table-bordered">
+                          <table className="table table-bordered">
                           <thead className="thead-light">
                             <tr>
                                 <th scope="col" style={this.col1}>#</th>
@@ -231,7 +215,7 @@ export default class Proddisponible extends Component {
                         <div className="center">
                           <Paginacion items={this.state.lstPrdDisp} onChangePage={this.onChangePage} />
                         </div>
-                      </div>
+                      
                 </React.Fragment>
                 }
             </React.Fragment>

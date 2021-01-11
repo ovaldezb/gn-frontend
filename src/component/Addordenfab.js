@@ -1,13 +1,13 @@
 import Axios from "axios";
 import React, { Component } from "react";
-import "react-day-picker/lib/style.css";
+//import "react-day-picker/lib/style.css";
 import swal from "sweetalert";
 import Global from "../Global";
 import authHeader from "../services/auth-header";
 import SimpleReactValidator from 'simple-react-validator';
 import NumberFormat from 'react-number-format';
 import Moment from 'moment';
-import TextField from '@material-ui/core/TextField';
+import {TextField} from '@material-ui/core';
 
 export default class Addordenfab extends Component {
   ocRef = React.createRef();
@@ -324,7 +324,7 @@ export default class Addordenfab extends Component {
                   onChange={value => this.selectDayFab(value)}
                   InputLabelProps={{shrink: true}}
                 />
-                <TextField id="fechaFab" 
+                <TextField id="fechaEnt" 
                   label="Fecha Entrega"
                   type="date"
                   value={new Date()}

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import "react-day-picker/lib/style.css";
+//import "react-day-picker/lib/style.css";
 import "moment/locale/es-mx";
 import Moment from 'moment';
 import SimpleReactValidator from 'simple-react-validator'
@@ -8,12 +8,13 @@ import Global from "../Global";
 import swal from "sweetalert";
 import authHeader from "../services/auth-header";
 import Bitacora from '../services/bitacora-service';
-import TextField from '@material-ui/core/TextField';
+import {TextField} from '@material-ui/core';
 
 
 export default class Addmatprima extends Component {
   idMatPrima = '';
   fechaEntrada = '';
+  fechaCaducidad = '';
   btnName = 'Enviar';
   fechaCaducidad = '';
   descripcionRef = React.createRef();
@@ -40,21 +41,27 @@ export default class Addmatprima extends Component {
         abundante:''
     }
   };
-
-  constructor(){
-    super();
-    this.validator = new SimpleReactValidator({
-        messages:{
-            required:'requerido'
-        }
-    });
-    
-  }
+  validator = new SimpleReactValidator({
+    messages:{
+        required:'requerido'
+    }
+});
+  
 
   componentDidMount(){
-    this.setState({
-      materiaPrima:{}
-    });
+    if(!this.props.tipo){
+      this.btnName = "Actualizar";
+      this.idMatPrima = this.props.matprima.id;
+      this.fechaEntrada = this.props.matprima.fechaEntrada;
+      this.fechaCaducidad = this.props.matprima.fechaCaducidad;
+      this.setState({
+        materiaPrima: this.props.matprima
+      });
+      let tipo = document.getElementById("tipo");
+      tipo.value = this.props.matprima.tipo;
+    } 
+    
+    
       Axios.get(Global.url+'utils/unidad',{ headers: authHeader() })
       .then(
           res =>{
@@ -63,66 +70,15 @@ export default class Addmatprima extends Component {
               });
           }
       );
-
-      this.setState({
-          materiaPrima:{
-              escaso:this.props.matprima.escaso,
-              necesario:this.props.matprima.necesario
-          }
-      });
-
-      if(!this.props.tipo){
-        this.btnName = "Actualizar";
-        this.idMatPrima = this.props.matprima.id;
-        this.setState({
-          materiaPrima: this.props.matprima
-        });
-        let tipo = document.getElementById("tipo");
-        tipo.value = this.props.matprima.tipo;
-      } 
+      
   }
 
-  selectDayEnt = (day) => {
-      Moment.locale('es-mx');
-      var materiaprima ={
-        descripcion:this.descripcionRef.current.value,
-        cantidad: this.cantidadRef.current.value,
-        unidad:this.state.unidades[this.unidadRef.current.value] ,
-        codigo:this.claveRef.current.value,
-        proveedor:this.proveedorRef.current.value,
-        fechaEntrada:Moment(day).format('MM-DD-yyyy h:mm:ss'),
-        fechaCaducidad:this.state.materiaPrima.fechaCaducidad,
-        observaciones:this.observacionesRef.current.value,
-        lote:this.loteRef.current.value,
-        necesario:this.necesarioRef.current.value,
-        escaso:this.escasoRef.current.value,
-        tipo:this.tipoRef.current.value
-    }
-    this.setState({
-      materiaPrima:materiaprima
-    });
+  selectDayEnt = (event) => {
+    this.fechaEntrada = Moment(event.target.value).format('MM-DD-yyyy h:mm:ss');
   };
 
-  selectDayCad = (day) => {
-    Moment.locale('es-mx');
-    var materiaprima ={
-        descripcion:this.descripcionRef.current.value,
-        cantidad: this.cantidadRef.current.value,
-        unidad:this.state.unidades[this.unidadRef.current.value] ,
-        codigo:this.claveRef.current.value,
-        proveedor:this.proveedorRef.current.value,
-        fechaEntrada:this.state.materiaPrima.fechaEntrada,
-        fechaCaducidad:Moment(day).format('MM-DD-yyyy h:mm:ss'),
-        observaciones:this.observacionesRef.current.value,
-        lote:this.loteRef.current.value,
-        necesario:this.necesarioRef.current.value,
-        escaso:this.escasoRef.current.value,
-        tipo:this.tipoRef.current.value
-    }
-    this.setState({
-      materiaPrima:materiaprima
-    });
-    
+  selectDayCad = (event) => {
+    this.fechaCaducidad = Moment(event.target.value).format('MM-DD-yyyy h:mm:ss')
 };
 
  
@@ -158,6 +114,9 @@ export default class Addmatprima extends Component {
 
   agregarMateriaPrima = () =>{
     if(this.validator.allValid()){
+      var matprimenv = this.state.materiaPrima;
+      matprimenv.fechaEntrada = this.fechaEntrada;
+      matprimenv.fechaCaducidad = this.fechaCaducidad;
       if(this.props.tipo){
         Axios.post(Global.url+'matprima',this.state.materiaPrima,{ headers: authHeader() })
             .then(res => {
@@ -196,9 +155,8 @@ export default class Addmatprima extends Component {
  
   render() {
       const matprima = this.state.materiaPrima;
-      const fechaEntrada = matprima.fechaEntrada ? Moment(matprima.fechaEntrada,'DD-MM-YYYY').format('YYYY-MM-DD') : '';
-      const fechaCaducidad = matprima.fechaCaducidad ? Moment(matprima.fechaCaducidad,'DD-MM-YYYY').format('YYYY-MM-DD') : '';
-      
+      const fechaEntrada = matprima.fechaEntrada ? Moment(matprima.fechaEntrada,'MM-DD-YYYY').format('YYYY-MM-DD') : '';
+      const fechaCaducidad = matprima.fechaCaducidad ? Moment(matprima.fechaCaducidad,'MM-DD-YYYY').format('YYYY-MM-DD') : '';
       if(this.state.unidades.length > 0){
           var optnLst = this.state.unidades.map((unidad,i)=>{
               return <option key={i} value={i}>{unidad.unidadMedida}</option>
@@ -241,25 +199,56 @@ export default class Addmatprima extends Component {
           <div>
             <div className="showcase-form card">
               <div className="form-control grid">
-                <TextField id="fechaEnt" 
-                  label="Fecha Entrada"
+                {matprima.fechaEntrada  && 
+                <TextField
+                  id="fechaEnt"
+                  label="Fecha de Entrada"
                   type="date"
-                  value={fechaEntrada}
-                  onChange={value => this.selectDayEnt(value)}
-                  InputLabelProps={{shrink: true}}
-                />
-                
-                  <TextField
-                  id="fechaCad"
-                  label="Fecha Caducidad"
-                  type="date"
-                  defaultValue={fechaCaducidad}
-                  value={fechaCaducidad}
-                  onChange={value => this.selectDayCad(value)}
+                  defaultValue={fechaEntrada}
+                  onChange={event =>{this.selectDayEnt(event)}}
                   InputLabelProps={{
                     shrink: true,
                   }}
+                  
                 />
+              }
+              {!matprima.fechaEntrada  && 
+                <TextField
+                  id="fechaEnt"
+                  label="Fecha de Entrada"
+                  type="date"                  
+                  onChange={event =>{this.selectDayEnt(event)}}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  
+                />
+              }
+              {matprima.fechaCaducidad &&
+              <TextField
+                id="date"
+                label="Fecha de Caducidad"
+                type="date"
+                defaultValue={fechaCaducidad}
+                onChange={event =>{this.selectDayCad(event)}}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                
+              />
+              }
+              {!matprima.fechaCaducidad &&
+              <TextField
+                id="date"
+                label="Fecha de Caducidad"
+                type="date"                
+                onChange={event =>{this.selectDayCad(event)}}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                
+              />
+              }
               </div>
               <div className="form-control grid">
                   <legend>Tipo de MP:</legend>
@@ -292,8 +281,8 @@ export default class Addmatprima extends Component {
               </div>
             </div>
           </div>
-          <input type="submit" value={this.btnName} className="btn btn-primary" onClick={this.agregarMateriaPrima}/>
-          <input type="submit" value="Cancelar" className="btn btn-primary" onClick={this.cancelarMp}/>
+          <input type="submit" value={this.btnName} className="btn btn-success" onClick={this.agregarMateriaPrima}/>
+          <input type="submit" value="Cancelar" className="btn btn-danger" onClick={this.cancelarMp}/>
         </div>
 
       </form>

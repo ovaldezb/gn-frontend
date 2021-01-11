@@ -35,25 +35,15 @@ export default class Bitacora extends Component {
       });
   }
 
-  filter = () => {
+  filtrado = () =>{
     var filter = this.filterRef.current.value;
-    var td, found, i, j;
-    var tabla = document.getElementById("bitacora");
-    for (i = 0; i < tabla.rows.length; i++) {
-      td = tabla.rows[i].cells;
-      for (j = 0; j < td.length; j++) {
-        if (td[j].innerHTML.toUpperCase().indexOf(filter.toUpperCase()) > -1) {
-          found = true;
-        }
-      }
-      if (found) {
-        tabla.rows[i].style.display = "";
-        found = false;
-      } else {
-        tabla.rows[i].style.display = "none";
-      }
-    }
-  };
+    var nvoArray = this.state.lstBitac.filter(element =>{
+      return String(element.user.nombre).includes(filter) || String(element.user.apellido).includes(filter) || String(element.tipoEvento.desc).includes(filter) 
+    });
+    this.setState({
+      pageOfItems:nvoArray
+    });
+  }
 
   onChangePage = (pageOfItems,page) => {
     // update state with new page of items
@@ -97,9 +87,10 @@ export default class Bitacora extends Component {
                   <label className="label">Filtro:</label>
                 </li>
                 <li>
-                  <input name="filtro" className="input" ref={this.filterRef} onKeyUp={this.filter}/>
+                  <input name="filtro" className="input" ref={this.filterRef} onKeyUp={this.filtrado}/>
                 </li>
               </ul>
+              <h2>Bitácora</h2>
               <nav>
                 <ul>
                   <li>

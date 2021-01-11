@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import Header from './Header';
 import Menu from './Menu';
-import Ordenfabricacion from './Ordenfabricacion';
+import ProductoDisponible from './Proddisponible'
 
 export default class Lproddisp extends Component {
   render() {
@@ -11,7 +11,7 @@ export default class Lproddisp extends Component {
         <div className="grid-main">
           <Menu />
           <div className="container-gn">
-            <Ordenfabricacion />
+            <ProductoDisponible />
           </div>
         </div>
       </React.Fragment>

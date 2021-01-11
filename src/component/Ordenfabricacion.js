@@ -89,25 +89,14 @@ export default class Ordenfabricacion extends Component {
 
   }
 
-  filter = () => {
+  filtrado = () =>{
     var filter = this.filterRef.current.value;
-    var td, found, i, j;
-    var tabla = document.getElementById("ordenFabricacion");
-
-    for (i = 0; i < tabla.rows.length; i++) {
-      td = tabla.rows[i].cells;
-      for (j = 0; j < td.length; j++) {
-        if (td[j].innerHTML.toUpperCase().indexOf(filter.toUpperCase()) > -1) {
-          found = true;
-        }
-      }
-      if (found) {
-        tabla.rows[i].style.display = "";
-        found = false;
-      } else {
-        tabla.rows[i].style.display = "none";
-      }
-    }
+    var nvoArray = this.state.lstOF.filter(element =>{
+      return Object.values(element).filter(item=>{ return String(item).includes(filter)}).length > 0 
+    });
+    this.setState({
+      pageOfItems:nvoArray
+    });
   }
 
   selectRow = (i) => {
@@ -161,10 +150,9 @@ export default class Ordenfabricacion extends Component {
                 <div className="container flex-gn">
                   <ul>
                     <li>Filtro:</li>
-                    <li>
-                      <input className="input"  type="text"  name="filtro" ref={this.filterRef} onKeyUp={this.filter}/>
-                    </li>
+                    <li><input className="input"  type="text"  name="filtro" ref={this.filterRef} onKeyUp={this.filtrado}/></li>
                   </ul>
+                  <h2>Orden de Fabricación</h2>
                   <nav>
                     <ul>
                       <li>

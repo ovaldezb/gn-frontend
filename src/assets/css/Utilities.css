@@ -80,6 +80,15 @@
   height: 100%;
 }
 
+.grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
 .grid-5 {
   display: grid;
   grid-template-columns: repeat(5, 1fr);

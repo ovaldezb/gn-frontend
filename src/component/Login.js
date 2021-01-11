@@ -80,9 +80,6 @@ class Login extends Component {
             <div className="collapse navbar-collapse" id="navbarSupportedContent">
             
             </div>
-            <form className="form-inline my-2 my-lg-0">
-            <div>Grupo Nordan</div>
-            </form>
           </nav>
         </header>
         <div className="contenedor">
@@ -95,19 +92,9 @@ class Login extends Component {
                   {this.validator.message("username",this.state.username,"required")}
                 </div>
                 <div className="input-contenedor">
-                <FontAwesomeIcon icon={faKey} className="icon"/>
-                  <input
-                    type="password"
-                    name="password"
-                    placeholder="Password"
-                    ref={this.passwordRef}
-                    onChange={this.onChangePassword}
-                  />
-                  {this.validator.message(
-                    "passqord",
-                    this.state.password,
-                    "required"
-                  )}
+                  <FontAwesomeIcon icon={faKey} className="icon"/>
+                  <input type="password" name="password" placeholder="Password" ref={this.passwordRef} onChange={this.onChangePassword} />
+                  {this.validator.message("password",this.state.password,"required")}
                 </div>
                 <input type="submit" value="Enviar" className="button" />
               </form>

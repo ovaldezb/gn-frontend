@@ -165,32 +165,35 @@ background-color: #f50707;
 }
 
 .formulario{
-  
   margin-top: 150px;
   padding: 3px;
-  width: 45%;
-  margin-left: 400px;
+  width: 30%;
+  margin-left: 455px;
   opacity: 1;
 }
 
 .titulo{
   text-align: center;
-  color: #060411;
+  color: #1255e7;
 }
 
 .formulario input[type="text"],
 .formulario input[type="password"] {
   font-size: 20px;
-  width: 92%;
+  width: 80%;
   padding: 10px;
   border: none;
 }
 
 .input-contenedor{
+  display: block;
   margin-bottom: 15px;
-  border: 1px solid #aaa;
+  border: 1px solid rgb(12, 164, 235);
   background: white;
+  width: 100%;
 }
+
+
 
 .icon{
   min-width: 50px;
@@ -214,8 +217,8 @@ background-color: #f50707;
 
 .formulario input[type="text"]:focus,
 .formulario input[type="password"]:focus{
-  border: lightblue;
-  background: rgb(230, 225, 226);
+  border: rgb(235, 128, 7) !important;
+  background: rgb(121, 245, 239);
 }
 
 /* Menu */
@@ -253,9 +256,23 @@ background-color: #f50707;
   text-decoration: none;
   color: #ddd;
   width: 100%;
+  transition: .4s;
+  -o-transition: .5s;
+  -webkit-transition:  .5s linear;
 }
 
 .menu a:hover{
   text-decoration: none;
   color: rgb(139, 250, 102);
+  margin-left: 1em;
+}
+
+.icon-menu{
+  margin-right: 10px;
+}
+
+.info-user{
+  color: #1255e7;
+  font-size: 18px;
+  font-weight: 600;
 }

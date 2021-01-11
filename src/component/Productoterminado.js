@@ -62,7 +62,16 @@ export default class Productoterminado extends Component {
         swal.close();
       }
     );
-    
+  }
+
+  filtrado = () =>{
+    var filter = this.filterRef.current.value;
+    var nvoArray = this.state.lstPdrTerm.filter(element =>{
+      return Object.values(element).filter(item=>{ return String(item).includes(filter)}).length > 0 
+    });
+    this.setState({
+      pageOfItems:nvoArray
+    });
   }
 
   selectRow = (i) => {
@@ -87,9 +96,10 @@ export default class Productoterminado extends Component {
                   <ul>
                     <li>Filtro:</li>
                     <li>
-                      <input className="input"  type="text"  name="filtro" ref={this.filterRef} onKeyUp={this.filter}/>
+                      <input className="input"  type="text"  name="filtro" ref={this.filterRef} onKeyUp={this.filtrado}/>
                     </li>
                   </ul>
+                  <h2>Producto Terminado</h2>
                   <nav>
                     <ul>
                       <li>

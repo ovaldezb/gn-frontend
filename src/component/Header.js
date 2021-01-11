@@ -1,14 +1,16 @@
-import React, { Component } from "react";
+import React, { Component} from "react";
 import { NavLink, Link, Redirect } from "react-router-dom";
 import logo from "../assets/images/logo.png";
 import AuthService from "../services/auth.service";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCoffee } from "@fortawesome/free-solid-svg-icons";
-
+import { faUser, faDoorOpen,faSitemap } from "@fortawesome/free-solid-svg-icons";
+import Clock from 'react-live-clock';
 //import { library } from '@fortawesome/fontawesome-svg-core';
 //import { faStroopwafel } from '@fortawesome/free-solid-svg-icons';
 
 export default class Header extends Component {
+
+
   state = {
     currentUser: AuthService.getCurrentUser(),
   };
@@ -21,6 +23,8 @@ export default class Header extends Component {
     this.forceUpdate();
   };
 
+
+
   render() {
     const currentUser = this.state.currentUser;
     if(currentUser){
@@ -29,50 +33,28 @@ export default class Header extends Component {
           <nav className="navbar navbar-expand-lg nav-bg">
             <Link to="/#" className="navbar-brand"><img src={logo} alt="Grupo Nordan" height="80" /></Link>
               <div className="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul className="navbar-nav mr-auto">
-                  <li className="nav-item">
-                    <NavLink className="nav-link" activeClassName="active" to={"/principal"}>
-                      MP
-                    </NavLink>
-                  </li>
-                  <li className="nav-item">
-                    <NavLink className="nav-link" to={"/proddispon"}>
-                      PD
-                    </NavLink>
-                  </li>
-                  <li className="nav-item">
-                    <NavLink className="nav-link" to={"/ordenfabricacion"}>
-                      OF
-                    </NavLink>
-                  </li>
-                  <li className="nav-item">
-                    <NavLink className="nav-link" to={"/prodterminado"}>
-                      PT
-                    </NavLink>
-                  </li>
-                  <li className="nav-item">
-                    <NavLink className="nav-link" to={"/bitacora"}>
-                      Bitácora
-                    </NavLink>
-                  </li>
-                  <li className="nav-item">
-                    <NavLink className="nav-link" to={"/usuarios"}>
-                      Usuarios
-                    </NavLink>
-                  </li>
-                  <li className="nav-item"></li>
-                </ul>
+                <div className="navbar-nav mr-auto">
+                <div className="info-user">
+                    <Clock format={'dddd DD MMMM YYYY hh:mm A'} ticking={true}  />
+                  </div>
+                </div>
 
-                <form className="form-inline my-2 my-lg-0">
-                  <NavLink to={"/profile"} className="btn btn-toolbar">
-                    <FontAwesomeIcon icon={faCoffee} />
+                <form className="grid-3">
+                  
+                  <div className="info-user">
+                  <FontAwesomeIcon icon={faSitemap} size="2x" className="icon"/>
+                    {currentUser.area}
+                  </div>
+                  <div className="info-user">
+                    <FontAwesomeIcon icon={faUser} size="2x" className="icon"/>
                     {currentUser.username}
-                  </NavLink>
-
-                  <NavLink
-                    to="/login"
+                    </div> 
+                  <NavLink to="/login"
                     className="btn btn-success"
                     onClick={this.logOut}>
+                      <span>
+                      <FontAwesomeIcon icon={faDoorOpen}className="icon-menu" />
+                    </span>
                     Salir
                   </NavLink>
                 </form>
