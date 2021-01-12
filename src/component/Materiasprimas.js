@@ -146,8 +146,8 @@ export default class Materiasprimas extends Component {
   }
 
   updateLstMp(matprima){
-    let matprimant = this.state.lstMatPrim[((this.state.page-1)*10)+ this.state.idSelMp];
-    Bitacora(Global.UPDT_MATPRIM,JSON.stringify(matprimant),JSON.stringify(matprima));
+   // let matprimant = this.state.lstMatPrim[((this.state.page-1)*10)+ this.state.idSelMp];
+    //Bitacora(Global.UPDT_MATPRIM,JSON.stringify(matprimant),JSON.stringify(matprima));
     this.isAdd = true;
     this.loadMatPrim();
   }

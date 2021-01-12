@@ -276,3 +276,20 @@ background-color: #f50707;
   font-size: 18px;
   font-weight: 600;
 }
+
+/* Bitacora */
+.preStyle {
+  display: block;
+  padding: 10px 30px;
+  margin: 0;
+  overflow: scroll;
+  width: 100% !important;
+  
+}
+
+.styleBitacora {
+  background: #1f4662;
+  color: #fff;
+  font-size: 16px;
+  width: auto;
+}

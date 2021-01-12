@@ -124,7 +124,7 @@ export default class Addmatprima extends Component {
                   swal('Se insertó correctamente el producto',this.state.materiaPrima.descripcion,'success');
                   var matprimaAdded = res.data;
                   this.props.cancelar(matprimaAdded);
-                  Bitacora(Global.ADD_MATPRIM,JSON.stringify(matprimaAdded));
+                  Bitacora(Global.ADD_MATPRIM,null,JSON.stringify(matprimaAdded));
                 }
             }).catch(err=>{
                 console.log(err);
@@ -135,6 +135,7 @@ export default class Addmatprima extends Component {
         .then(res=>{
           swal('La materia prima se actualizo correctamente',this.state.materiaPrima.descripcion,'success');
           this.props.cancelar(res.data);
+          Bitacora(Global.UPDT_MATPRIM ,JSON.stringify(this.props.matprima),JSON.stringify(res.data));
         })
         .catch(err=>{
           console.log(err);

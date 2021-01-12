@@ -18,6 +18,7 @@
     "moment-timezone": "^0.5.32",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
+    "react-json-viewer": "^2.1.0",
     "react-live-clock": "^5.0.13",
     "react-moment": "^1.0.0",
     "react-number-format": "^4.4.1",
