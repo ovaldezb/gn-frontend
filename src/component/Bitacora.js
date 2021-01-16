@@ -9,7 +9,6 @@ import Moment from 'react-moment';
 import 'moment/locale/es';
 import Paginacion from './Paginacion';
 import JSONViewer from 'react-json-viewer';
-import momento from 'moment';
 
 export default class Bitacora extends Component {
   filterRef = React.createRef();

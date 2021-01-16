@@ -267,6 +267,11 @@ background-color: #f50707;
   margin-left: 1em;
 }
 
+.menu a:active{
+    background-color: white; /*#079cc5 !important;*/
+    font-size: 20px;
+}
+
 .icon-menu{
   margin-right: 10px;
 }

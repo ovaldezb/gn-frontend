@@ -24,8 +24,7 @@ export default class Addproddisp extends Component {
     btnName = 'Enviar';
     codigoRef = React.createRef();
     descRef = React.createRef();
-    unidadRef = React.createRef();
-    cantidadRef = React.createRef();
+    porcentajeRef = React.createRef();
     nombreRef = React.createRef();
     claveRef = React.createRef();
     isBusqueda = false;
@@ -35,9 +34,8 @@ export default class Addproddisp extends Component {
     state = {
         codigo:'',
         desc:'',
-        unidad:'', 
         lstMatPrim:[],
-        cantidad:0,
+        porcentaje:'',
         idSelPd:-1,
         idSelPdBus:-1,
         lstBusqDesc:[],
@@ -97,8 +95,7 @@ export default class Addproddisp extends Component {
         .then( res =>{
             this.setState({
                 codigo:res.data.codigo,
-                desc:res.data.descripcion,
-                unidad:res.data.unidad
+                desc:res.data.descripcion
             });
         })
         .catch(err =>{
@@ -122,11 +119,10 @@ export default class Addproddisp extends Component {
         return (x.codigo === this.state.codigo)
     });
     var matprima = {
-        cantidad:this.cantidadRef.current.value,
+        porcentaje:this.porcentajeRef.current.value,
         materiaprimadisponible:{
             codigo:this.codigoRef.current.value,    
             descripcion:this.descRef.current.value,
-            unidad:this.state.unidad
         }
     }
     if(res.length > 0){
@@ -134,24 +130,16 @@ export default class Addproddisp extends Component {
         this.setState({
             codigo:'',
             desc:'',
-            unidad:{}
         });
         return;
-    }else if(this.state.cantidad === '' || Number(this.state.cantidad) === 0){
-        swal('La cantidad no puede estar vacia o ser 0','Error','error');
+    }else if(this.state.porcentaje === '' || Number(this.state.porcentaje) === 0){
+        swal('La porcentaje no puede estar vacia o ser 0','Error','error');
         return;
     }else if(!this.isUpdt){
         console.log('agregar');
         lstMpTmp = this.state.lstMatPrim;
         lstMpTmp.push(matprima);
-        /*this.setState({
-            lstMatPrim:lstMpTmp,
-            codigo:'',
-            desc:'',
-            cantidad:0,
-            idSelPd:-1,
-            unidad:{}
-        });*/
+        
     }else if(this.isUpdt){
         lstMpTmp = this.state.lstMatPrim;
         lstMpTmp[this.state.idSelPd] = matprima;
@@ -161,9 +149,8 @@ export default class Addproddisp extends Component {
         lstMatPrim:lstMpTmp,
         codigo:'',
         desc:'',
-        cantidad:0,
-        idSelPd:-1,
-        unidad:{}
+        porcentaje:0,
+        idSelPd:-1
     });
   }
 
@@ -183,8 +170,7 @@ export default class Addproddisp extends Component {
     this.setState({
         desc:this.descRef.current.value,
         codigo:this.codigoRef.current.value,
-        unidad: this.state.unidad,
-        cantidad:this.cantidadRef.current.value,
+        porcentaje:this.porcentajeRef.current.value,
         nombre:this.nombreRef.current.value,
         clave:this.claveRef.current.value
     }); 
@@ -232,7 +218,7 @@ export default class Addproddisp extends Component {
         lstMatPrim:[],
         nombre:'',
         clave:'',
-        cantidad:''
+        porcentaje:''
     });
     this.props.cancelar(null);
   }
@@ -241,8 +227,7 @@ export default class Addproddisp extends Component {
       this.setState({
           codigo:'',
           desc:'',
-          cantidad:0,
-          unidad:{}
+          porcentaje:0
       });
   }
 
@@ -262,7 +247,6 @@ export default class Addproddisp extends Component {
     this.setState({
         codigo: this.state.lstBusqDesc[i].codigo,
         desc:this.state.lstBusqDesc[i].descripcion,
-        unidad:this.state.lstBusqDesc[i].unidad,
         lstBusqDesc:[],
         idSelPdBus:-1
     });
@@ -272,8 +256,7 @@ export default class Addproddisp extends Component {
     this.setState({
         codigo:this.state.lstMatPrim[i].materiaprimadisponible.codigo,
         desc:this.state.lstMatPrim[i].materiaprimadisponible.descripcion,
-        cantidad:this.state.lstMatPrim[i].cantidad,
-        unidad:this.state.lstMatPrim[i].materiaprimadisponible.unidad
+        porcentaje:this.state.lstMatPrim[i].porcentaje
     });
     this.isUpdt = true;
   }
@@ -308,8 +291,7 @@ export default class Addproddisp extends Component {
                     <td>{i+1}</td>
                     <td>{mpdis.materiaprimadisponible.codigo}</td>
                     <td>{mpdis.materiaprimadisponible.descripcion}</td>
-                    <td>{mpdis.cantidad}</td>
-                    <td>{mpdis.materiaprimadisponible.unidad.unidadMedida}</td>
+                    <td>{mpdis.porcentaje}</td>
                 </tr>
             );
         });
@@ -317,15 +299,16 @@ export default class Addproddisp extends Component {
     
     return (
       <form onSubmit={this.onSubmit} onChange={this.onSubmit}>
+        <h6 className="center">Producto Disponible</h6>
         <div className="container-ng">
           <div className="showcase-form card">
             <div className="grid-2-1">
               <div className="form-control">
-                <input type="text" name="nombre" placeholder="Nombre Producto" ref={this.nombreRef} value={this.state.nombre}  required/>
+                <input type="text" name="nombre" placeholder="Nombre Producto" ref={this.nombreRef} defaultValue={this.state.nombre}  required/>
                 {this.validator.message('nombre',this.state.nombre,'required')}
               </div>
               <div className="form-control">
-                <input type="text" name="clave" placeholder="Clave" ref={this.claveRef} value={this.state.clave} />
+                <input type="text" name="clave" placeholder="Clave" ref={this.claveRef} defaultValue={this.state.clave} />
                 {this.validator.message('clave',this.state.clave,'required')}
               </div>
             </div>
@@ -335,23 +318,21 @@ export default class Addproddisp extends Component {
             <p></p>
             <div className="row">
               <div className="col-2">
-                <input type="text" placeholder="Codigo"  onKeyUp={this.busquedaCodigo} ref={this.codigoRef}  value={this.state.codigo}/>
+                <input type="text" placeholder="Codigo"  onKeyUp={this.busquedaCodigo} ref={this.codigoRef} defaultValue={this.state.codigo}/>
               </div>
               <div className="col-4">
-                <input type="text" placeholder="Descripcion" onKeyUp={this.busquedaDesc} ref={this.descRef} value={this.state.desc}/>
+                <input type="text" placeholder="Descripcion" onKeyUp={this.busquedaDesc} ref={this.descRef} defaultValue={this.state.desc}/>
               </div>
-              <div className="col-1">     
-                <input type="text" placeholder="Unidad" disabled ref={this.unidadRef} defaultValue={this.state.unidad.unidadMedida} />  
-              </div>
+              
               <div className="col-2">
-                <input type="number" placeholder="Cantidad" style={this.right} ref={this.cantidadRef} value={this.state.cantidad}/>
+                <input type="number" placeholder="Porcentaje" style={this.center} ref={this.porcentajeRef}  defaultValue={this.state.porcentaje}/>
               </div>
               <div className="col-1">
-              {this.state.unidad.unidadMedida &&
+              {/*this.state.unidad.unidadMedida && */}
                 <Link onClick={this.addMatPrima}>
                 <FontAwesomeIcon icon={faPlusCircle} />
                 </Link>
-                }
+                
               </div>
               <div className="col-1">
               {this.state.lstMatPrim.length > 0 && this.state.idSelPd >= 0 &&
@@ -361,7 +342,7 @@ export default class Addproddisp extends Component {
               }
               </div>
               <div className="col-1">
-              {(this.state.codigo || this.state.desc || this.state.cantidad > 0 ) &&
+              {(this.state.codigo || this.state.desc || this.state.porcentaje > 0 ) &&
                 <Link onClick={this.clearBusqMP}>
                     <FontAwesomeIcon icon={faEraser}/>
                 </Link>
@@ -378,7 +359,6 @@ export default class Addproddisp extends Component {
                     {rowsBusq}
                     </tbody>
                 </table>              
-              
             </div>
             }
           </div>
@@ -394,8 +374,7 @@ export default class Addproddisp extends Component {
                   <td>#</td>
                   <td>Codigo</td>
                   <td>Descripcion</td>
-                  <td>Cantidad</td>
-                  <td>Unidad</td>
+                  <td>porcentaje</td>
                 </tr>
               </thead>
             </table>

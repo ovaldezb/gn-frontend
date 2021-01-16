@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import Header from "./Header";
-import Ordenfabricacion from "./Ordenfabricacion";
+import Ordenfabricacion from "./Ordenesfabricacion";
 import Menu from "./Menu";
 
 export default class Lordenfab extends Component {

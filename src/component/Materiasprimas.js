@@ -44,8 +44,6 @@ export default class Materiasprimas extends Component {
     matprima:{}
   };
 
-  
-
   componentDidMount() {
     this.loadMatPrim();
   }
@@ -99,7 +97,9 @@ export default class Materiasprimas extends Component {
   addMp = () => {
     this.displayAdd = true;
     this.setState((prevState,props)=>{
-      return({matprima:{escaso:'',necesario:''}});
+      return(
+        {matprima:{escaso:'',necesario:''}}
+        );
     });
     this.forceUpdate();
   };

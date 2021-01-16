@@ -285,16 +285,7 @@ export default class Usuarios extends Component {
         style = "pointer";
       }
       return (
-        <tr
-          key={i}
-          onClick={() => {
-            this.selectRow(i);
-          }}
-          onDoubleClick={() => {
-            this.updatePopulateUser();
-          }}
-          className={style}
-        >
+        <tr key={i} onClick={() => {this.selectRow(i); }} onDoubleClick={() => {this.updatePopulateUser();}} className={style}>
           <td>
             {user.nombre} {user.apellido}
           </td>

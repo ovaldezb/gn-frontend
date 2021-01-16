@@ -10,60 +10,71 @@ import {
   faTrash, faClipboardCheck
 } from "@fortawesome/free-solid-svg-icons";
 import Paginacion from './Paginacion';
-import Addordenfab from "./Addordenfab";
 import Moment from 'react-moment';
 import momento from 'moment';
 import NumberFormat from 'react-number-format';
 import swal from "sweetalert";
 import axios from 'axios';
+import Addordencompra from "./Addordencompra";
 
-export default class Ordenfabricacion extends Component {
+export default class Ordenescompra extends Component {
   filterRef = React.createRef();
   center = {textAlign:"center"}
   displayAdd = false;
   isComplete = false;
+  isAdd = true;
   state = {
-    lstOF: [],
+    lstOC: [],
     pageOfItems: [],
     page:1,
     filtro: "",
     status: "",
-    idSelOf: -1,
-    ordenfab:{}
+    idSelOc: -1,
+    ordencompra:{}
   };
 
   componentDidMount() {
-      this.loadAllOFs();
+      this.getAllOC();
   }
 
-  loadAllOFs() {
-    Axios.get(Global.url + "ordenfab", { headers: authHeader() })
+  getAllOC() {
+    Axios.get(Global.url + "ordencompra", { headers: authHeader() })
       .then((res) => {
         if (res.data.length > 0) {
           this.setState({
-            lstOF: res.data,
+            lstOC: res.data,
           });
         }
       })
       .catch();
   }
 
-  addOF = () => {
+  addOC = () => {
       this.displayAdd = true;
       this.forceUpdate();
   }
 
-  cancelarAdd = (ordenfab) =>{
-    this.displayAdd = false;
-    if(ordenfab){
+  updateOc = () =>{
+    let i = ((this.state.page-1)*10)+ this.state.idSelOc
+      this.setState({
+        ordencompra:this.state.pageOfItems[i]
+      });
+      this.displayAdd = true;
+      this.isAdd = false;
+      this.setState({
+        idSelOc: -1
+      });
+  }
 
-    }
+  cancelarAdd = (ordencom) =>{
+    this.displayAdd = false;
+    this.getAllOC();
     this.forceUpdate();
   }
 
   completeOF = () =>{
     swal({
-      title: "Desea completar la OF del lote: "+this.state.lstOF[((this.state.page-1)*10)+this.state.idSelOf].lote+"?",
+      title: "Desea completar la OF del lote: "+this.state.lstOC[((this.state.page-1)*10)+this.state.idSelOf].lote+"?",
       text: "Una vez completado pasará a PT",
       icon: "warning",
       buttons: true,
@@ -71,7 +82,7 @@ export default class Ordenfabricacion extends Component {
     })
     .then((willDelete) => {
       if (willDelete) {
-        axios.put(Global.url+'ordenfab/complete/'+this.state.lstOF[((this.state.page-1)*10)+this.state.idSelOf].id,{ headers: authHeader() })
+        axios.put(Global.url+'ordenfab/complete/'+this.state.lstOC[((this.state.page-1)*10)+this.state.idSelOf].id,{ headers: authHeader() })
             .then(res=>{
               //var mp = this.state.lstMatPrim[this.state.idSelMp];
               //Bitacora(Global.DEL_MATPRIM,JSON.stringify(mp),'');
@@ -91,7 +102,7 @@ export default class Ordenfabricacion extends Component {
 
   filtrado = () =>{
     var filter = this.filterRef.current.value;
-    var nvoArray = this.state.lstOF.filter(element =>{
+    var nvoArray = this.state.lstOC.filter(element =>{
       return Object.values(element).filter(item=>{ return String(item).includes(filter)}).length > 0 
     });
     this.setState({
@@ -101,7 +112,7 @@ export default class Ordenfabricacion extends Component {
 
   selectRow = (i) => {
     this.setState({
-      idSelOf: i,
+      idSelOc: i,
     });
   };
 
@@ -112,11 +123,11 @@ export default class Ordenfabricacion extends Component {
 
   render() {
     var style = {};
-    if (this.state.lstOF.length > 0) {
-      var lstOrdFabPI = this.state.pageOfItems.map((ordfab, i) => {
+    if (this.state.lstOC.length > 0) {
+      var lstOrdComPI = this.state.pageOfItems.map((ordcomp, i) => {
         if (this.state.idSelOf === i) {
           style = "selected pointer";
-          if(ordfab.estatus===Global.TEP){
+          if(ordcomp.estatus===Global.TEP){
             this.isComplete = true;
           }else{
             this.isComplete = false;
@@ -127,22 +138,22 @@ export default class Ordenfabricacion extends Component {
         
         return (
           <tr key={i} onClick={() => {this.selectRow(i)}}  className={style}>
-            <td>{ordfab.oc}</td>
-            <td>{ordfab.nombre}</td>
-            <td>{ordfab.clave}</td>
-            <td>{ordfab.lote}</td>
-            <td style={this.center}><NumberFormat value={Number(ordfab.piezas)}displayType={'text'} thousandSeparator={true}/></td>
-            <td><Moment format="DD MMMM YYYY">{momento(ordfab.fechaFabricacion,'MM-DD-YYYY').format('YYYY-MM-DDTHH:mm:ss')}</Moment></td>
-            <td><Moment format="DD MMMM YYYY">{momento(ordfab.fechaEntrega,'MM-DD-YYYY').format('YYYY-MM-DDTHH:mm:ss')}</Moment></td>
-            <td>{ordfab.cliente}</td>
-            <td>{ordfab.estatus}</td>
+            <td>{ordcomp.oc}</td>
+            <td>{ordcomp.nombreProducto}</td>
+            <td>{ordcomp.clave}</td>
+            <td>{ordcomp.lote}</td>
+            <td style={this.center}><NumberFormat value={Number(ordcomp.piezas)}displayType={'text'} thousandSeparator={true}/></td>
+            <td><Moment format="DD MMMM YYYY">{momento(ordcomp.fechaFabricacion,'MM-DD-YYYY').format('YYYY-MM-DDTHH:mm:ss')}</Moment></td>
+            <td><Moment format="DD MMMM YYYY">{momento(ordcomp.fechaEntrega,'MM-DD-YYYY').format('YYYY-MM-DDTHH:mm:ss')}</Moment></td>
+            <td>{ordcomp.cliente}</td>
+            <td>{ordcomp.estatus}</td>
           </tr>
         );
       });
       return (
         <React.Fragment>
           {this.displayAdd && 
-            <Addordenfab cancelar={this.cancelarAdd} matprima={this.state.ordenfab} />
+            <Addordencompra cancelar={this.cancelarAdd} ordencompra={this.state.ordencompra} tipo={this.isAdd}/>
           }
           {!this.displayAdd && (
             <React.Fragment>
@@ -152,21 +163,21 @@ export default class Ordenfabricacion extends Component {
                     <li>Filtro:</li>
                     <li><input className="input"  type="text"  name="filtro" ref={this.filterRef} onKeyUp={this.filtrado}/></li>
                   </ul>
-                  <h2>Orden de Fabricación</h2>
+                  <h2>Orden de Compra</h2>
                   <nav>
                     <ul>
                       <li>
-                        <Link to="#" onClick={this.addOF}>
+                        <Link to="#" onClick={this.addOC}>
                           <FontAwesomeIcon icon={faPlusSquare} />
                         </Link>
                       </li>
                       <li>
-                        <Link to="#" onClick={this.updateMp}>
+                        <Link to="#" onClick={this.updateOc}>
                           <FontAwesomeIcon icon={faEdit} />
                         </Link>
                       </li>
                       <li>
-                        <Link to="#" onClick={this.deleteMp}>
+                        <Link to="#" onClick={this.deleteOc}>
                           <FontAwesomeIcon icon={faTrash} />
                         </Link>
                       </li>
@@ -216,18 +227,18 @@ export default class Ordenfabricacion extends Component {
                   <col width="12%"/>
                   <col width="10%"/>
                   <col width="7%"/>
-                  <tbody>{lstOrdFabPI}</tbody>
+                  <tbody>{lstOrdComPI}</tbody>
                 </table>              
               </div>
               <div className="center">
-                <Paginacion items={this.state.lstOF} onChangePage={this.onChangePage} />
+                <Paginacion items={this.state.lstOC} onChangePage={this.onChangePage} />
               </div>
             </React.Fragment>
           )}
         </React.Fragment>
       );
     } else if(this.displayAdd){
-        return  <Addordenfab cancelar={this.cancelarAdd} matprima={this.state.ordenfab} />
+        return  <Addordencompra cancelar={this.cancelarAdd} ordencompra={this.state.ordencompra} tipo={this.isAdd} />
       }else {
       return (
           <div className="container">
@@ -235,17 +246,18 @@ export default class Ordenfabricacion extends Component {
               <div className="container flex-gn">
                 <div>
                 </div>
+                <h2>Orden de Compra</h2>
                 <nav>
                   <ul>
                     <li>
-                      <Link to="#" onClick={this.addOF}><FontAwesomeIcon icon={faPlusSquare} />
+                      <Link to="#" onClick={this.addOC}><FontAwesomeIcon icon={faPlusSquare} />
                       </Link>
                     </li>
                   </ul>
                 </nav>
               </div>
           </div>
-          <h1 className="center">No hay Ordenes de Fabricación para mostrar</h1>
+          <h1 className="center">No hay órdenes de compra para mostrar</h1>
           </div>
       );
     }
