@@ -28,7 +28,7 @@ export default class Materiasprimas extends Component {
   left = {textAlign:"left"}
   col1 = { width: 20 };
   col2 = { width: 140 };
-  col3 = { width: 70, textAlign: "center" };
+  col3 = { width: 50, textAlign: "center" };
   col4 = { width: 96 };
   col5 = { width: 100 };
   col6 = { width: 150 };
@@ -86,12 +86,18 @@ export default class Materiasprimas extends Component {
 
   filtrado = () =>{
     var filter = this.filterRef.current.value;
+    if(filter !== ''){
     var nvoArray = this.state.lstMatPrim.filter(element =>{
       return Object.values(element).filter(item=>{ return String(item).includes(filter)}).length > 0 
     });
     this.setState({
       pageOfItems:nvoArray
     });
+   }else{
+    this.setState({
+      pageOfItems:this.state.lstMatPrim
+    });
+   }
   }
 
   addMp = () => {
@@ -179,6 +185,7 @@ export default class Materiasprimas extends Component {
     }
     
     var style = {};
+    var styleDisp={};
     var styleCell = {};
     var styleFecCad = {};
     var today = new Date();
@@ -196,8 +203,16 @@ export default class Materiasprimas extends Component {
         } else {
           styleCell = "suficiente";
         }
+
+        if ((matprim.cantidad - matprim.apartado) > 0 && (matprim.cantidad - matprim.apartado) <= matprim.escaso) {
+          styleDisp = "escaso";
+        } else if ((matprim.cantidad - matprim.apartado) > matprim.escaso && (matprim.cantidad - matprim.apartado) <= matprim.necesario ) {
+          styleDisp = "necesario";
+        } else {
+          styleDisp = "suficiente";
+        }
+
         var fc = momento(matprim.fechaCaducidad,'MM-DD-YYYY').format('YYYY-MM-DDTHH:mm:ss');
-        
         var fecCad = new Date(momento(matprim.fechaCaducidad,'MM-DD-YYYY H:mm:ss'));
         var totalDaysBetwn = (fecCad.getTime() - today.getTime())/(1000*60*60*24);
         
@@ -211,13 +226,14 @@ export default class Materiasprimas extends Component {
 
         return (
           <tr key={i} onDoubleClick={() => this.dblClick(i)} onClick={() => {this.selectRow(i); }} className={style} >
-            <td style={this.col1}>{((this.state.page-1)*10) + i+1}</td>
+            
             <td style={this.left}>{matprim.descripcion}</td>
             <td className={styleCell} style={this.col3}><NumberFormat value={Number(matprim.cantidad).toFixed(2)} displayType={'text'} thousandSeparator={true} /></td>
+            <td className={styleDisp} style={this.col3}><NumberFormat value={Number(matprim.cantidad - matprim.apartado ).toFixed(2)} displayType={'text'} thousandSeparator={true} /></td>
             <td style={this.col4}>{matprim.unidad.unidadMedida}</td>
             <td style={this.col5}>{matprim.codigo}</td>
             <td style={this.col6}>{matprim.proveedor}</td>
-            <td style={this.col7}>{momento(matprim.fechaEntrada,'MM-DD-YYYY').format('DD MMMM YYYY')}</td>
+            <td style={this.col7}>{momento(matprim.fechaEntrada,'MM-DD-YYYY').format('DD MMM YYYY')}</td>
             <td className={styleFecCad} style={this.col7}><Moment fromNow>{fc}</Moment></td>
           </tr>
         );
@@ -261,19 +277,19 @@ export default class Materiasprimas extends Component {
               </div>
 
               <table className="table table-bordered header-font">
-                <col width="5%"/>
-                <col width="23%"/>
+                <col width="21%"/>
+                <col width="8%"/>
                 <col width="8%"/>
                 <col width="9%"/>
                 <col width="12%"/>
                 <col width="17%"/>
                 <col width="15%"/>
-                <col width="11%"/>
+                <col width="10%"/>
                 <thead className="thead-light">
                   <tr>
-                    <th>#</th>
                     <th style={this.center}>Descripción</th>
-                    <th style={this.center}>Cantidad</th>
+                    <th style={this.center}>Inv Físico</th>
+                    <th style={this.center}>Inv Disponible</th>
                     <th style={this.center}>Unidad</th>
                     <th style={this.center}>Código</th>
                     <th style={this.center}>Proveedor</th>
@@ -284,14 +300,14 @@ export default class Materiasprimas extends Component {
               </table>
               <div className="table-ovfl tbl-lesshead">
                 <table className="table table-bordered table-hover header-font" id="materiaprima">
-                  <col width="5%"/>
-                  <col width="24%"/>
-                  <col width="8%"/>
-                  <col width="10%"/>
-                  <col width="8%"/>
-                  <col width="18%"/>
-                  <col width="16%"/>
-                  <col width="11%"/>
+                <col width="21%"/>
+                <col width="8%"/>
+                <col width="8%"/>
+                <col width="9%"/>
+                <col width="12%"/>
+                <col width="17%"/>
+                <col width="15%"/>
+                <col width="10%"/>
                   <tbody>{lstMp}</tbody>
                 </table>              
               </div>

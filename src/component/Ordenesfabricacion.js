@@ -11,14 +11,13 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Paginacion from './Paginacion';
 import Addordenfab from "./Addordenfab";
-import Moment from 'react-moment';
-import momento from 'moment';
 import NumberFormat from 'react-number-format';
 import swal from "sweetalert";
 import axios from 'axios';
 
 export default class Ordenesfabricacion extends Component {
   filterRef = React.createRef();
+  selAllRef = React.createRef();
   center = {textAlign:"center"}
   displayAdd = false;
   isComplete = false;
@@ -33,11 +32,11 @@ export default class Ordenesfabricacion extends Component {
   };
 
   componentDidMount() {
-      this.loadAllOFs();
+      this.loadAactiveOF();
   }
 
-  loadAllOFs() {
-    Axios.get(Global.url + "ordenfab", { headers: authHeader() })
+  loadAactiveOF() {
+    Axios.get(Global.url + "ordenfab/active/false", { headers: authHeader() })
       .then((res) => {
         if (res.data.length > 0) {
           this.setState({
@@ -48,6 +47,26 @@ export default class Ordenesfabricacion extends Component {
       .catch();
   }
 
+  selectAllOF = () =>{
+    Axios.get(Global.url + "ordenfab/active/true", { headers: authHeader() })
+    .then((res) => {
+      if (res.data.length > 0) {
+        this.setState({
+          lstOF: res.data,
+        });
+      }
+    })
+    .catch();
+  }
+
+  selectType = () =>{
+    if(this.selAllRef.current.checked){
+      this.selectAllOF();
+    }else{
+      this.loadAactiveOF();
+    }
+  }
+
   addOF = () => {
       this.displayAdd = true;
       this.forceUpdate();
@@ -56,15 +75,15 @@ export default class Ordenesfabricacion extends Component {
   cancelarAdd = (ordenfab) =>{
     this.displayAdd = false;
     if(ordenfab){
-
+      this.loadAactiveOF();
     }
     this.forceUpdate();
   }
 
   completeOF = () =>{
     swal({
-      title: "Desea completar la OF del lote: "+this.state.lstOF[((this.state.page-1)*10)+this.state.idSelOf].lote+"?",
-      text: "Una vez completado pasará a PT",
+      title: "Desea completar la Orden de Fabricacón: "+this.pad(this.state.lstOF[((this.state.page-1)*10)+this.state.idSelOf].noConsecutivo,Global.SIZE_DOC)+"?",
+      text: "Una vez completado, pasará a Producto Terminado",
       icon: "warning",
       buttons: true,
       dangerMode: true,
@@ -110,6 +129,12 @@ export default class Ordenesfabricacion extends Component {
     this.setState({ pageOfItems: pageOfItems, page:page });
   }
 
+  pad(num, size) {
+    num = num.toString();
+    while (num.length < size) num = "0" + num;
+    return num;
+ }
+
   render() {
     var style = {};
     if (this.state.lstOF.length > 0) {
@@ -127,22 +152,25 @@ export default class Ordenesfabricacion extends Component {
         
         return (
           <tr key={i} onClick={() => {this.selectRow(i)}}  className={style}>
-            <td>{ordfab.oc}</td>
-            <td>{ordfab.nombre}</td>
-            <td>{ordfab.clave}</td>
-            <td>{ordfab.lote}</td>
+            <td style={this.center}>{this.pad(ordfab.noConsecutivo,Global.SIZE_DOC)}</td>
+            <td style={this.center}>{ordfab.oc}</td>
+            <td style={this.center}>{ordfab.lote}</td>
             <td style={this.center}><NumberFormat value={Number(ordfab.piezas)}displayType={'text'} thousandSeparator={true}/></td>
-            <td><Moment format="DD MMMM YYYY">{momento(ordfab.fechaFabricacion,'MM-DD-YYYY').format('YYYY-MM-DDTHH:mm:ss')}</Moment></td>
-            <td><Moment format="DD MMMM YYYY">{momento(ordfab.fechaEntrega,'MM-DD-YYYY').format('YYYY-MM-DDTHH:mm:ss')}</Moment></td>
-            <td>{ordfab.cliente}</td>
-            <td>{ordfab.estatus}</td>
+            <td style={this.center}>{ordfab.estatus}</td>
+            <td style={this.center}>
+              <Link to="#" onClick={this.completeOF} >
+              {this.isComplete && this.state.idSelOf === i &&
+                <FontAwesomeIcon icon={faClipboardCheck} size="2x" className="icon" />
+              }
+              </Link>
+            </td>
           </tr>
         );
       });
       return (
         <React.Fragment>
           {this.displayAdd && 
-            <Addordenfab cancelar={this.cancelarAdd} matprima={this.state.ordenfab} />
+            <Addordenfab cancelar={this.cancelarAdd} ordenfab={this.state.ordenfab} />
           }
           {!this.displayAdd && (
             <React.Fragment>
@@ -151,8 +179,9 @@ export default class Ordenesfabricacion extends Component {
                   <ul>
                     <li>Filtro:</li>
                     <li><input className="input"  type="text"  name="filtro" ref={this.filterRef} onKeyUp={this.filtrado}/></li>
+                    <li><input type="checkbox" ref={this.selAllRef} onChange={this.selectType} /></li>
                   </ul>
-                  <h2>Orden de Compra</h2>
+                  <h2>Orden de Fabricación</h2>
                   <nav>
                     <ul>
                       <li>
@@ -161,12 +190,12 @@ export default class Ordenesfabricacion extends Component {
                         </Link>
                       </li>
                       <li>
-                        <Link to="#" onClick={this.updateMp}>
+                        <Link to="#" onClick={this.updateOf}>
                           <FontAwesomeIcon icon={faEdit} />
                         </Link>
                       </li>
                       <li>
-                        <Link to="#" onClick={this.deleteMp}>
+                        <Link to="#" onClick={this.deleteOf}>
                           <FontAwesomeIcon icon={faTrash} />
                         </Link>
                       </li>
@@ -182,40 +211,32 @@ export default class Ordenesfabricacion extends Component {
                 </div>
               </div>
               <table className="table table-bordered header-font">
-                  <col width="7%"/>
-                  <col width="31%"/>
-                  <col width="8%"/>
-                  <col width="8%"/>
-                  <col width="6%"/>
-                  <col width="12%"/>
-                  <col width="12%"/>
+                  <col width="18%"/>
+                  <col width="18%"/>
+                  <col width="18%"/>
+                  <col width="18%"/>
+                  <col width="18%"/>
                   <col width="10%"/>
-                  <col width="7%"/>
+                  
                 <thead className="thead-light">                   
                   <tr>
+                    <th scope="col">No de Orden</th>
                     <th scope="col">OC</th>
-                    <th scope="col">Producto</th>
-                    <th scope="col">Clave</th>
                     <th scope="col">Lote</th>
                     <th scope="col">Piezas</th>
-                    <th scope="col">Fabricación</th>
-                    <th scope="col">Entrega</th>
-                    <th scope="col">Cliente</th>
                     <th scope="col">Estatus</th>
+                    <th scope="col"></th>
                   </tr>
                 </thead>
               </table>
-              <div className="table-ovfl tbl-lesshead">
+              <div className="table-ovfl table-hover tbl-lesshead">
                 <table className="table table-bordered table-lst" id="ordenFabricacion">
-                  <col width="7%"/>
-                  <col width="30%"/>
-                  <col width="8%"/>
-                  <col width="8%"/>
-                  <col width="6%"/>
-                  <col width="12%"/>
-                  <col width="12%"/>
+                  <col width="18%"/>
+                  <col width="18%"/>
+                  <col width="18%"/>
+                  <col width="18%"/>
+                  <col width="18%"/>
                   <col width="10%"/>
-                  <col width="7%"/>
                   <tbody>{lstOrdFabPI}</tbody>
                 </table>              
               </div>

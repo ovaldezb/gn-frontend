@@ -7,7 +7,7 @@ import Moment from 'react-moment';
 import momento from 'moment';
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTruck } from "@fortawesome/free-solid-svg-icons";
+import { faTruck, faPrint } from "@fortawesome/free-solid-svg-icons";
 import NumberFormat from 'react-number-format';
 import swal from 'sweetalert';
 
@@ -74,7 +74,8 @@ export default class Productoterminado extends Component {
     });
   }
 
-  selectRow = (i) => {
+  selectRow = (i, activar) => {
+    this.showTruck = activar;
     this.setState({
       idSelPt: i,
     });
@@ -103,10 +104,15 @@ export default class Productoterminado extends Component {
                   <nav>
                     <ul>
                       <li>
+                        <Link to="#" onClick={this.printPT}>
+                        <FontAwesomeIcon icon={faPrint} size="2x" />
+                        </Link>
+                      </li>
+                      <li>
                         <Link to="#" onClick={this.deliverPT}>
                           {this.state.idSelPt !== -1 && this.showTruck &&
                           <FontAwesomeIcon icon={faTruck} size="2x" />
-                          }                          
+                          }
                         </Link>
                       </li>                                              
                     </ul>
@@ -125,7 +131,7 @@ export default class Productoterminado extends Component {
                 <col width="11%"/>
                 <thead>
                   <tr>
-                    <th>Clave</th>
+                    <th>No OF</th>
                     <th>Producto</th>
                     <th>OC</th>
                     <th>Lote</th>
@@ -150,10 +156,9 @@ export default class Productoterminado extends Component {
                     {
                       this.state.pageOfItems.map((prodterm,i)=>{
                         style = this.state.idSelPt === i ? "selected pointer":{};
-                        this.showTruck = prodterm.estatus.codigo === Global.WTDEL ;
                         return(
-                          <tr key={i} onClick={() => {this.selectRow(i)}}  className={style}>
-                            <td>{prodterm.clave}</td>
+                          <tr key={i} onClick={() => {this.selectRow(i,(prodterm.estatus.codigo === Global.WTDEL))}}  className={style}>
+                            <td>{prodterm.noConsecutivo}</td>
                             <td>{prodterm.nombre}</td>
                             <td>{prodterm.oc}</td>
                             <td>{prodterm.lote}</td>

@@ -75,25 +75,26 @@ export default class Addordencompra extends Component {
       oc:this.state.ordencompra.oc,
       clave:this.state.ordencompra.clave,
       nombreProducto:this.state.ordencompra.nombreProducto,
-      //lote:this.state.ordencompra.lote,
       cliente:this.state.ordencompra.cliente,
       fechaFabricacion:this.state.ordencompra.fechaFabricacion,
       fechaEntrega:this.state.ordencompra.fechaEntrega,
-      //noConsecutivo:this.state.counter,
+      noConsecutivo:this.state.counter,
       piezas:this.state.ordencompra.piezas,
       observaciones:this.state.ordencompra.observaciones,
       presentacion:this.state.ordencompra.presentacion,
-      estatus:{codigo:'TEP'}
+      estatus:Global.OPEN,
+      piezasPendientes:this.state.ordencompra.piezas,
+      piezasCompletadas:0
     };
 
     Axios.post(Global.url+'ordencompra',ordenCompraTmp,{ headers: authHeader() })
       .then(res=>{
-          swal('Se guardó la Orden de Compra con éxito',this.state.ordencompra.noConsecutivo,'success');
+          swal('Se guardó la Orden de Compra con éxito',ordenCompraTmp.noConsecutivo,'success');
           this.clean();
-        this.cancelarOC();
+          this.cancelarOC();
       })
       .catch(err=>{
-
+        console.log(err);
       });
   }
 
@@ -107,7 +108,6 @@ export default class Addordencompra extends Component {
       oc:this.ocRef.current.value,
       clave:this.claveRef.current.value,
       nombreProducto:this.nombreRef.current.value,
-      //lote:this.loteRef.current.value,
       cliente:this.clienteRef.current.value,
       fechaFabricacion:this.state.ordencompra.fechaFabricacion,
       fechaEntrega:this.state.ordencompra.fechaEntrega,
@@ -150,8 +150,8 @@ export default class Addordencompra extends Component {
     });
   }
 
-  keyUp = () =>{
-    console.log('keyUp');
+  occhange = () =>{
+    
   }
 
   pad(num, size) {
@@ -172,7 +172,7 @@ export default class Addordencompra extends Component {
             <div className="showcase-form card">
             <div className="form-control grid">
                 <div>
-                  <input type="text" name="oc" placeholder="Orden de Compra" ref={this.ocRef} value={ordencompra.oc} />
+                  <input type="text" name="oc" placeholder="Orden de Compra" ref={this.ocRef} value={ordencompra.oc} onChange={this.occhange} />
                   {this.validator.message('oc',ordencompra.oc,'required')}
                 </div>
                 <div>
@@ -181,7 +181,7 @@ export default class Addordencompra extends Component {
               </div>
               <div className="form-control grid-1-2">
                 <div>
-                  <input type="text" name="clave" placeholder="Clave" onKeyUp={this.busPdClave} ref={this.claveRef} value={this.state.ordencompra.clave}/>
+                  <input type="text" name="clave" placeholder="Clave" onKeyUp={this.busPdClave} ref={this.claveRef} value={this.state.ordencompra.clave} />
                   {this.validator.message('clave',this.state.ordencompra.clave,'required')}
                 </div>
                 <div>

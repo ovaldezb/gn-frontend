@@ -16,10 +16,13 @@ var Global = {
     HTTP_OK:200,
     OK:'OK',
     ERROR:'ERROR',
-    TEP:'TEP',
+    OPEN:'OPEN',
     DRAFT:'DRAFT',
+    TEP:'TEP',
+    WTDEL:'WTDEL',
     CMPLT:'CMPLT',
-    WTDEL:'WTDEL'
+    DELVRD:'DELVRD',
+    SIZE_DOC:8
 };
 
 export default Global

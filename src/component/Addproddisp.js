@@ -70,7 +70,7 @@ export default class Addproddisp extends Component {
   busquedaDesc = (e)=>{
     if(e.keyCode === 13){
         if(this.state.desc !==''){
-            Axios.get(Global.url+'matprimdisp/filter/'+this.state.desc,{ headers: authHeader() })
+            Axios.get(Global.url+'matprimdisp/filter/'+this.state.desc.toUpperCase(),{ headers: authHeader() })
                 .then(res =>{
                     this.setState({
                         lstBusqDesc:res.data
@@ -113,7 +113,6 @@ export default class Addproddisp extends Component {
   }
 
   addMatPrima = (e) =>{
-      console.log('AddMP',this.isUpdt);
     let lstMpTmp;
     var res = this.state.lstMatPrim.filter(x => {
         return (x.codigo === this.state.codigo)
@@ -136,9 +135,10 @@ export default class Addproddisp extends Component {
         swal('La porcentaje no puede estar vacia o ser 0','Error','error');
         return;
     }else if(!this.isUpdt){
-        console.log('agregar');
+        //console.log('agregar');
         lstMpTmp = this.state.lstMatPrim;
         lstMpTmp.push(matprima);
+        
         
     }else if(this.isUpdt){
         lstMpTmp = this.state.lstMatPrim;
@@ -261,6 +261,10 @@ export default class Addproddisp extends Component {
     this.isUpdt = true;
   }
 
+  descChange = () =>{
+
+  }
+
   render() {
     //const matdisp = this.state.matdisp;   
     if(this.state.lstBusqDesc.length > 0){
@@ -291,7 +295,7 @@ export default class Addproddisp extends Component {
                     <td>{i+1}</td>
                     <td>{mpdis.materiaprimadisponible.codigo}</td>
                     <td>{mpdis.materiaprimadisponible.descripcion}</td>
-                    <td>{mpdis.porcentaje}</td>
+                    <td style={this.center}>{mpdis.porcentaje}</td>
                 </tr>
             );
         });
@@ -314,37 +318,38 @@ export default class Addproddisp extends Component {
             </div>
           </div>
           <div className="showcase-form card">
-            <h2 className="center">Materiales para el producto</h2>
+            <h2 className="center">Materia prima para el producto</h2>
             <p></p>
             <div className="row">
               <div className="col-2">
                 <input type="text" placeholder="Codigo"  onKeyUp={this.busquedaCodigo} ref={this.codigoRef} defaultValue={this.state.codigo}/>
               </div>
               <div className="col-4">
-                <input type="text" placeholder="Descripcion" onKeyUp={this.busquedaDesc} ref={this.descRef} defaultValue={this.state.desc}/>
+                <input type="text" placeholder="Descripcion" onKeyUp={this.busquedaDesc} ref={this.descRef} value={this.state.desc} onChange={this.descChange}/>
               </div>
               
               <div className="col-2">
-                <input type="number" placeholder="Porcentaje" style={this.center} ref={this.porcentajeRef}  defaultValue={this.state.porcentaje}/>
+                <input type="number" placeholder="Porcentaje" style={this.center} ref={this.porcentajeRef}  value={this.state.porcentaje} onChange={this.descChange}/>
               </div>
               <div className="col-1">
               {/*this.state.unidad.unidadMedida && */}
+              {this.state.codigo && this.state.desc && this.state.porcentaje > 0 && 
                 <Link onClick={this.addMatPrima}>
-                <FontAwesomeIcon icon={faPlusCircle} />
+                  <FontAwesomeIcon icon={faPlusCircle} title="Agregar la MP seleccionada" />
                 </Link>
-                
+              }
               </div>
               <div className="col-1">
               {this.state.lstMatPrim.length > 0 && this.state.idSelPd >= 0 &&
                 <Link onClick={this.delMatPrim}>
-                    <FontAwesomeIcon icon={faMinusCircle}/>
+                    <FontAwesomeIcon icon={faMinusCircle} title="Elimina la MP seleccionada"/>
                 </Link>
               }
               </div>
               <div className="col-1">
               {(this.state.codigo || this.state.desc || this.state.porcentaje > 0 ) &&
                 <Link onClick={this.clearBusqMP}>
-                    <FontAwesomeIcon icon={faEraser}/>
+                    <FontAwesomeIcon icon={faEraser} title="Limpia los campos de la Materia prima"/>
                 </Link>
               }
               </div>              
@@ -364,22 +369,26 @@ export default class Addproddisp extends Component {
           </div>
           <div className="showcase-form card">
             <table className="table table-dark table-bordered">
-                <col width="6%"/>
-                <col width="21%"/>
-                <col width="45%"/>
-                <col width="15%"/>
-                <col width="13%"/>
+                <col width="10%"/>
+                <col width="20%"/>
+                <col width="50%"/>
+                <col width="20%"/>
+                
               <thead>
                 <tr>
                   <td>#</td>
                   <td>Codigo</td>
                   <td>Descripcion</td>
-                  <td>porcentaje</td>
+                  <td style={this.center}>Porcentaje</td>
                 </tr>
               </thead>
             </table>
             <div className="table-ovfl-prddisp">
                 <table className="table table-bordered tbl-lesshead">
+                  <col width="10%"/>
+                  <col width="20%"/>
+                  <col width="50%"/>
+                  <col width="20%"/>
                     <tbody>
                     {rows}
                     </tbody>

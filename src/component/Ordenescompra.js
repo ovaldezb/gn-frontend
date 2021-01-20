@@ -125,7 +125,7 @@ export default class Ordenescompra extends Component {
     var style = {};
     if (this.state.lstOC.length > 0) {
       var lstOrdComPI = this.state.pageOfItems.map((ordcomp, i) => {
-        if (this.state.idSelOf === i) {
+        if (this.state.idSelOc === i) {
           style = "selected pointer";
           if(ordcomp.estatus===Global.TEP){
             this.isComplete = true;
@@ -141,7 +141,6 @@ export default class Ordenescompra extends Component {
             <td>{ordcomp.oc}</td>
             <td>{ordcomp.nombreProducto}</td>
             <td>{ordcomp.clave}</td>
-            <td>{ordcomp.lote}</td>
             <td style={this.center}><NumberFormat value={Number(ordcomp.piezas)}displayType={'text'} thousandSeparator={true}/></td>
             <td><Moment format="DD MMMM YYYY">{momento(ordcomp.fechaFabricacion,'MM-DD-YYYY').format('YYYY-MM-DDTHH:mm:ss')}</Moment></td>
             <td><Moment format="DD MMMM YYYY">{momento(ordcomp.fechaEntrega,'MM-DD-YYYY').format('YYYY-MM-DDTHH:mm:ss')}</Moment></td>
@@ -194,9 +193,8 @@ export default class Ordenescompra extends Component {
               </div>
               <table className="table table-bordered header-font">
                   <col width="7%"/>
-                  <col width="31%"/>
-                  <col width="8%"/>
-                  <col width="8%"/>
+                  <col width="39%"/>
+                  <col width="8%"/>                  
                   <col width="6%"/>
                   <col width="12%"/>
                   <col width="12%"/>
@@ -207,7 +205,6 @@ export default class Ordenescompra extends Component {
                     <th scope="col">OC</th>
                     <th scope="col">Producto</th>
                     <th scope="col">Clave</th>
-                    <th scope="col">Lote</th>
                     <th scope="col">Piezas</th>
                     <th scope="col">Fabricación</th>
                     <th scope="col">Entrega</th>
@@ -219,8 +216,7 @@ export default class Ordenescompra extends Component {
               <div className="table-ovfl tbl-lesshead">
                 <table className="table table-bordered table-lst" id="ordenFabricacion">
                   <col width="7%"/>
-                  <col width="30%"/>
-                  <col width="8%"/>
+                  <col width="38%"/>
                   <col width="8%"/>
                   <col width="6%"/>
                   <col width="12%"/>
