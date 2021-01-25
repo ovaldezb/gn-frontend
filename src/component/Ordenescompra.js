@@ -7,18 +7,19 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPlusSquare,
   faEdit,
-  faTrash, faClipboardCheck
+  faTrash
 } from "@fortawesome/free-solid-svg-icons";
 import Paginacion from './Paginacion';
 import Moment from 'react-moment';
 import momento from 'moment';
 import NumberFormat from 'react-number-format';
 import swal from "sweetalert";
-import axios from 'axios';
 import Addordencompra from "./Addordencompra";
+import axios from 'axios';
 
 export default class Ordenescompra extends Component {
   filterRef = React.createRef();
+  selAllRef = React.createRef();
   center = {textAlign:"center"}
   displayAdd = false;
   isComplete = false;
@@ -34,11 +35,11 @@ export default class Ordenescompra extends Component {
   };
 
   componentDidMount() {
-      this.getAllOC();
+      this.loadOC(false);
   }
 
-  getAllOC() {
-    Axios.get(Global.url + "ordencompra", { headers: authHeader() })
+  loadOC(args) {
+    Axios.get(Global.url + "ordencompra"+(args?'/all':''), { headers: authHeader() })
       .then((res) => {
         if (res.data.length > 0) {
           this.setState({
@@ -55,6 +56,10 @@ export default class Ordenescompra extends Component {
   }
 
   updateOc = () =>{
+    if(this.state.idSelOc === -1){
+      swal('Debe seleccionar una OC');
+      return;
+    }
     let i = ((this.state.page-1)*10)+ this.state.idSelOc
       this.setState({
         ordencompra:this.state.pageOfItems[i]
@@ -66,30 +71,35 @@ export default class Ordenescompra extends Component {
       });
   }
 
-  cancelarAdd = (ordencom) =>{
+  cancelarAdd = () =>{
     this.displayAdd = false;
-    this.getAllOC();
+    this.isAdd = true;
+    this.loadOC(false);
     this.forceUpdate();
   }
 
-  completeOF = () =>{
+  selectType = () =>{
+    this.loadOC(this.selAllRef.current.checked);
+  }
+
+  deleteOc = () =>{
     swal({
-      title: "Desea completar la OF del lote: "+this.state.lstOC[((this.state.page-1)*10)+this.state.idSelOf].lote+"?",
-      text: "Una vez completado pasará a PT",
+      title: "Estas seguro?",
+      text: "Una vez eliminado, no se podrá recuperar la Orden de Compra "+this.state.lstOC[this.state.idSelOc].oc,
       icon: "warning",
       buttons: true,
       dangerMode: true,
     })
     .then((willDelete) => {
       if (willDelete) {
-        axios.put(Global.url+'ordenfab/complete/'+this.state.lstOC[((this.state.page-1)*10)+this.state.idSelOf].id,{ headers: authHeader() })
+        axios.delete(Global.url+'ordencompra/'+this.state.lstOC[this.state.idSelOc].id,{ headers: authHeader() })
             .then(res=>{
-              //var mp = this.state.lstMatPrim[this.state.idSelMp];
+              //var oc = this.state.lstOC[this.state.idSelOc];
               //Bitacora(Global.DEL_MATPRIM,JSON.stringify(mp),'');
-              swal("La Orden de Fabricación ha sido completada!", {
+              swal("La orden de compra ha sido eliminada!", {
                 icon: "success",
               });
-              this.loadAllOFs();
+              this.loadOC(false);
             }).catch(
               err =>{
                 console.log('Error '+err.message);
@@ -97,7 +107,6 @@ export default class Ordenescompra extends Component {
             );
       } 
     });
-
   }
 
   filtrado = () =>{
@@ -140,15 +149,16 @@ export default class Ordenescompra extends Component {
           <tr key={i} onClick={() => {this.selectRow(i)}}  className={style}>
             <td>{ordcomp.oc}</td>
             <td>{ordcomp.nombreProducto}</td>
-            <td>{ordcomp.clave}</td>
+            <td style={this.center}>{ordcomp.clave}</td>
             <td style={this.center}><NumberFormat value={Number(ordcomp.piezas)}displayType={'text'} thousandSeparator={true}/></td>
-            <td><Moment format="DD MMMM YYYY">{momento(ordcomp.fechaFabricacion,'MM-DD-YYYY').format('YYYY-MM-DDTHH:mm:ss')}</Moment></td>
-            <td><Moment format="DD MMMM YYYY">{momento(ordcomp.fechaEntrega,'MM-DD-YYYY').format('YYYY-MM-DDTHH:mm:ss')}</Moment></td>
-            <td>{ordcomp.cliente}</td>
+            <td><Moment format="DD MMM YYYY">{momento(ordcomp.fechaFabricacion,'MM-DD-YYYY').format('YYYY-MM-DDTHH:mm:ss')}</Moment></td>
+            <td><Moment format="DD MMM YYYY">{momento(ordcomp.fechaEntrega,'MM-DD-YYYY').format('YYYY-MM-DDTHH:mm:ss')}</Moment></td>
+            <td>{ordcomp.cliente.nombre}</td>
             <td>{ordcomp.estatus}</td>
           </tr>
         );
       });
+      console.log(this.state.idSelOc);
       return (
         <React.Fragment>
           {this.displayAdd && 
@@ -161,6 +171,7 @@ export default class Ordenescompra extends Component {
                   <ul>
                     <li>Filtro:</li>
                     <li><input className="input"  type="text"  name="filtro" ref={this.filterRef} onKeyUp={this.filtrado}/></li>
+                    <li><input type="checkbox" ref={this.selAllRef} onChange={this.selectType} /></li>
                   </ul>
                   <h2>Orden de Compra</h2>
                   <nav>
@@ -176,16 +187,16 @@ export default class Ordenescompra extends Component {
                         </Link>
                       </li>
                       <li>
-                        <Link to="#" onClick={this.deleteOc}>
+                        {(this.state.idSelOc === -1 || this.state.lstOC[this.state.idSelOc].estatus !== Global.OPEN) &&
+                          <Link to="#">
+                          <FontAwesomeIcon icon={faTrash} style={{color:'grey'}}/>
+                          </Link>
+                        }
+                        {(this.state.idSelOc !== -1 && this.state.lstOC[this.state.idSelOc].estatus === Global.OPEN) &&
+                        <Link to="#" onClick={this.deleteOc} >
                           <FontAwesomeIcon icon={faTrash} />
                         </Link>
-                      </li>
-                      <li>                        
-                        <Link to="#" onClick={this.completeOF} >
-                        {this.isComplete &&
-                          <FontAwesomeIcon icon={faClipboardCheck} />
-                        }
-                        </Link>                        
+                        }                        
                       </li>
                     </ul>
                   </nav>

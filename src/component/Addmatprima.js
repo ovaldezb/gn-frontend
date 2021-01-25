@@ -13,8 +13,6 @@ import {TextField} from '@material-ui/core';
 
 export default class Addmatprima extends Component {
   idMatPrima = '';
-  fechaEntrada = '';
-  fechaCaducidad = '';
   btnName = 'Enviar';
   fechaCaducidad = '';
   descripcionRef = React.createRef();
@@ -31,6 +29,7 @@ export default class Addmatprima extends Component {
   state = {
     selectedDayEnt: null,
     unidades:[],
+    lstProv:[],
     materiaPrima:{},
     date: new Date('2019-12-06 00:00:00'),
     locale: { name: 'en-US', label: 'English' },
@@ -60,65 +59,83 @@ export default class Addmatprima extends Component {
       let tipo = document.getElementById("tipo");
       tipo.value = this.props.matprima.tipo;
     } 
-    
-    
-      Axios.get(Global.url+'utils/unidad',{ headers: authHeader() })
-      .then(
-          res =>{
-              this.setState({
-                  unidades:res.data
-              });
-          }
-      );
-      
+      this.getUnidades();
+      this.getProveedores();
+  }
+
+  getUnidades = () =>{
+    Axios.get(Global.url+'utils/unidad',{ headers: authHeader() })
+    .then(
+        res =>{
+            this.setState({
+                unidades:res.data
+            });
+        }
+    );
+  }
+
+  getProveedores = () =>{
+    Axios.get(Global.url+'proveedor',{ headers: authHeader() })
+    .then(
+        res =>{
+            this.setState({
+              lstProv:res.data
+            });
+        }
+    );
   }
 
   selectDayEnt = (event) => {
-    this.fechaEntrada = Moment(event.target.value).format('MM-DD-yyyy h:mm:ss');
+    var materiaprima = this.state.materiaPrima;
+    materiaprima.fechaEntrada = Moment(event.target.value).format('MM-DD-yyyy h:mm:ss');
+    this.setState({
+      materiaPrima:materiaprima
+    });
   };
 
   selectDayCad = (event) => {
-    this.fechaCaducidad = Moment(event.target.value).format('MM-DD-yyyy h:mm:ss')
+    var materiaprima = this.state.materiaPrima;
+    materiaprima.fechaCaducidad = Moment(event.target.value).format('MM-DD-yyyy h:mm:ss');
+    this.setState({
+      materiaPrima:materiaprima
+    });
 };
-
- 
 
   enviarFormulario = (e) => {
     e.preventDefault();
-
     var existeData = {
       escaso: this.escasoRef.current.value,
       necesarioMin:Number(this.escasoRef.current.value)+1,
       necesarioMax:this.necesarioRef.current.value,
       abundante:Number(this.necesarioRef.current.value) + 1
     };
-    var materiaprima ={
-        descripcion:this.descripcionRef.current.value,
-        cantidad: this.cantidadRef.current.value,
-        unidad:this.state.unidades[this.unidadRef.current.value] ,
-        codigo:this.claveRef.current.value,
-        proveedor:this.proveedorRef.current.value,
-        fechaEntrada:this.state.materiaPrima.fechaEntrada,
-        fechaCaducidad:this.state.materiaPrima.fechaCaducidad,
-        observaciones:this.observacionesRef.current.value,
-        lote:this.loteRef.current.value,
-        necesario:this.necesarioRef.current.value,
-        escaso:this.escasoRef.current.value,
-        tipo:this.tipoRef.current.value
-    }
+    var materiaprima = this.state.materiaPrima;
+     
+    materiaprima.descripcion=this.descripcionRef.current.value.toUpperCase();
+    materiaprima.cantidad=this.cantidadRef.current.value;
+    materiaprima.unidad=this.state.unidades[this.unidadRef.current.value];
+    materiaprima.codigo=this.claveRef.current.value;
+    materiaprima.proveedor= this.state.lstProv[this.proveedorRef.current.selectedIndex];
+    //=this.state.materiaPrima.fechaEntrada,
+    //materiaprima.fechaCaducidadthis.state.materiaPrima.,
+    materiaprima.observaciones=this.observacionesRef.current.value;
+    materiaprima.lote=this.loteRef.current.value;
+    materiaprima.necesario=this.necesarioRef.current.value;
+    materiaprima.escaso=this.escasoRef.current.value;
+    materiaprima.tipo=this.tipoRef.current.value;
+    
     this.setState({
       existencia: existeData,
       materiaPrima:materiaprima
     });
+    
   };
 
   agregarMateriaPrima = () =>{
     if(this.validator.allValid()){
-      var matprimenv = this.state.materiaPrima;
-      matprimenv.fechaEntrada = this.fechaEntrada;
-      matprimenv.fechaCaducidad = this.fechaCaducidad;
       if(this.props.tipo){
-        Axios.post(Global.url+'matprima',this.state.materiaPrima,{ headers: authHeader() })
+        let matprim = this.state.materiaPrima
+        Axios.post(Global.url+'matprima',matprim,{ headers: authHeader() })
             .then(res => {
                 if(res.data.id!==null && res.data.id!==undefined){
                   swal('Se insertó correctamente el producto',this.state.materiaPrima.descripcion,'success');
@@ -147,6 +164,29 @@ export default class Addmatprima extends Component {
     }
   }
 
+  /*busqProve = (event) =>{
+    if(event.keyCode === 13){
+      Axios.get(Global.url+'proveedor/'+(this.state.materiaPrima.proveedor===''?'vacio':this.state.materiaPrima.proveedor),{ headers: authHeader() })
+      .then(res =>{
+        console.log(res.data);
+        if(res.data.length === 1){
+          let mp = this.state.materiaPrima;
+          mp.proveedor = res.data[0].nombre;
+          mp.id = res.data[0].id;
+          this.setState({
+            materiaPrima:mp
+          });
+        }
+      })
+      .catch(err=>{
+        console.log(err);
+      });
+    }
+  }*/
+  onChange = () =>{
+
+  }
+
   cancelarMp = (event) =>{
     this.setState({
       materiaPrima:{}
@@ -166,33 +206,41 @@ export default class Addmatprima extends Component {
     return (
       <React.Fragment>
       <form onSubmit={this.enviarFormulario} onChange={this.enviarFormulario}>
+        <h3 className="center">{this.btnName} Materia Prima</h3>
         <div className=" grid">
           <div>
             <div className="showcase-form card">
               <div className="form-control">
-                <input type="text" name="descripcion" placeholder="Descripcion" ref={this.descripcionRef} defaultValue={matprima.descripcion} required/>
-                {this.validator.message('descripcion',this.state.materiaPrima.descripcion,'required')}
+                <input type="text" name="descripcion" placeholder="Descripcion" ref={this.descripcionRef} value={matprima.descripcion}  onChange={this.onChage} required/>
+                {this.validator.message('descripcion',matprima.descripcion,'required')}
               </div>
               <div className="form-control grid">
                 <input type="number" name="cantidad" placeholder="Cantidad"  ref={this.cantidadRef} defaultValue={matprima.cantidad} required/>
                 <select className="custom-select" ref={this.unidadRef}>
                   {optnLst}
                 </select>
-                {this.validator.message('cantidad',this.state.materiaPrima.cantidad,'required')}
+                {this.validator.message('cantidad',matprima.cantidad,'required')}
               </div>
               <div className="form-control grid">
                 <div>
                   <input type="text" placeholder="Clave" name="clave" ref={this.claveRef} defaultValue={matprima.codigo} required/>
-                  {this.validator.message('clave',this.state.materiaPrima.codigo,'required')}
+                  {this.validator.message('clave',matprima.codigo,'required')}
                 </div>
                 <div>
                   <input type="text" placeholder="Lote" name="lote" ref={this.loteRef} defaultValue={matprima.lote} required/>
-                  {this.validator.message('lote',this.state.materiaPrima.lote,'required')}
+                  {this.validator.message('lote',matprima.lote,'required')}
                 </div>
               </div>
               <div className="form-control">
-                <input type="text" name="proveedor" placeholder="Proveedor"  ref={this.proveedorRef} defaultValue={matprima.proveedor} required />
-                {this.validator.message('proveedor',this.state.materiaPrima.proveedor,'required')}
+                <select value={matprima.proveedor!==undefined ? matprima.proveedor.id : '' } ref={this.proveedorRef} onChange={this.onChange}>
+                  {
+                    this.state.lstProv.map((prov,i)=>{
+                      return(
+                        <option key={i} value={prov.id}>{prov.nombre}</option>
+                      );
+                    })
+                  }
+                </select>
               </div>
               <div className="form-control"></div>
             </div>
@@ -209,9 +257,7 @@ export default class Addmatprima extends Component {
                   onChange={event =>{this.selectDayEnt(event)}}
                   InputLabelProps={{
                     shrink: true,
-                  }}
-                  
-                />
+                  }}/>
               }
               {!matprima.fechaEntrada  && 
                 <TextField
@@ -263,17 +309,17 @@ export default class Addmatprima extends Component {
                 <legend>Necesario</legend>
                 <legend>Abundante</legend>
               </div>
-              <div className="form-control grid-3">
+              <div className="form-control grid-3"> 
                 <div className="grid">
                   <input type="number" value="0" readOnly />
                   <input type="number"  name="escaso" required ref={this.escasoRef} defaultValue={matprima.escaso}/>
                 </div>
                 <div className="grid">
-                  <input type="number" readOnly  value={(Number(this.state.materiaPrima.escaso) + 1)} />
+                  <input type="number" readOnly  value={(Number(this.state.materiaPrima.escaso) + 1)}  onChange={this.onChage}/>
                   <input type="number" required ref={this.necesarioRef} defaultValue={matprima.necesario} />
                 </div>
                 <div className="grid">
-                  <input type="number" readOnly value={Number(this.state.materiaPrima.necesario) + 1} />
+                  <input type="number" readOnly value={Number(this.state.materiaPrima.necesario) + 1} onChange={this.onChage} />
                 </div>
               </div>
               <div className="form-control ">
@@ -282,11 +328,12 @@ export default class Addmatprima extends Component {
               </div>
             </div>
           </div>
-          <input type="submit" value={this.btnName} className="btn btn-success" onClick={this.agregarMateriaPrima}/>
-          <input type="submit" value="Cancelar" className="btn btn-danger" onClick={this.cancelarMp}/>
         </div>
-
       </form>
+      <div className="grid">
+        <input type="submit" value={this.btnName} className="btn btn-success" onClick={this.agregarMateriaPrima}/>
+        <input type="submit" value="Cancelar" className="btn btn-danger" onClick={this.cancelarMp}/>
+      </div>
 </React.Fragment>
     );
   }

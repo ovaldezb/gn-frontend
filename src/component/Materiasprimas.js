@@ -111,15 +111,15 @@ export default class Materiasprimas extends Component {
   };
 
   updateMp = () =>{
+    
+    this.displayAdd = true;
+    this.isAdd = false;
     let i = ((this.state.page-1)*10)+ this.state.idSelMp
-      this.setState({
-        matprima:this.state.pageOfItems[i]
-      });
-      this.displayAdd = true;
-      this.isAdd = false;
-      this.setState({
-        idSelMp: -1
-      });
+    console.log('Update');
+    this.setState({
+      matprima:this.state.lstMatPrim[i],
+      idSelMp: -1
+    });  
   }
 
   deleteMp = () =>{
@@ -151,9 +151,7 @@ export default class Materiasprimas extends Component {
     });
   }
 
-  updateLstMp(matprima){
-   // let matprimant = this.state.lstMatPrim[((this.state.page-1)*10)+ this.state.idSelMp];
-    //Bitacora(Global.UPDT_MATPRIM,JSON.stringify(matprimant),JSON.stringify(matprima));
+  updateLstMp(){
     this.isAdd = true;
     this.loadMatPrim();
   }
@@ -168,7 +166,7 @@ export default class Materiasprimas extends Component {
           lstMatPrim:lstTmp
         });
       }else{
-        this.updateLstMp(matprima);
+        this.updateLstMp();
       }
     }
     this.forceUpdate();
@@ -232,7 +230,7 @@ export default class Materiasprimas extends Component {
             <td className={styleDisp} style={this.col3}><NumberFormat value={Number(matprim.cantidad - matprim.apartado ).toFixed(2)} displayType={'text'} thousandSeparator={true} /></td>
             <td style={this.col4}>{matprim.unidad.unidadMedida}</td>
             <td style={this.col5}>{matprim.codigo}</td>
-            <td style={this.col6}>{matprim.proveedor}</td>
+            <td style={this.col6}>{matprim.proveedor.nombre}</td>
             <td style={this.col7}>{momento(matprim.fechaEntrada,'MM-DD-YYYY').format('DD MMM YYYY')}</td>
             <td className={styleFecCad} style={this.col7}><Moment fromNow>{fc}</Moment></td>
           </tr>

@@ -68,7 +68,7 @@ export default class Menu extends Component {
                   </Link> 
                 </li>
                 <li>
-                  <Link to="#">
+                  <Link to="proveedores">
                     <span><FontAwesomeIcon icon={faUserTie}className="icon-menu" /></span>
                     Proveedores
                   </Link> 

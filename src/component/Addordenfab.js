@@ -125,16 +125,10 @@ export default class Addordenfab extends Component {
     }
 
     this.isErrorInit = true;
-    var ordenFabTmp = {
-      oc:this.state.ordenfab.oc,
-      lote:this.state.ordenfab.lote,
-      noConsecutivo:Number(this.state.counter),
-      piezas:this.state.ordenfab.piezas,
-      observaciones:this.state.ordenfab.observaciones,
-      matprima:this.state.lstMatPrimResp,
-      estatus:Global.TEP,
-      nombre:this.state.ordenfab.nombre
-    };
+    var ordenFabTmp = this.state.ordenfab;
+    ordenFabTmp.noConsecutivo=Number(this.state.counter);
+    ordenFabTmp.matprima=this.state.lstMatPrimResp;
+    ordenFabTmp.estatus=Global.TEP;    
     
     Axios.post(Global.url+'ordenfab',ordenFabTmp,{ headers: authHeader() })
       .then(res=>{
@@ -177,22 +171,20 @@ export default class Addordenfab extends Component {
 
   enviarFormulario = (e) =>{
     e.preventDefault();
-    var ordenFab = {
-      oc:this.ocRef.current.value,
-      lote:this.loteRef.current.value,
-      noConsecutivo:this.state.counter,
-      piezas:this.piezasRef.current.value,
-      observaciones:this.obsRef.current.value,
-      presentacion:this.state.ordenfab.presentacion,
-      estatus:Global.TEP
-    };
+    var ordenFab = this.state.ordenfab;
+    ordenFab.oc=this.ocRef.current.value;
+    ordenFab.lote=this.loteRef.current.value;
+    ordenFab.noConsecutivo=this.state.counter;
+    ordenFab.piezas=this.piezasRef.current.value;
+    ordenFab.observaciones=this.obsRef.current.value;
+    //ordenFab.presentacion:this.state.ordenfab.presentacion,    
     this.setState({
       ordenfab:ordenFab,
       piezasPendientes:this.state.piezasTotales - this.piezasRef.current.value
     });
   }
 
-  buscaOC = (e) =>{
+  /*buscaOC = (e) =>{
     if(e.keyCode === 13){
       Axios.get(Global.url+'ordencompra/oc/'+this.state.ordenfab.oc,{ headers: authHeader() })
       .then(res =>{
@@ -204,14 +196,13 @@ export default class Addordenfab extends Component {
           piezasPendientes:res.data.piezas - res.data.piezasFabricadas,
           piezasTotales:res.data.piezas - res.data.piezasFabricadas,
           clave:res.data.clave,
-          
         });
       })
       .catch(err =>{
         console.log(err);
       });
     }
-  }
+  }*/
   
   clean = () =>{
     this.setState({
@@ -253,6 +244,37 @@ export default class Addordenfab extends Component {
     
   }
 
+  validaOF = (e) =>{
+    if(e.keyCode === 13 || e._reactName === 'onBlur'){
+      
+      if(this.state.ordenfab.oc === undefined){
+        return;
+      }
+      Axios.get(Global.url+'ordencompra/oc/'+this.state.ordenfab.oc,{ headers: authHeader() })
+      .then(res=>{
+        let of = this.state.ordenfab;
+        of.presentacion=res.data.presentacion;
+        of.nombre=res.data.nombreProducto;
+        this.setState({
+          ordenfab:of,
+          piezasPendientes:res.data.piezas - res.data.piezasFabricadas,
+          piezasTotales:res.data.piezas - res.data.piezasFabricadas,
+          clave:res.data.clave,
+        });
+      })
+      .catch(err=>{
+        //console.log(err);
+          swal('No existe la OC '+this.state.ordenfab.oc,'no es posible continuar con la OF','warning');
+          let of = this.state.ordenfab;
+          of.oc = ''
+          this.setState({
+            ordenfab: of,
+            piezasPendientes:''
+          });
+      });
+    }
+  }
+
   updtRow = (i) =>{
     
     let mpArray = this.state.lstMatPrimResp;
@@ -267,6 +289,9 @@ export default class Addordenfab extends Component {
     this.setState({
       valor:Number(this.valorRef.current.value)
     });
+  }
+  onChange = () =>{
+
   }
 
   pad(num, size) {
@@ -288,7 +313,7 @@ export default class Addordenfab extends Component {
               </div>
               <div className="form-control grid">
                 <div>
-                  <input type="text" name="oc" placeholder="Orden de Compra" ref={this.ocRef} value={this.state.ordenfab.oc} onKeyUp={this.buscaOC} />
+                  <input type="text" name="oc" placeholder="Orden de Compra" ref={this.ocRef} value={this.state.ordenfab.oc} onKeyUp={this.validaOF} onBlur={this.validaOF} />
                   {this.validator.message('oc',this.state.ordenfab.oc,'required')}
                 </div>
                 <div>
@@ -300,7 +325,7 @@ export default class Addordenfab extends Component {
             <div className="showcase-form card">
               <div className="form-control grid-3">
                 <div>
-                  <input type="number" name="piezas" placeholder="Piezas" ref={this.piezasRef} value={this.state.ordenfab.piezas} />
+                  <input type="number" name="piezas" placeholder="Piezas" ref={this.piezasRef} value={this.state.ordenfab.piezas} onChange={this.onChange}/>
                   {this.validator.message('piezas',this.state.ordenfab.piezas,'required')}
                 </div>
                 <div>

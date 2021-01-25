@@ -10,22 +10,42 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTruck, faPrint } from "@fortawesome/free-solid-svg-icons";
 import NumberFormat from 'react-number-format';
 import swal from 'sweetalert';
+import Logo from '../assets/images/logo.png'
+import Clock from 'react-live-clock';
 
 export default class Productoterminado extends Component {
+  
   filterRef = React.createRef();  
+  activosRef = React.createRef();
   showTruck = false;
+  isPrint= false;
   center = {textAlign:"center"}
+  hide={display:'none'};
   state = {
       lstPdrTerm:[],
       pageOfItems: [],
       page:1,
       filtro: "",
-      idSelPt: -1,
+      idSelPt: -1
       };
+    right_top = {textAlign:'right',verticalAlign: 'top'};
+    center_top = {textAlign:'center',verticalAlign: 'top'};
+    left_top = {textAlign:'left',verticalAlign: 'top'};
+  componentDidMount(props) {
+    //super();
+    this.loadProdTermActive();
+  }
 
-  constructor(props) {
-    super();
-    this.loadProdTerm();
+  loadProdTermActive(){
+    Axios.get(Global.url+'prodterm/activo',{ headers: authHeader() })
+      .then( res =>{
+        this.setState({
+          lstPdrTerm:res.data
+        });
+      })
+      .catch(err => {
+
+      });
   }
 
   loadProdTerm(){
@@ -43,7 +63,7 @@ export default class Productoterminado extends Component {
   deliverPT = () =>{
     var prodterm = this.state.lstPdrTerm[this.state.idSelPt];
     swal({
-      title:"Se va a entregar el PT del Lote"+prodterm.lote,
+      title:"Se va a entregar el PT del Lote:"+prodterm.lote,
       text: prodterm.nombre,
       content: "input",
       dangerMode:false,
@@ -51,15 +71,18 @@ export default class Productoterminado extends Component {
       buttons: true
     }).then(
       comment =>{
+        if(comment){
         prodterm.comentario = comment;
-        Axios.put(Global.url+'prodterm/'+this.state.lstPdrTerm[this.state.idSelPt].id,prodterm,{ headers: authHeader() })
-        .then(res =>{
-          swal('PT '+prodterm.nombre+' entregado',prodterm.lote,'success');
-        })
-        .catch(err=>{
+         Axios.put(Global.url+'prodterm/'+this.state.lstPdrTerm[this.state.idSelPt].id,prodterm,{ headers: authHeader() })
+         .then(res =>{
+           swal('PT '+prodterm.nombre+' entregado','Lote:'+prodterm.lote,'success');
+           this.loadProdTermActive();
+         })
+         .catch(err=>{
 
-        });
+         });
         swal.close();
+        }
       }
     );
   }
@@ -86,9 +109,95 @@ export default class Productoterminado extends Component {
     this.setState({ pageOfItems: pageOfItems, page:page });
   }
 
+  selectType = () =>{
+    if(this.activosRef.current.checked){
+      this.loadProdTerm();
+    }else{      
+      this.loadProdTermActive();
+    }
+  }
+
+  printPT = () =>{
+    if(this.state.idSelPt < 0){
+      swal('Debe elegir un Producto Terminado');
+      return;
+    };
+   this.forceUpdate();
+    let printwind = window.open("");
+    let estilos = '<style> '+
+    '@media print{'+
+     ' .table-main{'+
+     '   border-collapse: collapse;'+
+     '   width: 100%;'+
+     '   font-size: 14px;'+
+     '   font-family: Arial, Helvetica, sans-serif;'+
+     '   padding: 0;'+
+     ' }'+
+     ' .table-0{'+
+     '   border: 2px solid black;'+
+     '   border-collapse: collapse;'+
+     '   width: 100%;'+
+     '   height: 157px;'+
+     '   margin-bottom: 0px;'+
+     '   margin-right: 0px;'+
+     ' }'+
+     ' .table-1{'+
+     '   border-collapse: collapse;'+
+     '   width: 101.5%;'+
+     '   height: 157px;'+
+     '   margin-bottom: 0px;'+
+     '   margin-left: -3px;'+
+     '  }'+
+    ' .table-1 td{'+
+    '   border: 2px solid black;'+
+    ' }'+
+    ' .table-2{'+
+    '   border: 2px solid black;'+
+    '   border-collapse: collapse;'+
+    '   width: 100%;'+
+    '   margin-top: -3px;'+
+    '   height: 100px;'+
+    '  }'+  
+    ' .table-3{'+
+    '   border-collapse: collapse;'+
+    '   width: 100%;'+
+    '   height: 350px;'+
+    '   margin-top: -3px;'+
+    '  }'+
+    ' .table-3 td, th{'+
+    '   border: 2px solid black;'+
+    ' }'+
+    '}'+
+    '</style>';
+    var is_chrome = Boolean(window.chrome);
+    var is_safari = Boolean(window.safari);
+    
+    printwind.document.write(estilos+' '+document.getElementById('print').innerHTML);
+    if (is_chrome) {
+      console.log('Entrando')
+      printwind.print();      
+    }
+    else if (is_safari) {
+      printwind.print();
+      setTimeout(()=>{
+        printwind.close();
+      },1000);
+    }
+    else {
+      printwind.print();
+      printwind.close();
+    }
+  }
+
+  pad(num, size) {
+    num = num.toString();
+    while (num.length < size) num = "0" + num;
+    return num;
+ }
+
   render() {
     var style={};
-      if(this.state.lstPdrTerm.length > 0 ){
+    if(this.state.lstPdrTerm.length > 0 && !this.isPrint){
         return(
           <React.Fragment>
             <div className="container">
@@ -99,13 +208,18 @@ export default class Productoterminado extends Component {
                     <li>
                       <input className="input"  type="text"  name="filtro" ref={this.filterRef} onKeyUp={this.filtrado}/>
                     </li>
+                    <li>
+                      <input type="checkbox" ref={this.activosRef} onChange={this.selectType}/>
+                    </li>
                   </ul>
                   <h2>Producto Terminado</h2>
                   <nav>
                     <ul>
                       <li>
-                        <Link to="#" onClick={this.printPT}>
-                        <FontAwesomeIcon icon={faPrint} size="2x" />
+                      <Link to="#" onClick={this.printPT}>
+                        
+                          <FontAwesomeIcon icon={faPrint} size="2x" />
+                        
                         </Link>
                       </li>
                       <li>
@@ -158,7 +272,7 @@ export default class Productoterminado extends Component {
                         style = this.state.idSelPt === i ? "selected pointer":{};
                         return(
                           <tr key={i} onClick={() => {this.selectRow(i,(prodterm.estatus.codigo === Global.WTDEL))}}  className={style}>
-                            <td>{prodterm.noConsecutivo}</td>
+                            <td>{this.pad(prodterm.noConsecutivo,Global.SIZE_DOC)}</td>
                             <td>{prodterm.nombre}</td>
                             <td>{prodterm.oc}</td>
                             <td>{prodterm.lote}</td>
@@ -175,13 +289,123 @@ export default class Productoterminado extends Component {
               </div>
               <Paginacion items={this.state.lstPdrTerm} onChangePage={this.onChangePage} />
             </div>
+            {this.state.idSelPt !==-1 && 
+            <div id="print" style={{display:'none'}}>
+              <table className="table-main">
+                  <tbody>
+                <tr>
+                  <td style={this.w70}>
+                    <table className="table-0">
+                        <tbody>
+                      <tr>
+                        <td style={this.w25} rowSpan="3">
+                          <img src={Logo} alt="" width="100%" />
+                        </td>
+                        <td style={this.w75}>Grupo Nordan SA de CV</td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">FRONTERA No 12, Col A. OBREGON TEL (722)2714460/61</td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">SAN MATEO ATENCO, ESTADO DE MEXICO</td>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                  <td style={this.w30}>
+                    <table className="table-1">
+                    <tbody>
+                      <tr>
+                        <td>Remision #</td>
+                        <td>32902</td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">Fecha</td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2"><Clock format={'DD-MMMM-YYYY'} ticking={false}  /></td>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td colSpan="2">
+                    <table className="table-2">
+                      <col width="20%" />
+                      <col width="15%" />
+                      <col width="65%" />
+                      <tbody>
+                      <tr>
+                        <td>&nbsp;</td>
+                        <td>Cliente:</td>
+                        <td>{this.state.lstPdrTerm[this.state.idSelPt].cliente}</td>
+                      </tr>
+                      <tr>
+                        <td>&nbsp;</td>
+                        <td>Direccion:</td>
+                        <td>Toluca Edo de Mex</td>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td colSpan="2">
+                    <table className="table-3">
+                      <thead>
+                        <tr>
+                          <th>Cantidad</th>
+                          <th>Clave</th>
+                          <th>Descripcion</th>
+                          <th>OC</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      <tr>
+                        <td style={this.center_top}>{this.state.lstPdrTerm[this.state.idSelPt].piezas}</td>
+                        <td style={this.center_top}>{this.state.lstPdrTerm[this.state.idSelPt].clave}</td>
+                        <td style={this.left_top}>
+                          <p>
+                            {this.state.lstPdrTerm[this.state.idSelPt].nombre}
+                          </p>
+                          <p>Lote:{this.state.lstPdrTerm[this.state.idSelPt].lote}</p>
+                          <p>{this.state.lstPdrTerm[this.state.idSelPt].comentario}</p>
+                        </td>
+                        <td style={this.center_top}>{this.state.lstPdrTerm[this.state.idSelPt].oc}</td>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+            }
           </React.Fragment>
         );
 
       }else{
         return (
             <React.Fragment>
-                <div className="container-gn">
+              <div className="container">
+                <div className="barnav">
+                  <div className="container flex-gn">
+                    <ul>
+                      <li>Filtro:</li>
+                      <li>
+                        <input className="input"  type="text"  name="filtro" ref={this.filterRef} onKeyUp={this.filtrado}/>
+                      </li>
+                      <li>
+                        <input type="checkbox" ref={this.activosRef} onChange={this.selectType}/>
+                      </li>
+                    </ul>
+                    <h2>Producto Terminado</h2>
+                    <nav>
+                      
+                    </nav>
+                  </div>
+                </div>
                   <h2 className="center">No hay producto terminado para mostrar</h2>
                 </div>
             </React.Fragment>

@@ -2,7 +2,7 @@ import Axios from 'axios'
 import React, { Component } from 'react'
 import authHeader from "../services/auth-header";
 import Global from '../Global';
-import Addcliente from './Addcliente';
+import Addproveedor from './Addproveedor';
 import {Link} from 'react-router-dom';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faPlusSquare, faEdit,  faTrash,} from "@fortawesome/free-solid-svg-icons";
@@ -10,28 +10,28 @@ import Paginacion from './Paginacion';
 import swal from "sweetalert";
 import axios from "axios";
 
-export default class Clientes extends Component {
+export default class Proveedores extends Component {
     displayAdd = false;
     isUpdt = false;
     filterRef = React.createRef();
     state={
-        lstClientes:[],
+        lstProv:[],
         pageOfItems: [],
         page:1,
-        cliente:{},
-        idSelCli:-1,
+        proveedor:{},
+        idSelProv:-1,
         filter:''
     }
 
     componentDidMount(){
-        this.getClientes();
+        this.getProveedores();
     }
 
-    getClientes(){
-        Axios.get(Global.url+'cliente',authHeader())
+    getProveedores(){
+        Axios.get(Global.url+'proveedor',{ headers: authHeader() })
         .then(res =>{
             this.setState({
-                lstClientes:res.data
+                lstProv:res.data
             });
         } )
         .catch(err=>{
@@ -39,29 +39,29 @@ export default class Clientes extends Component {
         });
     }
 
-    addCl = () =>{
+    addProv = () =>{
         this.displayAdd = true;
         this.forceUpdate();
     }
 
-    deleteCl = () =>{
+    deleteProv = () =>{
         swal({
             title: "Estas seguro?",
-            text: "Una vez eliminado, no se podrá recuperar el cliente",
+            text: "Una vez eliminado, no se podrá recuperar el proveedor",
             icon: "warning",
             buttons: true,
             dangerMode: true,
           })
           .then((willDelete) => {
             if (willDelete) {
-              axios.delete(Global.url+'cliente/'+this.state.lstClientes[this.state.idSelCli].id,{ headers: authHeader() })
+              axios.delete(Global.url+'proveedor/'+this.state.lstProv[this.state.idSelProv].id,{ headers: authHeader() })
                   .then(res=>{
                     //var mp = this.state.lstMatPrim[this.state.idSelMp];
                     //Bitacora(Global.DEL_MATPRIM,JSON.stringify(mp),'');
-                    swal("La materia prima ha sido eliminada!", {
+                    swal("El proveedor ha sido eliminado!", {
                       icon: "success",
                     });
-                    this.getClientes();
+                    this.getProveedores();
                     
                   }).catch(
                     err =>{
@@ -72,29 +72,29 @@ export default class Clientes extends Component {
           });
     }
 
-    cancelarCli = ()=>{
+    cancelarProv = ()=>{
         this.displayAdd = false;
         this.isUpdt = false;
-        this.getClientes();
+        this.getProveedores();
     }
 
     selectRow = (i) => {
         this.setState({
-          idSelCli: i,
+          idSelProv: i,
         });
       };
 
-    updateCl = () =>{
+    updateProv = () =>{
         this.displayAdd = true;
         this.isUpdt = true;
         this.setState({
-            cliente:this.state.lstClientes[((this.state.page-1)*10)+this.state.idSelCli]
+            proveedor:this.state.lstProv[((this.state.page-1)*10)+this.state.idSelProv]
         });
     }
 
     filtrado = () =>{
         var filter = this.filterRef.current.value;
-        var nvoArray = this.state.lstClientes.filter(element =>{
+        var nvoArray = this.state.lstProv.filter(element =>{
           return Object.values(element).filter(item=>{ return String(item).includes(filter)}).length > 0 
         });
         this.setState({
@@ -108,11 +108,11 @@ export default class Clientes extends Component {
   }
 
     render() {
-      if(this.state.lstClientes.length >0){
+      if(this.state.lstProv.length >0){
         return (
             <React.Fragment>
             {this.displayAdd &&
-                <Addcliente cancelar={this.cancelarCli} tipo={this.isUpdt} cliente={this.state.cliente}/>
+                <Addproveedor cancelar={this.cancelarProv} tipo={this.isUpdt} proveedor={this.state.proveedor}/>
             }
             {!this.displayAdd &&
                 <React.Fragment>
@@ -124,21 +124,21 @@ export default class Clientes extends Component {
                                     <input className="input" type="text" ref={this.filterRef} onKeyUp={this.filtrado}/>
                                 </li>
                             </ul>
-                            <h2>Clientes</h2>
+                            <h2>Proveedores</h2>
                             <nav>
                                 <ul>
                                     <li>
-                                        <Link to="#" onClick={this.addCl}>
+                                        <Link to="#" onClick={this.addProv}>
                                             <FontAwesomeIcon icon={faPlusSquare} />
                                         </Link>
                                     </li>
                                     <li>
-                                        <Link to="#" onClick={this.updateCl}>
+                                        <Link to="#" onClick={this.updateProv}>
                                             <FontAwesomeIcon icon={faEdit} />
                                         </Link>
                                     </li>
                                     <li>
-                                        <Link to="#" onClick={this.deleteCl} >
+                                        <Link to="#" onClick={this.deleteProv} >
                                             <FontAwesomeIcon icon={faTrash} />
                                         </Link>
                                     </li>
@@ -151,6 +151,8 @@ export default class Clientes extends Component {
                             <tr>
                                 <th>Nombre</th>
                                 <th>RFC</th>
+                                <th>Telefono</th>
+                                <th>Correo</th>
                                 <th>Contacto</th>
                             </tr>
                         </thead>
@@ -158,18 +160,20 @@ export default class Clientes extends Component {
                     <div className="table-ovfl tbl-lesshead">
                         <table className="table table-hover">
                             <tbody>
-                                {this.state.pageOfItems.map((cli,i)=>{
+                                {this.state.pageOfItems.map((prov,i)=>{
                                     var style = {};
-                                    if(this.state.idSelCli === i){
+                                    if(this.state.idSelProv === i){
                                         style="selected pointer"
                                     }else{
                                         style={};
                                     }
                                     return(
                                         <tr key={i} onClick={() => {this.selectRow(i); }} className={style} >
-                                            <td>{cli.nombre}</td>
-                                            <td>{cli.rfc}</td>
-                                            <td>{cli.contacto}</td>
+                                            <td>{prov.nombre}</td>
+                                            <td>{prov.rfc}</td>
+                                            <td>{prov.telefono}</td>
+                                            <td>{prov.email}</td>
+                                            <td>{prov.contacto}</td>
                                         </tr>
                                     );
                                 })}
@@ -177,14 +181,14 @@ export default class Clientes extends Component {
                         </table>
                     </div>
                     <div className="center">
-                        <Paginacion items={this.state.lstClientes} onChangePage={this.onChangePage} />
+                        <Paginacion items={this.state.lstProv} onChangePage={this.onChangePage} />
                     </div>
                 </React.Fragment>
             }
             </React.Fragment>
         )
       }else if(this.displayAdd){
-        return <Addcliente cancelar={this.cancelarCli} tipo={this.isUpdt}/>
+        return <Addproveedor cancelar={this.cancelarProv} tipo={this.isUpdt}/>
       }else{
           return(
             <div className="container">
@@ -195,13 +199,13 @@ export default class Clientes extends Component {
                     <nav>
                       <ul>
                         <li>
-                          <Link to="#" onClick={this.addCl}><FontAwesomeIcon icon={faPlusSquare} /></Link>
+                          <Link to="#" onClick={this.addProv}><FontAwesomeIcon icon={faPlusSquare} /></Link>
                         </li>
                       </ul>
                     </nav>
                   </div>
                 </div>
-                <h1 className="center">No hay clientes para mostrar</h1>
+                <h1 className="center">No hay Proveedores para mostrar</h1>
             </div>
           );
       }

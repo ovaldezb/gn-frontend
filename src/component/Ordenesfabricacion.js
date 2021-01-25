@@ -97,7 +97,7 @@ export default class Ordenesfabricacion extends Component {
               swal("La Orden de Fabricación ha sido completada!", {
                 icon: "success",
               });
-              this.loadAllOFs();
+              this.loadAactiveOF();
             }).catch(
               err =>{
                 console.log('Error '+err.message);

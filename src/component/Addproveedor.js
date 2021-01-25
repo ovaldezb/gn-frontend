@@ -6,7 +6,7 @@ import swal from 'sweetalert';
 import authHeader from "../services/auth-header";
 
 
-export default class Addcliente extends Component {
+export default class Addproveedor extends Component {
     btnMsg = 'Enviar';
     nombreRef = React.createRef();
     direccionRef = React.createRef();
@@ -14,9 +14,9 @@ export default class Addcliente extends Component {
     emailRef = React.createRef();
     rfcRef = React.createRef();
     contactoRef = React.createRef();
-    idCliente = '';
+    idProveedor = '';
     state={
-        cliente:{}
+        proveedor:{}
     }
     validator = new SimpleReactValidator({
         messages:{
@@ -26,9 +26,9 @@ export default class Addcliente extends Component {
     componentDidMount(){
         if(this.props.tipo){
             this.btnMsg = 'Actualizar';
-            this.idCliente = this.props.cliente.id;
+            this.idProveedor = this.props.proveedor.id;
             this.setState({
-                cliente:this.props.cliente
+                proveedor:this.props.proveedor
             });
         }
     }
@@ -36,7 +36,7 @@ export default class Addcliente extends Component {
 
     enviarFormulario = (event) =>{
         event.preventDefault();
-        var cli = {
+        var prov = {
             nombre:this.nombreRef.current.value,
             direccion:this.direccionRef.current.value,
             telefono:this.telRef.current.value,
@@ -46,30 +46,30 @@ export default class Addcliente extends Component {
             activo:true
         }
         this.setState({
-            cliente:cli
+            proveedor:prov
         });
         
     }
 
-    enviarCliente = () =>{
+    enviarProveedor = () =>{
         if(this.validator.allValid()){
             if(this.btnMsg === 'Enviar'){
               Axios
-                .post(Global.url+'cliente', this.state.cliente,{ headers: authHeader() })
+                .post(Global.url+'proveedor', this.state.proveedor,{ headers: authHeader() })
                 .then(res=>{
-                    swal('Se inserto el cliente correctamente','','success');
-                    this.cancelarCli();
+                    swal('Se inserto el proveedor correctamente','','success');
+                    this.cancelarProv();
                 })
                 .catch(err=>{
                     console.log(err);
                 });
             }else{
               Axios
-                .put(Global.url+'cliente/'+this.idCliente,this.state.cliente,{ headers: authHeader() })
+                .put(Global.url+'proveedor/'+this.idProveedor,this.state.proveedor,{ headers: authHeader() })
                 .then(
                     res =>{
-                        swal('Se actualizo correctamente el cliente','','success');
-                        this.cancelarCli();
+                        swal('Se actualizo correctamente el proveedor','','success');
+                        this.cancelarProv();
                     }
                 )
                 .catch(err =>{
@@ -82,49 +82,49 @@ export default class Addcliente extends Component {
         }
     }
 
-    cancelarCli = () =>{
+    cancelarProv = () =>{
         this.setState({
-            cliente:{}
+            proveedor:{}
         });
         this.props.cancelar();
     }
 
     render() {
-        const cliente = this.state.cliente;
+        const proveedor = this.state.proveedor;
         return (            
             <React.Fragment>
               <form onChange={this.enviarFormulario} onSubmit={this.enviarFormulario}> 
-                <h2 className="center">Agregar Cliente</h2>
+                <h2 className="center">Agregar Proveedor</h2>
                 <div className="grid">
                     <div className="showcase-form card">
                         <div className="form-control">
-                            <input type="text" name="nombre" placeholder="Nombre del Cliente" ref={this.nombreRef} value={cliente.nombre}/>
-                            {this.validator.message('nombre',this.state.cliente.nombre,'required')}
+                            <input type="text" name="nombre" placeholder="Nombre del Proveedor" ref={this.nombreRef} value={proveedor.nombre}/>
+                            {this.validator.message('nombre',this.state.proveedor.nombre,'required')}
                         </div>
                         <div className="form-control">
-                            <textarea type="text" name="dir" placeholder="Dirección" ref={this.direccionRef} value={cliente.direccion} />
-                            {this.validator.message('dir',this.state.cliente.direccion,'required')}
+                            <textarea type="text" name="dir" placeholder="Dirección" ref={this.direccionRef} value={proveedor.direccion} />
+                            {this.validator.message('dir',this.state.proveedor.direccion,'required')}
                         </div>
                         <div className="form-control">
-                            <input type="text" name="telefono" placeholder="Telefono" ref={this.telRef} value={cliente.telefono}/>
-                            {this.validator.message('telefono',this.state.cliente.telefono,'required')}
+                            <input type="text" name="telefono" placeholder="Telefono" ref={this.telRef} value={proveedor.telefono}/>
+                            {this.validator.message('telefono',this.state.proveedor.telefono,'required')}
                         </div>
                     </div>
                     <div className="showcase-form card">
                         <div className="form-control">
-                            <input type="text" placeholder="Correo Electronico" ref={this.emailRef} value={cliente.email}/>
+                            <input type="text" placeholder="Correo Electronico" ref={this.emailRef} value={proveedor.email}/>
                         </div>
                         <div className="form-control">
-                            <input type="text" placeholder="RFC" ref={this.rfcRef}  value={cliente.rfc}/>
+                            <input type="text" placeholder="RFC" ref={this.rfcRef}  value={proveedor.rfc}/>
                         </div>
                         <div className="form-control">
-                            <input type="text" placeholder="Contacto" ref={this.contactoRef} value={cliente.contacto} />
+                            <input type="text" placeholder="Contacto" ref={this.contactoRef} value={proveedor.contacto} />
                         </div>
                     </div>
                 </div>
                 <div className="container grid">
-                    <button className="btn btn-success" onClick={this.enviarCliente} >{this.btnMsg}</button>
-                    <button className="btn btn-danger" onClick={this.cancelarCli}>Cancelar</button>
+                    <button className="btn btn-success" onClick={this.enviarProveedor} >{this.btnMsg}</button>
+                    <button className="btn btn-danger" onClick={this.cancelarProv}>Cancelar</button>
                 </div>
               </form>
             </React.Fragment>

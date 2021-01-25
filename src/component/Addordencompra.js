@@ -10,7 +10,7 @@ import {TextField} from '@material-ui/core';
 export default class Addordencompra extends Component {
   ocRef = React.createRef();
   claveRef = React.createRef();
-  nombreRef = React.createRef();
+  
   presRef = React.createRef();
   clienteRef = React.createRef();
   piezasRef = React.createRef();
@@ -18,12 +18,17 @@ export default class Addordencompra extends Component {
   btnName = 'Guardar';
   isErrorInit = true;
   right = {textAlign:"right"}
+  center = {textAlign:"center"}
   state={
       ordencompra:{},
-      proddisp:{},
+      
       lstMatPrim:[],
       lstMatPrimResp:[],
-      lstErr:[]
+      lstErr:[],
+      lstCliente:[],
+      idCliente:'',
+      idOrdenCompra:'',
+      
   }
 
   constructor(){
@@ -34,29 +39,54 @@ export default class Addordencompra extends Component {
           required:'Requerido'
       }
     });
-    
   }
 
   componentDidMount(){
       if(!this.props.tipo){
         this.btnName = "Actualizar";
         this.setState({
-            ordencompra: this.props.ordencompra
+            ordencompra: this.props.ordencompra,
+            idCliente:this.props.ordencompra.cliente.id,
+            idOrdenCompra:this.props.ordencompra.id
           });
       }
   }
 
-  busPdClave = (event) =>{
+  buscaCliente = (event) =>{
     if(event.keyCode === 13){
+      Axios.get(Global.url+'cliente/'+(this.clienteRef.current.value === '' ? 'vacio':this.clienteRef.current.value),{ headers: authHeader() })
+      .then(res =>{
+        if(res.data.length > 0){
+          let oc = this.state.ordencompra;
+          oc.cliente = res.data[0];
+          console.log(oc);
+          this.setState({
+            ordencompra:oc,
+            idCliente:res.data[0].id
+          });
+        }else{
+          this.setState({
+            lstCliente:res.data
+          });
+        }
+      })
+      .catch(err=>{
+
+      });
+    }
+  }
+
+  busProductoClave = (event) =>{
+    if(event.keyCode === 13 || event._reactName === 'onBlur'){
       Axios.get(Global.url+'prodisp/'+this.state.ordencompra.clave,{ headers: authHeader() })
           .then(res=>{
+            let oc = this.state.ordencompra;
+            console.log(res);
             if(res.data !== null){     
+              oc.clave = res.data.clave;
+              oc.nombreProducto = res.data.nombre;
               this.setState({
-                proddisp:res.data,
-                ordencompra:{
-                  clave:res.data.clave,
-                  nombre:res.data.nombre                  
-                },
+                ordencompra:oc,
                 lstMatPrim:res.data.materiaPrimaUsada
               });
             }else{
@@ -71,59 +101,62 @@ export default class Addordencompra extends Component {
 
   guardaOC = () =>{
     this.isErrorInit = true;
-    var ordenCompraTmp = {
-      oc:this.state.ordencompra.oc,
-      clave:this.state.ordencompra.clave,
-      nombreProducto:this.state.ordencompra.nombreProducto,
-      cliente:this.state.ordencompra.cliente,
-      fechaFabricacion:this.state.ordencompra.fechaFabricacion,
-      fechaEntrega:this.state.ordencompra.fechaEntrega,
-      noConsecutivo:this.state.counter,
-      piezas:this.state.ordencompra.piezas,
-      observaciones:this.state.ordencompra.observaciones,
-      presentacion:this.state.ordencompra.presentacion,
-      estatus:Global.OPEN,
-      piezasPendientes:this.state.ordencompra.piezas,
-      piezasCompletadas:0
-    };
-
-    Axios.post(Global.url+'ordencompra',ordenCompraTmp,{ headers: authHeader() })
+    var ordenCompraTmp = this.state.ordencompra;
+    if(this.btnName==='Guardar'){
+      ordenCompraTmp.estatus=Global.OPEN;
+      ordenCompraTmp.piezasCompletadas=0;
+      ordenCompraTmp.piezasEntregadas=0;
+      Axios.post(Global.url+'ordencompra',ordenCompraTmp,{ headers: authHeader() })
+        .then(res=>{
+          console.log(res);
+            swal('Se guardó la Orden de Compra con éxito',ordenCompraTmp.oc,'success');
+            this.cancelarOC();
+        })
+        .catch(err=>{
+          console.log(err);
+        });
+    }else{
+      Axios.put(Global.url+'ordencompra/'+this.state.idOrdenCompra,ordenCompraTmp,{ headers: authHeader() })
       .then(res=>{
-          swal('Se guardó la Orden de Compra con éxito',ordenCompraTmp.noConsecutivo,'success');
-          this.clean();
-          this.cancelarOC();
+          swal('Se actualizó la Orden de Compra con éxito',''+res.data.oc,'success');
+          this.cancelarOC(res.data);
       })
       .catch(err=>{
         console.log(err);
       });
+    }
   }
 
   cancelarOC = () => {
-    this.props.cancelar(null);
+    this.clean();
+    this.props.cancelar();
   }
 
   enviarFormulario = (e) =>{
     e.preventDefault();
-    var ordenComp = {
-      oc:this.ocRef.current.value,
-      clave:this.claveRef.current.value,
-      nombreProducto:this.nombreRef.current.value,
-      cliente:this.clienteRef.current.value,
-      fechaFabricacion:this.state.ordencompra.fechaFabricacion,
-      fechaEntrega:this.state.ordencompra.fechaEntrega,
-      noConsecutivo:this.state.counter,
-      piezas:this.piezasRef.current.value,
-      presentacion:this.presRef.current.value,
-      observaciones:this.obsRef.current.value
-    };
+
+    var ordenComp = this.state.ordencompra;
+    ordenComp.oc=this.ocRef.current.value;
+    ordenComp.clave=this.claveRef.current.value;
+    ordenComp.nombreProducto=this.state.ordencompra.nombreProducto;
+    if(ordenComp.cliente !== undefined){
+      ordenComp.cliente.nombre = this.clienteRef.current.value;    
+    }    
+    ordenComp.fechaFabricacion=this.state.ordencompra.fechaFabricacion;
+    ordenComp.fechaEntrega=this.state.ordencompra.fechaEntrega;
+    ordenComp.piezas=this.piezasRef.current.value;
+    ordenComp.presentacion=this.presRef.current.value;
+    ordenComp.observaciones=this.obsRef.current.value;
+
     this.setState({
       ordencompra:ordenComp
     });
+    console.log(this.state.ordencompra);
   }
 
   selectDayFab = (day) => {
     var ordenComp = this.state.ordencompra;
-    ordenComp.fechaFabricacion = Moment(day).format('MM-DD-yyyy h:mm:ss');
+    ordenComp.fechaFabricacion = Moment(day.target.value).format('MM-DD-yyyy h:mm:ss');
     this.setState({
       ordencompra:ordenComp
     });
@@ -131,9 +164,20 @@ export default class Addordencompra extends Component {
 
   selectDayEnt = (day) => {
     var ordenComp = this.state.ordencompra;
-    ordenComp.fechaEntrega= Moment(day).format('MM-DD-yyyy h:mm:ss');
+    ordenComp.fechaEntrega= Moment(day.target.value).format('MM-DD-yyyy h:mm:ss');
     this.setState({
       ordencompra:ordenComp
+    });
+  }
+
+  selCliente = (index) =>{
+    let oc = this.state.ordencompra;
+    oc.cliente = this.state.lstCliente[index];    
+    let id = this.state.lstCliente[index].id;
+    this.setState({
+      ordencompra:oc,
+      idCliente:id,
+      lstCliente:[]
     });
   }
 
@@ -143,9 +187,10 @@ export default class Addordencompra extends Component {
         clave:'',
         nombreProducto:'',
         oc:'',
-        cliente:'',
+        cliente:{nombre:''},
         piezas:'',
-       observaciones:''
+       observaciones:'',
+       presentacion:''
       }
     });
   }
@@ -161,10 +206,13 @@ export default class Addordencompra extends Component {
   }
 
   render() {
-      const ordencompra = this.state.ordencompra;
-      const fechaFabricacion = ordencompra.fechaFabricacion ?  Moment(ordencompra.fechaEntrada,'MM-DD-YYYY').format('YYYY-MM-DD') : '';
-      const fechaEntrega = ordencompra.fechaEntrega ?  Moment(ordencompra.fechaEntrega,'MM-DD-YYYY').format('YYYY-MM-DD') : '';
+    const ordencompra = this.state.ordencompra;
+    //console.log(ordencompra.cliente);    
+    const fechaFabricacion = ordencompra.fechaFabricacion ?  Moment(ordencompra.fechaFabricacion,'MM-DD-YYYY').format('YYYY-MM-DD') : '';
+    const fechaEntrega = ordencompra.fechaEntrega ?  Moment(ordencompra.fechaEntrega,'MM-DD-YYYY').format('YYYY-MM-DD') : '';
+    console.log(ordencompra.cliente);
     return (
+      
       <React.Fragment>
         <form onSubmit={this.enviarFormulario} onChange={this.enviarFormulario}>
           <h3 className="center">Agregar orden de compra</h3>
@@ -181,43 +229,81 @@ export default class Addordencompra extends Component {
               </div>
               <div className="form-control grid-1-2">
                 <div>
-                  <input type="text" name="clave" placeholder="Clave" onKeyUp={this.busPdClave} ref={this.claveRef} value={this.state.ordencompra.clave} />
-                  {this.validator.message('clave',this.state.ordencompra.clave,'required')}
+                  <input type="text" name="clave" placeholder="Clave" onKeyUp={this.busProductoClave} ref={this.claveRef} value={ordencompra.clave} onBlur={this.busPdClave} onChange={this.occhange}/>
+                  {this.validator.message('clave',ordencompra.clave,'required')}
                 </div>
                 <div>
-                  <input type="text" name="nombre" placeholder="Nombre del Producto" ref={this.nombreRef}  value={this.state.ordencompra.nombre}/>
-                  {this.validator.message('nombre',this.state.ordencompra.nombreProducto,'required')}
+                  <legend>{ordencompra.nombreProducto}</legend>
+                  
                 </div>
               </div>
               <div className="form-control grid-2-1">
                 <div>
-                  <input type="text" name="cliente" placeholder="Cliente" ref={this.clienteRef} value={this.state.ordencompra.cliente} />
-                  {this.validator.message('cliente',this.state.ordencompra.cliente,'required')}
+                  {ordencompra.cliente && 
+                  <input type="text" 
+                    name="cliente" 
+                    placeholder="Cliente" 
+                    ref={this.clienteRef} 
+                    value={ordencompra.cliente.nombre} 
+                    onKeyUp={this.buscaCliente} onChange={this.occhange}/>                  
+                  }
+                  {!ordencompra.cliente && 
+                  <input type="text" 
+                    name="cliente" 
+                    placeholder="Cliente" 
+                    ref={this.clienteRef}                     
+                    onKeyUp={this.buscaCliente} onKeyBlur={this.buscaCliente} />                  
+                  }
+                  {ordencompra.cliente && this.validator.message('cliente',ordencompra.cliente.nombre,'required')}
+                  {this.state.lstCliente.length > 1 &&
+                  <div className="tbl-cli">
+                    <table>
+                      <tbody>
+                        {this.state.lstCliente.map((cli,i)=>{
+                          return(
+                            <tr key={i} onClick={()=>{this.selCliente(i)}}>
+                              <td>{cli.nombre}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                    </div>
+                  }
                 </div>
                 <div>
-                  <input type="number" name="piezas" style={this.right} placeholder="Piezas Totales" ref={this.piezasRef} value={this.state.ordencompra.piezas} />
-                  {this.validator.message('piezas',this.state.ordencompra.piezas,'required')}
+                  <input type="number" name="piezas" style={this.center} placeholder="Piezas Totales" ref={this.piezasRef} value={this.state.ordencompra.piezas} onChange={this.occhange}/>
+                  {this.validator.message('piezas',ordencompra.piezas,'required')}
                 </div>
               </div>
             </div>
             <div className="showcase-form card">
               <div className="form-control grid">
-                <input type="number" placeholder="Presentación" ref={this.presRef} value={this.state.ordencompra.presentacion}/>
+                <input type="number" placeholder="Presentación" ref={this.presRef} value={ordencompra.presentacion} onChange={this.occhange}/>
                 <div>
                     <legend>mililitros</legend>
                 </div>
               </div>
               <div className="form-control grid">  
-              
-              <TextField id="fechaFab" 
+              {ordencompra.fechaFabricacion && 
+                <TextField id="fechaFab" 
                   label="Fecha Fabricación"
                   type="date"
                   defaultValue={fechaFabricacion}
                   onChange={value => this.selectDayFab(value)}
                   InputLabelProps={{shrink: true}}
                 />
-                
-                
+              }
+              {!ordencompra.fechaFabricacion && 
+                <TextField id="fechaFab" 
+                  label="Fecha Fabricación"
+                  type="date"
+                  defaultValue={fechaFabricacion}
+                  onChange={value => this.selectDayFab(value)}
+                  InputLabelProps={{shrink: true}}
+                />
+              }
+              {ordencompra.fechaEntrega && 
                 <TextField id="fechaEnt" 
                   label="Fecha Entrega"
                   type="date"
@@ -225,7 +311,16 @@ export default class Addordencompra extends Component {
                   onChange={value => this.selectDayEnt(value)}
                   InputLabelProps={{shrink: true}}
                 />    
-                
+              }
+              {!ordencompra.fechaEntrega && 
+                <TextField id="fechaEnt" 
+                  label="Fecha Entrega"
+                  type="date"
+                  defaultValue={fechaEntrega}
+                  onChange={value => this.selectDayEnt(value)}
+                  InputLabelProps={{shrink: true}}
+                />    
+              }
               </div>
               
               <div className="form-control">

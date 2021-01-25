@@ -261,6 +261,16 @@ export default class Addproddisp extends Component {
     this.isUpdt = true;
   }
 
+  validaClave = () =>{
+    Axios.get(Global.url+'prodisp/'+this.state.clave,{ headers: authHeader() })
+    .then(res=>{
+      if(res.data ){
+        swal('Ya existe un producto con este codigo',res.data.nombre,'success');
+      }
+    })
+    .catch();
+  }
+
   descChange = () =>{
 
   }
@@ -312,7 +322,7 @@ export default class Addproddisp extends Component {
                 {this.validator.message('nombre',this.state.nombre,'required')}
               </div>
               <div className="form-control">
-                <input type="text" name="clave" placeholder="Clave" ref={this.claveRef} defaultValue={this.state.clave} />
+                <input type="text" name="clave" placeholder="Clave" ref={this.claveRef} defaultValue={this.state.clave} onBlur={this.validaClave}/>
                 {this.validator.message('clave',this.state.clave,'required')}
               </div>
             </div>
@@ -334,7 +344,7 @@ export default class Addproddisp extends Component {
               <div className="col-1">
               {/*this.state.unidad.unidadMedida && */}
               {this.state.codigo && this.state.desc && this.state.porcentaje > 0 && 
-                <Link onClick={this.addMatPrima}>
+                <Link to="#" onClick={this.addMatPrima}>
                   <FontAwesomeIcon icon={faPlusCircle} title="Agregar la MP seleccionada" />
                 </Link>
               }
