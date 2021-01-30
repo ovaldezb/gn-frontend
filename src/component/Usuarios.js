@@ -86,11 +86,7 @@ export default class Usuarios extends Component {
     this.setState({
       usuario: user,
     });
-    console.log(
-      "cambio",
-      this.state.usuario.activo,
-      this.estatusRef.current.checked
-    );
+    
   };
 
   submitFormulario = (event) => {
@@ -108,15 +104,17 @@ export default class Usuarios extends Component {
       usuario: user,
     });
     if (this.validator.allValid()) {
+      if(!(this.passwordRef.current.value === this.passwordverifRef.current.value)){
+        
+        swal('La contraseña no coincide','Favor de corregir','warning');
+        return;
+      }
+
       if (this.state.btnNombre === "Enviar") {
-        Axios.post(Global.url + "auth/signup", this.state.usuario, {
-          headers: authHeader(),
-        })
+        Axios.post(Global.url + "auth/signup", this.state.usuario, {headers: authHeader()})
           .then((res) => {
-            console.log(res);
             if (res.status === 200) {
-              Bitacora(Global.ADD_USER, "", JSON.stringify(res.data));
-              //lstTmp.push(res.data);
+              Bitacora(Global.ADD_USER, "", JSON.stringify(res.data));              
               this.getListUsers();
               this.clearForm();
               swal("Se ha insertado el usuario correctamente", "", "success");
@@ -256,10 +254,6 @@ export default class Usuarios extends Component {
 
     for (i = 0; i < tabla.rows.length; i++) {
       td = tabla.rows[i].cells;
-      /*var tdArray = new Array(td);
-      tdArray.forEach(element => {
-          console.log(element[0]);
-      });*/
       for (j = 0; j < td.length; j++) {
         if (td[j].innerHTML.toUpperCase().indexOf(filter.toUpperCase()) > -1) {
           found = true;
@@ -297,7 +291,7 @@ export default class Usuarios extends Component {
     });
     return (
       <React.Fragment>
-        <form onSubmit={this.submitFormulario} onChange={this.onChangeFormulario}>
+        <form onSubmit={this.onChangeFormulario} onChange={this.onChangeFormulario}>
           <div className="container-gn grid-1-2">
             <div className="showcase-form card">
               <div className="form-control">
@@ -333,7 +327,7 @@ export default class Usuarios extends Component {
                     value={this.state.usuario.activo}
                     id="estatus"
                   />
-                  <span class="slider round"></span>
+                  <span className="slider round"></span>
                 </label>
               </div>
               <div className="form-control">

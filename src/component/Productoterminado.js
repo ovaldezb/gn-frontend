@@ -21,6 +21,8 @@ export default class Productoterminado extends Component {
   isPrint= false;
   center = {textAlign:"center"}
   hide={display:'none'};
+  cajasInt = 0;
+  residual = 0;
   state = {
       lstPdrTerm:[],
       pageOfItems: [],
@@ -73,9 +75,9 @@ export default class Productoterminado extends Component {
       comment =>{
         if(comment){
         prodterm.comentario = comment;
-         Axios.put(Global.url+'prodterm/'+this.state.lstPdrTerm[this.state.idSelPt].id,prodterm,{ headers: authHeader() })
+         Axios.put(Global.url+'prodterm/dlvr/'+this.state.lstPdrTerm[this.state.idSelPt].id,prodterm,{ headers: authHeader() })
          .then(res =>{
-           swal('PT '+prodterm.nombre+' entregado','Lote:'+prodterm.lote,'success');
+           swal('PT '+prodterm.producto.nombre+' entregado','Lote:'+prodterm.lote,'success');
            this.loadProdTermActive();
          })
          .catch(err=>{
@@ -86,6 +88,8 @@ export default class Productoterminado extends Component {
       }
     );
   }
+
+
 
   filtrado = () =>{
     var filter = this.filterRef.current.value;
@@ -117,12 +121,52 @@ export default class Productoterminado extends Component {
     }
   }
 
-  printPT = () =>{
+  pideNoRemision = () =>{
     if(this.state.idSelPt < 0){
       swal('Debe elegir un Producto Terminado');
       return;
     };
-   this.forceUpdate();
+    let prodterm = this.state.lstPdrTerm[this.state.idSelPt];
+    this.cajasInt = Math.floor(prodterm.piezas / prodterm.producto.prodxcaja);
+    this.residual = prodterm.piezas -(this.cajasInt*prodterm.producto.prodxcaja);
+    
+    if(!prodterm.noRemision){
+      swal({
+        title:"Se requiere el No de Remision para este Lote:"+prodterm.lote,
+        text: prodterm.nombre,
+        content: "input",
+        dangerMode:false,
+        icon:'warning',
+        buttons: true
+      }).then(
+        noRemision =>{
+          if(noRemision){
+          prodterm.noRemision = noRemision;
+          prodterm.fechaRemision = new Date() ;
+           Axios.put(Global.url+'prodterm/updnrem/'+this.state.lstPdrTerm[this.state.idSelPt].id,prodterm,{ headers: authHeader() })
+           .then(res =>{
+             let lstPT = this.state.lstPdrTerm;
+             lstPT[this.state.idSelPt] = prodterm
+             this.setState({
+              lstPdrTerm:lstPT
+             });
+            this.printPT();
+           })
+           .catch(err=>{
+  
+           });
+          swal.close();
+          }
+        }
+      );
+    }else{
+      this.printPT();
+    }
+    
+    
+  }
+
+  printPT = () =>{
     let printwind = window.open("");
     let estilos = '<style> '+
     '@media print{'+
@@ -167,6 +211,15 @@ export default class Productoterminado extends Component {
     ' .table-3 td, th{'+
     '   border: 2px solid black;'+
     ' }'+
+    ' .width30{'+
+    '   width:30%;'+
+    '  }'+
+    ' .width70{'+
+    '   width:70%;'+
+    '  }'+
+    ' .center{'+
+    '  text-align:center;'+
+    ' }'+
     '}'+
     '</style>';
     var is_chrome = Boolean(window.chrome);
@@ -174,7 +227,6 @@ export default class Productoterminado extends Component {
     
     printwind.document.write(estilos+' '+document.getElementById('print').innerHTML);
     if (is_chrome) {
-      console.log('Entrando')
       printwind.print();      
     }
     else if (is_safari) {
@@ -187,6 +239,10 @@ export default class Productoterminado extends Component {
       printwind.print();
       printwind.close();
     }
+
+    this.setState({
+      idSelPt:-1
+    });
   }
 
   pad(num, size) {
@@ -216,7 +272,7 @@ export default class Productoterminado extends Component {
                   <nav>
                     <ul>
                       <li>
-                      <Link to="#" onClick={this.printPT}>
+                      <Link to="#" onClick={this.pideNoRemision}>
                         
                           <FontAwesomeIcon icon={faPrint} size="2x" />
                         
@@ -273,13 +329,13 @@ export default class Productoterminado extends Component {
                         return(
                           <tr key={i} onClick={() => {this.selectRow(i,(prodterm.estatus.codigo === Global.WTDEL))}}  className={style}>
                             <td>{this.pad(prodterm.noConsecutivo,Global.SIZE_DOC)}</td>
-                            <td>{prodterm.nombre}</td>
+                            <td>{prodterm.producto.nombre}</td>
                             <td>{prodterm.oc}</td>
                             <td>{prodterm.lote}</td>
                             <td style={this.center}><NumberFormat value={Number(prodterm.piezas)}displayType={'text'} thousandSeparator={true}/></td>
                             <td style={this.center}><Moment format="DD MMMM YYYY">{momento(prodterm.fechaFabricacion,'YYYY-MM-DD').format('YYYY-MM-DD')}</Moment></td>
                             <td style={this.center}><Moment format="DD MMMM YYYY">{momento(prodterm.fechaEntrega,'YYYY-MM-DD').format('YYYY-MM-DD')}</Moment></td>
-                            <td style={this.center}>{prodterm.estatus.label}</td>
+                            <td style={this.center} title={prodterm.cliente.nombre}>{prodterm.estatus.label}</td>
                           </tr>
                         );
                       })
@@ -294,33 +350,33 @@ export default class Productoterminado extends Component {
               <table className="table-main">
                   <tbody>
                 <tr>
-                  <td style={this.w70}>
-                    <table className="table-0">
+                  <td className="width70">
+                    <table className="table-0" border="1">
                         <tbody>
-                      <tr>
-                        <td style={this.w25} rowSpan="3">
-                          <img src={Logo} alt="" width="100%" />
-                        </td>
-                        <td style={this.w75}>Grupo Nordan SA de CV</td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">FRONTERA No 12, Col A. OBREGON TEL (722)2714460/61</td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">SAN MATEO ATENCO, ESTADO DE MEXICO</td>
-                      </tr>
+                          <tr>
+                            <td className="width30" rowSpan="3">
+                              <img src={Logo} alt="" width="90%" />
+                            </td>
+                            <td className="width70 center"><b>Grupo Nordan S.A. de C.V.</b></td>
+                          </tr>
+                          <tr>
+                            <td colSpan="2"><h6>FRONTERA No 12, Col A. OBREGON TEL (722)2714460/61</h6></td>
+                          </tr>
+                          <tr>
+                            <td colSpan="2"><h6>SAN MATEO ATENCO, ESTADO DE MEXICO</h6></td>
+                          </tr>
                       </tbody>
                     </table>
                   </td>
-                  <td style={this.w30}>
+                  <td className="width30">
                     <table className="table-1">
                     <tbody>
                       <tr>
-                        <td>Remision #</td>
-                        <td>32902</td>
+                        <td><b>Remisión #</b></td>
+                        <td className="center">{this.state.lstPdrTerm[this.state.idSelPt].noRemision}</td>
                       </tr>
                       <tr>
-                        <td colSpan="2">Fecha</td>
+                        <td colSpan="2"><b>Fecha</b></td>
                       </tr>
                       <tr>
                         <td colSpan="2"><Clock format={'DD-MMMM-YYYY'} ticking={false}  /></td>
@@ -339,12 +395,17 @@ export default class Productoterminado extends Component {
                       <tr>
                         <td>&nbsp;</td>
                         <td>Cliente:</td>
-                        <td>{this.state.lstPdrTerm[this.state.idSelPt].cliente}</td>
+                        <td>{this.state.lstPdrTerm[this.state.idSelPt].cliente.nombre}</td>
                       </tr>
                       <tr>
                         <td>&nbsp;</td>
                         <td>Direccion:</td>
-                        <td>Toluca Edo de Mex</td>
+                        <td>{this.state.lstPdrTerm[this.state.idSelPt].cliente.direccion}</td>
+                      </tr>
+                      <tr>
+                        <td>&nbsp;</td>
+                        <td>RFC:</td>
+                        <td>{this.state.lstPdrTerm[this.state.idSelPt].cliente.rfc}</td>
                       </tr>
                       </tbody>
                     </table>
@@ -367,10 +428,17 @@ export default class Productoterminado extends Component {
                         <td style={this.center_top}>{this.state.lstPdrTerm[this.state.idSelPt].clave}</td>
                         <td style={this.left_top}>
                           <p>
-                            {this.state.lstPdrTerm[this.state.idSelPt].nombre}
+                            {this.state.lstPdrTerm[this.state.idSelPt].producto.nombre}
                           </p>
                           <p>Lote:{this.state.lstPdrTerm[this.state.idSelPt].lote}</p>
-                          <p>{this.state.lstPdrTerm[this.state.idSelPt].comentario}</p>
+                          <p>
+                            {Math.floor(this.state.lstPdrTerm[this.state.idSelPt].piezas / this.state.lstPdrTerm[this.state.idSelPt].producto.prodxcaja)} CAJAS C/{this.state.lstPdrTerm[this.state.idSelPt].producto.prodxcaja} PZAS&nbsp;
+                            {(this.state.lstPdrTerm[this.state.idSelPt].piezas - (Math.floor(this.state.lstPdrTerm[this.state.idSelPt].piezas / this.state.lstPdrTerm[this.state.idSelPt].producto.prodxcaja))*this.state.lstPdrTerm[this.state.idSelPt].producto.prodxcaja) > 0 &&
+                              <React.Fragment>
+                                C/UNA MAS CON UN RESTO DE {this.state.lstPdrTerm[this.state.idSelPt].piezas - (Math.floor(this.state.lstPdrTerm[this.state.idSelPt].piezas / this.state.lstPdrTerm[this.state.idSelPt].producto.prodxcaja))*this.state.lstPdrTerm[this.state.idSelPt].producto.prodxcaja} PZAS
+                              </React.Fragment>
+                            }
+                          </p>
                         </td>
                         <td style={this.center_top}>{this.state.lstPdrTerm[this.state.idSelPt].oc}</td>
                       </tr>

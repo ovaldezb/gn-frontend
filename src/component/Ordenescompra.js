@@ -45,6 +45,10 @@ export default class Ordenescompra extends Component {
           this.setState({
             lstOC: res.data,
           });
+        }else{
+          this.setState({
+            lstOC:[],
+          });
         }
       })
       .catch();
@@ -80,6 +84,9 @@ export default class Ordenescompra extends Component {
 
   selectType = () =>{
     this.loadOC(this.selAllRef.current.checked);
+    // this.setState({
+    //   selected:this.selAllRef.current.checked
+    // });
   }
 
   deleteOc = () =>{
@@ -148,9 +155,10 @@ export default class Ordenescompra extends Component {
         return (
           <tr key={i} onClick={() => {this.selectRow(i)}}  className={style}>
             <td>{ordcomp.oc}</td>
-            <td>{ordcomp.nombreProducto}</td>
+            <td>{ordcomp.producto.nombre}</td>
             <td style={this.center}>{ordcomp.clave}</td>
             <td style={this.center}><NumberFormat value={Number(ordcomp.piezas)}displayType={'text'} thousandSeparator={true}/></td>
+            <td style={this.center}><NumberFormat value={Number(ordcomp.piezasFabricadas)}displayType={'text'} thousandSeparator={true}/></td>
             <td><Moment format="DD MMM YYYY">{momento(ordcomp.fechaFabricacion,'MM-DD-YYYY').format('YYYY-MM-DDTHH:mm:ss')}</Moment></td>
             <td><Moment format="DD MMM YYYY">{momento(ordcomp.fechaEntrega,'MM-DD-YYYY').format('YYYY-MM-DDTHH:mm:ss')}</Moment></td>
             <td>{ordcomp.cliente.nombre}</td>
@@ -158,7 +166,7 @@ export default class Ordenescompra extends Component {
           </tr>
         );
       });
-      console.log(this.state.idSelOc);
+      
       return (
         <React.Fragment>
           {this.displayAdd && 
@@ -171,7 +179,7 @@ export default class Ordenescompra extends Component {
                   <ul>
                     <li>Filtro:</li>
                     <li><input className="input"  type="text"  name="filtro" ref={this.filterRef} onKeyUp={this.filtrado}/></li>
-                    <li><input type="checkbox" ref={this.selAllRef} onChange={this.selectType} /></li>
+                    <li><input type="checkbox" ref={this.selAllRef} onChange={this.selectType} checked={this.selAllRef.current.checked}/></li>
                   </ul>
                   <h2>Orden de Compra</h2>
                   <nav>
@@ -204,9 +212,10 @@ export default class Ordenescompra extends Component {
               </div>
               <table className="table table-bordered header-font">
                   <col width="7%"/>
-                  <col width="39%"/>
-                  <col width="8%"/>                  
+                  <col width="30%"/>
+                  <col width="8%"/>
                   <col width="6%"/>
+                  <col width="8%"/>
                   <col width="12%"/>
                   <col width="12%"/>
                   <col width="10%"/>
@@ -217,6 +226,7 @@ export default class Ordenescompra extends Component {
                     <th scope="col">Producto</th>
                     <th scope="col">Clave</th>
                     <th scope="col">Piezas</th>
+                    <th scope="col">OF</th>
                     <th scope="col">Fabricación</th>
                     <th scope="col">Entrega</th>
                     <th scope="col">Cliente</th>
@@ -227,9 +237,10 @@ export default class Ordenescompra extends Component {
               <div className="table-ovfl tbl-lesshead">
                 <table className="table table-bordered table-lst" id="ordenFabricacion">
                   <col width="7%"/>
-                  <col width="38%"/>
+                  <col width="30%"/>
                   <col width="8%"/>
                   <col width="6%"/>
+                  <col width="8%"/>
                   <col width="12%"/>
                   <col width="12%"/>
                   <col width="10%"/>
@@ -248,12 +259,15 @@ export default class Ordenescompra extends Component {
         return  <Addordencompra cancelar={this.cancelarAdd} ordencompra={this.state.ordencompra} tipo={this.isAdd} />
       }else {
       return (
-          <div className="container">
+          <React.Fragment>
           <div className="barnav">
               <div className="container flex-gn">
-                <div>
-                </div>
-                <h2>Orden de Compra</h2>
+              <ul>
+                    <li>Filtro:</li>
+                    <li><input className="input"  type="text"  name="filtro" ref={this.filterRef} onKeyUp={this.filtrado}/></li>
+                    <li><input type="checkbox" ref={this.selAllRef} onChange={this.selectType} /></li>
+                  </ul>
+                  <h2>Orden de Compra</h2>
                 <nav>
                   <ul>
                     <li>
@@ -265,7 +279,7 @@ export default class Ordenescompra extends Component {
               </div>
           </div>
           <h1 className="center">No hay órdenes de compra para mostrar</h1>
-          </div>
+          </React.Fragment>
       );
     }
   }

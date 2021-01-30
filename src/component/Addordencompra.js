@@ -56,15 +56,15 @@ export default class Addordencompra extends Component {
     if(event.keyCode === 13){
       Axios.get(Global.url+'cliente/'+(this.clienteRef.current.value === '' ? 'vacio':this.clienteRef.current.value),{ headers: authHeader() })
       .then(res =>{
-        if(res.data.length > 0){
+        console.log(res.data.length);
+        if(res.data.length === 1){
           let oc = this.state.ordencompra;
           oc.cliente = res.data[0];
-          console.log(oc);
           this.setState({
             ordencompra:oc,
             idCliente:res.data[0].id
           });
-        }else{
+        }else if(res.data.length > 1){
           this.setState({
             lstCliente:res.data
           });
@@ -84,7 +84,7 @@ export default class Addordencompra extends Component {
             console.log(res);
             if(res.data !== null){     
               oc.clave = res.data.clave;
-              oc.nombreProducto = res.data.nombre;
+              oc.producto = res.data;              
               this.setState({
                 ordencompra:oc,
                 lstMatPrim:res.data.materiaPrimaUsada
@@ -137,8 +137,7 @@ export default class Addordencompra extends Component {
 
     var ordenComp = this.state.ordencompra;
     ordenComp.oc=this.ocRef.current.value;
-    ordenComp.clave=this.claveRef.current.value;
-    ordenComp.nombreProducto=this.state.ordencompra.nombreProducto;
+    ordenComp.clave=this.claveRef.current.value;    
     if(ordenComp.cliente !== undefined){
       ordenComp.cliente.nombre = this.clienteRef.current.value;    
     }    
@@ -151,7 +150,7 @@ export default class Addordencompra extends Component {
     this.setState({
       ordencompra:ordenComp
     });
-    console.log(this.state.ordencompra);
+    
   }
 
   selectDayFab = (day) => {
@@ -185,7 +184,7 @@ export default class Addordencompra extends Component {
     this.setState({
       ordencompra:{
         clave:'',
-        nombreProducto:'',
+        producto:{},
         oc:'',
         cliente:{nombre:''},
         piezas:'',
@@ -207,10 +206,9 @@ export default class Addordencompra extends Component {
 
   render() {
     const ordencompra = this.state.ordencompra;
-    //console.log(ordencompra.cliente);    
     const fechaFabricacion = ordencompra.fechaFabricacion ?  Moment(ordencompra.fechaFabricacion,'MM-DD-YYYY').format('YYYY-MM-DD') : '';
     const fechaEntrega = ordencompra.fechaEntrega ?  Moment(ordencompra.fechaEntrega,'MM-DD-YYYY').format('YYYY-MM-DD') : '';
-    console.log(ordencompra.cliente);
+
     return (
       
       <React.Fragment>
@@ -229,12 +227,13 @@ export default class Addordencompra extends Component {
               </div>
               <div className="form-control grid-1-2">
                 <div>
-                  <input type="text" name="clave" placeholder="Clave" onKeyUp={this.busProductoClave} ref={this.claveRef} value={ordencompra.clave} onBlur={this.busPdClave} onChange={this.occhange}/>
+                  <input type="text" name="clave" placeholder="Clave" onKeyUp={this.busProductoClave} ref={this.claveRef} value={ordencompra.clave} onBlur={this.busProductoClave} onChange={this.occhange}/>
                   {this.validator.message('clave',ordencompra.clave,'required')}
                 </div>
                 <div>
-                  <legend>{ordencompra.nombreProducto}</legend>
-                  
+                  {ordencompra.producto && 
+                  <legend><b>{ordencompra.producto.nombre}</b></legend>
+                  }
                 </div>
               </div>
               <div className="form-control grid-2-1">
@@ -256,8 +255,8 @@ export default class Addordencompra extends Component {
                   }
                   {ordencompra.cliente && this.validator.message('cliente',ordencompra.cliente.nombre,'required')}
                   {this.state.lstCliente.length > 1 &&
-                  <div className="tbl-cli">
-                    <table>
+                  <div >
+                    <table className="tbl-cli">
                       <tbody>
                         {this.state.lstCliente.map((cli,i)=>{
                           return(

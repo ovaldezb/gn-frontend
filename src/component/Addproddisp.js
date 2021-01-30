@@ -27,6 +27,7 @@ export default class Addproddisp extends Component {
     porcentajeRef = React.createRef();
     nombreRef = React.createRef();
     claveRef = React.createRef();
+    prodxcajaRef = React.createRef();
     isBusqueda = false;
     isReset = false;
     idPrdDisp = '';
@@ -62,7 +63,8 @@ export default class Addproddisp extends Component {
         this.setState({
             nombre:prddisp.nombre,
             clave:prddisp.clave,
-            lstMatPrim:prddisp.materiaPrimaUsada
+            lstMatPrim:prddisp.materiaPrimaUsada,
+            prodxcaja:prddisp.prodxcaja
         });
       }
   }
@@ -172,7 +174,8 @@ export default class Addproddisp extends Component {
         codigo:this.codigoRef.current.value,
         porcentaje:this.porcentajeRef.current.value,
         nombre:this.nombreRef.current.value,
-        clave:this.claveRef.current.value
+        clave:this.claveRef.current.value,
+        prodxcaja:this.prodxcajaRef.current.value
     }); 
   }
 
@@ -181,14 +184,15 @@ export default class Addproddisp extends Component {
           nombre:this.state.nombre,
           clave:this.state.clave,
           tipo:'vacio',
-          materiaPrimaUsada: this.state.lstMatPrim
+          materiaPrimaUsada: this.state.lstMatPrim,
+          prodxcaja:this.state.prodxcaja
       };
       if(this.validator.allValid()){
         if(this.props.tipo){
           Axios.post(Global.url+'prodisp',prdDispSave,{ headers: authHeader() })
             .then(res =>{
               this.props.cancelar(prdDispSave);
-              swal('Se inserto correctamente el Producto',prdDispSave.nombre,'success');
+              swal('Se insertó correctamente el producto',prdDispSave.nombre,'success');
               Bitacora(Global.ADD_PRDDISP,'',JSON.stringify(prdDispSave));
             })
             .catch(err=>{
@@ -199,7 +203,7 @@ export default class Addproddisp extends Component {
             .then(res =>{
                 console.log(res.data.id);
                 if(res.data.id){
-                    swal('Se actualizo correctamente el Producto',prdDispSave.nombre,'success');
+                    swal('Se actualizó correctamente el producto',prdDispSave.nombre,'success');
                     this.props.cancelar(res.data);
                 }
             })
@@ -265,7 +269,7 @@ export default class Addproddisp extends Component {
     Axios.get(Global.url+'prodisp/'+this.state.clave,{ headers: authHeader() })
     .then(res=>{
       if(res.data ){
-        swal('Ya existe un producto con este codigo',res.data.nombre,'success');
+        swal('Ya existe un producto con este código',res.data.nombre,'warning');
       }
     })
     .catch();
@@ -276,7 +280,6 @@ export default class Addproddisp extends Component {
   }
 
   render() {
-    //const matdisp = this.state.matdisp;   
     if(this.state.lstBusqDesc.length > 0){
         var rowsBusq = this.state.lstBusqDesc.map((mdisp,i)=>{
             if(this.state.idSelPdBus === i){
@@ -313,7 +316,7 @@ export default class Addproddisp extends Component {
     
     return (
       <form onSubmit={this.onSubmit} onChange={this.onSubmit}>
-        <h6 className="center">Producto Disponible</h6>
+        
         <div className="container-ng">
           <div className="showcase-form card">
             <div className="grid-2-1">
@@ -326,9 +329,14 @@ export default class Addproddisp extends Component {
                 {this.validator.message('clave',this.state.clave,'required')}
               </div>
             </div>
+            <div className="grid-1-2">
+            <div className="form-control">
+            <input type="number" name="empxcaja" placeholder="Productos por caja" ref={this.prodxcajaRef} defaultValue={this.state.prodxcaja} />
+            </div>
+            </div>
           </div>
           <div className="showcase-form card">
-            <h2 className="center">Materia prima para el producto</h2>
+            <h3 className="center">Materia prima para el producto</h3>
             <p></p>
             <div className="row">
               <div className="col-2">
@@ -342,7 +350,7 @@ export default class Addproddisp extends Component {
                 <input type="number" placeholder="Porcentaje" style={this.center} ref={this.porcentajeRef}  value={this.state.porcentaje} onChange={this.descChange}/>
               </div>
               <div className="col-1">
-              {/*this.state.unidad.unidadMedida && */}
+              
               {this.state.codigo && this.state.desc && this.state.porcentaje > 0 && 
                 <Link to="#" onClick={this.addMatPrima}>
                   <FontAwesomeIcon icon={faPlusCircle} title="Agregar la MP seleccionada" />

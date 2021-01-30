@@ -23,12 +23,14 @@ export default class Clientes extends Component {
         filter:''
     }
 
+    center={textAlign:'center'};
+
     componentDidMount(){
         this.getClientes();
     }
 
     getClientes(){
-        Axios.get(Global.url+'cliente',authHeader())
+        Axios.get(Global.url+'cliente',{ headers: authHeader() })
         .then(res =>{
             this.setState({
                 lstClientes:res.data
@@ -147,16 +149,32 @@ export default class Clientes extends Component {
                         </div>
                     </div>
                     <table className="table table-dark">
+                        <colgroup>
+                            <col width="20%"/>
+                            <col width="20%"/>
+                            <col width="20%"/>
+                            <col width="20%"/>
+                            <col width="20%"/>
+                        </colgroup>
                         <thead>
                             <tr>
-                                <th>Nombre</th>
-                                <th>RFC</th>
-                                <th>Contacto</th>
+                                <th style={this.center}>Nombre</th>
+                                <th style={this.center}>RFC</th>
+                                <th style={this.center}>Teléfono</th>
+                                <th style={this.center}>Correo</th>
+                                <th style={this.center}>Contacto</th>
                             </tr>
                         </thead>
                     </table>
                     <div className="table-ovfl tbl-lesshead">
                         <table className="table table-hover">
+                            <colgroup>
+                                <col width="20%"/>
+                                <col width="20%"/>
+                                <col width="20%"/>
+                                <col width="20%"/>
+                                <col width="20%"/>
+                            </colgroup>
                             <tbody>
                                 {this.state.pageOfItems.map((cli,i)=>{
                                     var style = {};
@@ -168,8 +186,10 @@ export default class Clientes extends Component {
                                     return(
                                         <tr key={i} onClick={() => {this.selectRow(i); }} className={style} >
                                             <td>{cli.nombre}</td>
-                                            <td>{cli.rfc}</td>
-                                            <td>{cli.contacto}</td>
+                                            <td style={this.center}>{cli.rfc}</td>
+                                            <td style={this.center}>{cli.telefono}</td>
+                                            <td style={this.center}>{cli.email}</td>
+                                            <td style={this.center}>{cli.contacto}</td>
                                         </tr>
                                     );
                                 })}

@@ -77,7 +77,14 @@
   gap: 20px;
   justify-content: center;
   align-items: center;
-  /*height: 100%; */
+}
+
+.grid-3-l {
+  display: grid;
+  grid-template-columns: 0.7fr 0.5fr 2fr;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
 }
 
 .grid-4 {
@@ -122,7 +129,7 @@
 }
 
 .table-ovfl-prddisp {
-  height: 180px;
+  height: 154px;
   overflow: auto;
 }
 
@@ -214,4 +221,9 @@ input:checked + .slider:before {
 .valor{
   width:90px;
   text-align: center;
+}
+
+.producto{
+  font-size: 12px;
+  font-weight: bold;
 }

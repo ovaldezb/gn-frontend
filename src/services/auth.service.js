@@ -21,19 +21,19 @@ class AuthService{
     }
 
     logout(){
-        console.log('logout');
+        
         localStorage.removeItem(Global.JWT_NAME);
     }
 
     register(username,email,password){
         return axios.post(Global.url+'auth/signup',{username,email,password})
         .then(res =>{
-            console.log(res);
+            //console.log(res);
         });
     }
 
     getCurrentUser(){
-        console.log(localStorage.getItem(Global.JWT_NAME));
+        //console.log(localStorage.getItem(Global.JWT_NAME));
         return JSON.parse(localStorage.getItem(Global.JWT_NAME));
     }
 }

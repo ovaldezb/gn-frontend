@@ -14,9 +14,10 @@ import Addproddisp from './Addproddisp'
 export default class Proddisponible extends Component {
   displayAdd = false;
   isAdd = true;
-  col1 = { width: 20 };
-  col2 = { width: 100 };
-  col3 = { width: 96, textAlign: "center" };
+  col1 = { width: '10%' };
+  col2 = { width: "50%" };
+  col3 = { width: "20%", textAlign: "center" };
+  col4 = { width: '20%', textAlign: "center" };
   filterRef = React.createRef();
   state ={
     lstPrdDisp:[],
@@ -157,9 +158,10 @@ export default class Proddisponible extends Component {
             }
             return(
                 <tr key={i} onClick={() => {this.selectRow(i); }} className={this.style}>
-                    <td>{i+1}</td>
-                    <td>{proddisp.nombre}</td>
-                    <td>{proddisp.clave}</td>
+                    <td style={this.col1}>{i+1}</td>
+                    <td style={this.col2}>{proddisp.nombre}</td>
+                    <td style={this.col3}>{proddisp.clave}</td>
+                    <td style={this.col4}>{proddisp.prodxcaja}</td>
                 </tr>
             );
         });
@@ -204,6 +206,7 @@ export default class Proddisponible extends Component {
                                 <th scope="col" style={this.col1}>#</th>
                                 <th scope="col" style={this.col2}>Nombre</th>
                                 <th scope="col" style={this.col3}>Clave</th>
+                                <th scope="col" style={this.col4}>Piezas x Caja</th>
                             </tr>
                           </thead>
                         </table>

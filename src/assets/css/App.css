@@ -347,5 +347,16 @@ background-color: #f50707;
   border:2px solid #1255e7;
   height: 55px;
   overflow: scroll;
+  width: 150px;
+  cursor: pointer;
+  display: block;
 }
 
+.tbl-oc{
+  display: block;
+  border:2px solid #1255e7;
+  background: #b4becb;
+  width: 120px;
+  height: 55px;
+  overflow: scroll;
+}

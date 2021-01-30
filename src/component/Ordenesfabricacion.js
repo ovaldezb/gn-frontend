@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPlusSquare,
   faEdit,
-  faTrash, faClipboardCheck
+  faTrash, faClipboardCheck,faGhost
 } from "@fortawesome/free-solid-svg-icons";
 import Paginacion from './Paginacion';
 import Addordenfab from "./Addordenfab";
@@ -18,8 +18,10 @@ import axios from 'axios';
 export default class Ordenesfabricacion extends Component {
   filterRef = React.createRef();
   selAllRef = React.createRef();
+  isActive = true;
   center = {textAlign:"center"}
   displayAdd = false;
+  isAdd = true;
   isComplete = false;
   state = {
     lstOF: [],
@@ -28,7 +30,8 @@ export default class Ordenesfabricacion extends Component {
     filtro: "",
     status: "",
     idSelOf: -1,
-    ordenfab:{}
+    ordenfab:{},
+    selected:false
   };
 
   componentDidMount() {
@@ -41,6 +44,10 @@ export default class Ordenesfabricacion extends Component {
         if (res.data.length > 0) {
           this.setState({
             lstOF: res.data,
+          });
+        }else{
+          this.setState({
+            lstOF: [],
           });
         }
       })
@@ -65,6 +72,9 @@ export default class Ordenesfabricacion extends Component {
     }else{
       this.loadAactiveOF();
     }
+    // this.setState({
+    //   selected:this.selAllRef.current.checked
+    // });
   }
 
   addOF = () => {
@@ -74,6 +84,7 @@ export default class Ordenesfabricacion extends Component {
 
   cancelarAdd = (ordenfab) =>{
     this.displayAdd = false;
+    this.isAdd =true;
     if(ordenfab){
       this.loadAactiveOF();
     }
@@ -90,8 +101,9 @@ export default class Ordenesfabricacion extends Component {
     })
     .then((willDelete) => {
       if (willDelete) {
-        axios.put(Global.url+'ordenfab/complete/'+this.state.lstOF[((this.state.page-1)*10)+this.state.idSelOf].id,{ headers: authHeader() })
+        axios.get(Global.url+'ordenfab/complete/'+this.state.lstOF[((this.state.page-1)*10)+this.state.idSelOf].id,{ headers: authHeader() })
             .then(res=>{
+              
               //var mp = this.state.lstMatPrim[this.state.idSelMp];
               //Bitacora(Global.DEL_MATPRIM,JSON.stringify(mp),'');
               swal("La Orden de Fabricación ha sido completada!", {
@@ -105,7 +117,39 @@ export default class Ordenesfabricacion extends Component {
             );
       } 
     });
+  }
 
+  updateOf = () =>{
+    this.displayAdd = true;
+    this.isAdd = false;
+    this.setState({
+      ordenfab:this.state.lstOF[this.state.idSelOf]
+    });
+  }
+
+  deleteOf = () =>{
+    swal({
+      title: "Esta seguro que desea eliminar la OF "+this.pad(this.state.lstOF[((this.state.page-1)*10)+this.state.idSelOf].noConsecutivo,Global.SIZE_DOC)+"?",
+      text: "Una vez eliminada, no se podra recuperar",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    })
+    .then((willDelete) => {
+      if (willDelete) {
+        axios.delete(Global.url+'ordenfab/'+this.state.lstOF[((this.state.page-1)*10)+this.state.idSelOf].id,{ headers: authHeader() })
+            .then(res=>{
+              swal("La Orden de Fabricación ha sido eliminada!", {
+                icon: "success",
+              });
+              this.loadAactiveOF();
+            }).catch(
+              err =>{
+                console.log('Error '+err.message);
+              }
+            );
+      } 
+    });
   }
 
   filtrado = () =>{
@@ -119,6 +163,11 @@ export default class Ordenesfabricacion extends Component {
   }
 
   selectRow = (i) => {
+    if(this.state.lstOF[i].estatus === Global.CMPLT){
+      this.isActive = false;
+    }else{
+      this.isActive = true;
+    }
     this.setState({
       idSelOf: i,
     });
@@ -170,7 +219,7 @@ export default class Ordenesfabricacion extends Component {
       return (
         <React.Fragment>
           {this.displayAdd && 
-            <Addordenfab cancelar={this.cancelarAdd} ordenfab={this.state.ordenfab} />
+            <Addordenfab cancelar={this.cancelarAdd} ordenfab={this.state.ordenfab} tipo={this.isAdd}/>
           }
           {!this.displayAdd && (
             <React.Fragment>
@@ -179,28 +228,31 @@ export default class Ordenesfabricacion extends Component {
                   <ul>
                     <li>Filtro:</li>
                     <li><input className="input"  type="text"  name="filtro" ref={this.filterRef} onKeyUp={this.filtrado}/></li>
-                    <li><input type="checkbox" ref={this.selAllRef} onChange={this.selectType} /></li>
+                    <li><input type="checkbox" ref={this.selAllRef} onChange={this.selectType} checked={this.selAllRef.current.checked}/></li>
                   </ul>
                   <h2>Orden de Fabricación</h2>
                   <nav>
                     <ul>
                       <li>
-                        <Link to="#" onClick={this.addOF}>
+                        <Link to="#" onClick={this.addOF} title="Agrega una nueva OF">
                           <FontAwesomeIcon icon={faPlusSquare} />
                         </Link>
                       </li>
                       <li>
-                        <Link to="#" onClick={this.updateOf}>
+                        
+                            <Link to="#" onClick={this.updateOf} title="Actualiza la OF Seleccionada">
                           <FontAwesomeIcon icon={faEdit} />
-                        </Link>
+                          </Link>
+                          
+                        
                       </li>
                       <li>
-                        <Link to="#" onClick={this.deleteOf}>
+                        <Link to="#" onClick={this.deleteOf} title="Elimina la OF Seleccionada">
                           <FontAwesomeIcon icon={faTrash} />
                         </Link>
                       </li>
                       <li>                        
-                        <Link to="#" onClick={this.completeOF} >
+                        <Link to="#" onClick={this.completeOF} title="Completa la OF Seleccionada">
                         {this.isComplete &&
                           <FontAwesomeIcon icon={faClipboardCheck} />
                         }
@@ -211,13 +263,14 @@ export default class Ordenesfabricacion extends Component {
                 </div>
               </div>
               <table className="table table-bordered header-font">
+                <colgroup>
                   <col width="18%"/>
                   <col width="18%"/>
                   <col width="18%"/>
                   <col width="18%"/>
                   <col width="18%"/>
                   <col width="10%"/>
-                  
+                </colgroup>
                 <thead className="thead-light">                   
                   <tr>
                     <th scope="col">No de Orden</th>
@@ -248,26 +301,30 @@ export default class Ordenesfabricacion extends Component {
         </React.Fragment>
       );
     } else if(this.displayAdd){
-        return  <Addordenfab cancelar={this.cancelarAdd} matprima={this.state.ordenfab} />
+        return  <Addordenfab cancelar={this.cancelarAdd} ordenfab={this.state.ordenfab} tipo={this.isAdd}/>
       }else {
       return (
-          <div className="container">
+          <React.Fragment>
           <div className="barnav">
               <div className="container flex-gn">
-                <div>
-                </div>
+                <ul>
+                  <li>Filtro:</li>
+                  <li><input className="input"  type="text"  name="filtro" ref={this.filterRef} onKeyUp={this.filtrado}/></li>
+                  <li><input type="checkbox" ref={this.selAllRef} onChange={this.selectType} /></li>
+                </ul>
+                <h2>Orden de Fabricación</h2>
                 <nav>
                   <ul>
                     <li>
-                      <Link to="#" onClick={this.addOF}><FontAwesomeIcon icon={faPlusSquare} />
-                      </Link>
+                      <Link to="#" onClick={this.addOF}><FontAwesomeIcon icon={faPlusSquare} /></Link>
                     </li>
+                    
                   </ul>
                 </nav>
               </div>
           </div>
           <h1 className="center">No hay Ordenes de Fabricación para mostrar</h1>
-          </div>
+          </React.Fragment>
       );
     }
   }
