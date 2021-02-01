@@ -202,7 +202,6 @@ export default class Usuarios extends Component {
                 ),
                 ""
               );
-              //this.state.lstUsers.splice(this.state.idSelMp,1);
               this.getListUsers();
               swal("El usuario ha sido eliminado!", { icon: "success" });
               this.setState({
@@ -410,10 +409,12 @@ export default class Usuarios extends Component {
               </table>
               <div className="table-ovfl-user tbl-lesshead">
                 <table className="table table-hover" id="usuarios">
+                  <colgroup>
                   <col width="26%" />
                   <col width="22%" />
                   <col width="37%" />
                   <col width="15%" />
+                  </colgroup>
                   <tbody>{rows}</tbody>
                 </table>
               </div>
@@ -421,6 +422,7 @@ export default class Usuarios extends Component {
                 <Paginacion
                   items={this.state.lstUsers}
                   onChangePage={this.onChangePage}
+                  page={this.state.page}
                 />
               </div>
             </div>

@@ -343,7 +343,7 @@ export default class Productoterminado extends Component {
                   </tbody>
                 </table>
               </div>
-              <Paginacion items={this.state.lstPdrTerm} onChangePage={this.onChangePage} />
+              <Paginacion items={this.state.lstPdrTerm} onChangePage={this.onChangePage} page={this.state.page}/>
             </div>
             {this.state.idSelPt !==-1 && 
             <div id="print" style={{display:'none'}}>

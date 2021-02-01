@@ -216,7 +216,7 @@ export default class Proddisponible extends Component {
                           </table>              
                         </div>
                         <div className="center">
-                          <Paginacion items={this.state.lstPrdDisp} onChangePage={this.onChangePage} />
+                          <Paginacion items={this.state.lstPrdDisp} onChangePage={this.onChangePage} page={this.state.page}/>
                         </div>
                       
                 </React.Fragment>

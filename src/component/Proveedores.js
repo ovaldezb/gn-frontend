@@ -181,7 +181,7 @@ export default class Proveedores extends Component {
                         </table>
                     </div>
                     <div className="center">
-                        <Paginacion items={this.state.lstProv} onChangePage={this.onChangePage} />
+                        <Paginacion items={this.state.lstProv} onChangePage={this.onChangePage} page={this.state.page}/>
                     </div>
                 </React.Fragment>
             }

@@ -15,6 +15,7 @@ export default class Addordencompra extends Component {
   clienteRef = React.createRef();
   piezasRef = React.createRef();
   obsRef =React.createRef();
+  tipoPresRef = React.createRef();
   btnName = 'Guardar';
   isErrorInit = true;
   right = {textAlign:"right"}
@@ -70,9 +71,7 @@ export default class Addordencompra extends Component {
           });
         }
       })
-      .catch(err=>{
-
-      });
+      .catch(err=>{   });
     }
   }
 
@@ -146,6 +145,7 @@ export default class Addordencompra extends Component {
     ordenComp.piezas=this.piezasRef.current.value;
     ordenComp.presentacion=this.presRef.current.value;
     ordenComp.observaciones=this.obsRef.current.value;
+    ordenComp.tipoPresentacion=this.tipoPresRef.current.value;
 
     this.setState({
       ordencompra:ordenComp
@@ -280,7 +280,10 @@ export default class Addordencompra extends Component {
               <div className="form-control grid">
                 <input type="number" placeholder="Presentación" ref={this.presRef} value={ordencompra.presentacion} onChange={this.occhange}/>
                 <div>
-                    <legend>mililitros</legend>
+                    <select ref={this.tipoPresRef}>
+                      <option value="milimililitros">mililitros</option>
+                      <option value="gramos">gramos</option>
+                    </select>
                 </div>
               </div>
               <div className="form-control grid">  

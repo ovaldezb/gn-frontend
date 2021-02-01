@@ -26,7 +26,6 @@ export default class Bitacora extends Component {
   }
 
   getAllBitacoras() {
-      console.log('Bit')
     Axios.get(Global.url + "bitacora",{headers:authHeader()})
       .then((res) => {
         if (res.status === Global.HTTP_OK)
@@ -50,7 +49,7 @@ export default class Bitacora extends Component {
   }
 
   dblClick = (i) => {
-    console.log('dbl click',this.state.lstBitac[(this.state.page-1)*10 + i]);
+    //console.log('dbl click',this.state.lstBitac[(this.state.page-1)*10 + i]);
     Axios.get(Global.url+'bitacora/'+this.state.lstBitac[(this.state.page-1)*10 + i].id,{headers:authHeader()})
       .then(res =>{
         this.setState({
@@ -75,11 +74,14 @@ export default class Bitacora extends Component {
     this.setState({
       bitacora:undefined
     });
+    //console.log(this.state.pageOfItems,this.state.page);
+    this.onChangePage(this.state.pageOfItems,this.state.page);
   }
 
   onChangePage = (pageOfItems,page) => {
     // update state with new page of items
     this.setState({ pageOfItems: pageOfItems ,page:page});
+
   }
 
   render() {
@@ -97,14 +99,18 @@ export default class Bitacora extends Component {
     var style = {};
     if(this.show){
       return(
-        <React.Fragment> 
+      <div> 
+        
       <div className="row">
         <div className="col-1">
           <legend>Usuario:</legend>
         </div>
-        <di className="col">
+        <div className="col">
           <legend>{this.state.bitacora.user.nombre} {this.state.bitacora.user.apellido}</legend>
-        </di>
+        </div>  
+        <div className="col">
+          <button className="btn btn-primary btn-sm" onClick={this.regresa}>Regresar</button>
+        </div>
       </div>
       <div className="row">
         <div className="col-1">
@@ -144,15 +150,8 @@ export default class Bitacora extends Component {
           
         </div>
       </div>
-      <div className="row">
-        <div className="col">&nbsp;</div>
+      
       </div>
-      <div className="row">
-          <div className="col">
-            <button className="btn" onClick={this.regresa}>Regresar</button>
-          </div>
-      </div>
-      </React.Fragment>
       )
     }else if(this.state.lstBitac.length > 0){
       var rows = this.state.pageOfItems.map((bitacora,i)=>{
@@ -198,10 +197,12 @@ export default class Bitacora extends Component {
             </div>
           </div>
           <table className="table table-bordered" style={width}>
+            <colgroup>
             <col width="5%"/>
             <col width="25%"/>
             <col width="35%"/>
             <col width="35%"/>
+            </colgroup>
             <thead className="thead-dark">
                 <tr>
                     <th style={head1}>#</th>
@@ -213,14 +214,16 @@ export default class Bitacora extends Component {
           </table>
             <div className="table-ovfl tbl-lesshead">
                 <table className="table table-bordered table-hover" id="bitacora">
-                  <col width="5%"/>
-                  <col width="25%"/>
-                  <col width="35%"/>
-                  <col width="35%"/>
+                  <colgroup>
+                    <col width="5%"/>
+                    <col width="25%"/>
+                    <col width="35%"/>
+                    <col width="35%"/>
+                  </colgroup>
                   <tbody>{rows}</tbody>
                 </table>
             </div>
-            <Paginacion items={this.state.lstBitac} onChangePage={this.onChangePage}/>
+            <Paginacion items={this.state.lstBitac} onChangePage={this.onChangePage} page={this.state.page}/>
         </div>
       </React.Fragment>
     );

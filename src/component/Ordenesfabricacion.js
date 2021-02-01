@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPlusSquare,
   faEdit,
-  faTrash, faClipboardCheck,faGhost
+  faTrash, faClipboardCheck
 } from "@fortawesome/free-solid-svg-icons";
 import Paginacion from './Paginacion';
 import Addordenfab from "./Addordenfab";
@@ -294,7 +294,7 @@ export default class Ordenesfabricacion extends Component {
                 </table>              
               </div>
               <div className="center">
-                <Paginacion items={this.state.lstOF} onChangePage={this.onChangePage} />
+                <Paginacion items={this.state.lstOF} onChangePage={this.onChangePage} page={this.state.page} />
               </div>
             </React.Fragment>
           )}

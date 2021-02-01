@@ -197,7 +197,7 @@ export default class Clientes extends Component {
                         </table>
                     </div>
                     <div className="center">
-                        <Paginacion items={this.state.lstClientes} onChangePage={this.onChangePage} />
+                        <Paginacion items={this.state.lstClientes} onChangePage={this.onChangePage} page={this.state.page} />
                     </div>
                 </React.Fragment>
             }

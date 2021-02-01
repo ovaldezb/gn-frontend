@@ -244,6 +244,7 @@ background-color: #f50707;
   -o-transition: 1s;
   -webkit-transition:  .5s linear;
   -webkit-transform:translate3d(0,0,0);
+  -transform:translate3d(0,0,0);
 }
 
 .menu ul li:hover{
@@ -360,3 +361,4 @@ background-color: #f50707;
   height: 55px;
   overflow: scroll;
 }
+

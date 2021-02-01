@@ -22,7 +22,10 @@ class Paginacion extends React.Component {
 
     componentDidMount() {
         // set page if items array isn't empty
-        if (this.props.items && this.props.items.length) {
+        //console.log(this.props.page);
+        if(this.props.page > 1){
+            this.setPage(this.props.page);
+        }else if (this.props.items && this.props.items.length) {
             this.setPage(this.props.initialPage);
         }
     }
