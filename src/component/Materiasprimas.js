@@ -275,6 +275,7 @@ export default class Materiasprimas extends Component {
               </div>
 
               <table className="table table-bordered header-font">
+                <colgroup>
                 <col width="21%"/>
                 <col width="8%"/>
                 <col width="8%"/>
@@ -283,6 +284,7 @@ export default class Materiasprimas extends Component {
                 <col width="17%"/>
                 <col width="15%"/>
                 <col width="10%"/>
+                </colgroup>
                 <thead className="thead-light">
                   <tr>
                     <th style={this.center}>Descripción</th>
@@ -298,6 +300,7 @@ export default class Materiasprimas extends Component {
               </table>
               <div className="table-ovfl tbl-lesshead">
                 <table className="table table-bordered table-hover header-font" id="materiaprima">
+                  <colgroup>
                 <col width="21%"/>
                 <col width="8%"/>
                 <col width="8%"/>
@@ -306,6 +309,7 @@ export default class Materiasprimas extends Component {
                 <col width="17%"/>
                 <col width="15%"/>
                 <col width="10%"/>
+                </colgroup>
                   <tbody>{lstMp}</tbody>
                 </table>              
               </div>

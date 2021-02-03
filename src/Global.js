@@ -1,5 +1,5 @@
 var Global = {
-    url:'http://localhost:8085/api/',
+    url:'http://35.224.209.5:8085/api/',
     JWT_NAME:'USER',
     ADD_USER:'ADD_USER',
     UPDT_USER:'UPDT_USER',

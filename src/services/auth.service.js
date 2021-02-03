@@ -15,7 +15,7 @@ class AuthService{
             }
             return res.data;
         }).catch(err=>{
-            console.log(JSON.stringify(err));
+            console.log(err);
             return 'error';
         });
     }

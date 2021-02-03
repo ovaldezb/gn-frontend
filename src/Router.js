@@ -16,10 +16,11 @@ import Lcliente from './component/Lcliente';
 import Lproveedor from './component/Lproveedor';
 
 class Router extends Component {
-
+  
   render() {
+    let PATH = process.env.REACT_APP_ROOT_PATH
     return (
-      <BrowserRouter>
+      <BrowserRouter basename={PATH}>
         <Switch>
           <Route exact path="/" component={Login} />
           <Route exact path="/principal" component={Principal} />
