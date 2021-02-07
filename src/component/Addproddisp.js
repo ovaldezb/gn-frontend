@@ -12,7 +12,6 @@ import Bitacora from '../services/bitacora-service';
 
 export default class Addproddisp extends Component {
     style = {};
-    styleBusqueda={border:"solid 1px red",width:"60%"};
     styleBusSel={}
     styleTblBus = {width:"100%"};
     col1B={width:"20%"};
@@ -21,7 +20,7 @@ export default class Addproddisp extends Component {
     center = {textAlign:"center"}
     right = {textAlign:"right"}
     left = {textAlign:"left"}
-    btnName = 'Enviar';
+    btnName = 'Guardar';
     codigoRef = React.createRef();
     descRef = React.createRef();
     porcentajeRef = React.createRef();
@@ -41,7 +40,8 @@ export default class Addproddisp extends Component {
         idSelPdBus:-1,
         lstBusqDesc:[],
         nombre:'',
-        clave:''
+        clave:'',
+        sumaPorcentaje:0
   };
 
   constructor(){
@@ -55,40 +55,43 @@ export default class Addproddisp extends Component {
   }
 
   componentDidMount(){
-      var prddisp = this.props.proddisp;
-      
-      if(!this.props.tipo){
-        this.btnName = "Actualizar";
-        this.idPrdDisp = this.props.proddisp.id;
-        this.setState({
-            nombre:prddisp.nombre,
-            clave:prddisp.clave,
-            lstMatPrim:prddisp.materiaPrimaUsada,
-            prodxcaja:prddisp.prodxcaja
-        });
+    var prddisp = this.props.proddisp;
+    if(!this.props.tipo){
+      let sumPor = 0;
+      this.btnName = "Actualizar";
+      this.idPrdDisp = this.props.proddisp.id;
+      for(let i=0;i<prddisp.materiaPrimaUsada.length;i++){
+        sumPor += Number(Number(prddisp.materiaPrimaUsada[i].porcentaje).toFixed(2));
       }
+      this.setState({
+          nombre:prddisp.nombre,
+          clave:prddisp.clave,
+          lstMatPrim:prddisp.materiaPrimaUsada,
+          prodxcaja:prddisp.prodxcaja,
+          sumaPorcentaje:Number(sumPor).toFixed(2)
+      });
+    }
+    
+    
+    this.setState({
+      
+    });
   }
   
   busquedaDesc = (e)=>{
-    if(e.keyCode === 13){
-        if(this.state.desc !==''){
-            Axios.get(Global.url+'matprimdisp/filter/'+this.state.desc.toUpperCase(),{ headers: authHeader() })
-                .then(res =>{
-                    this.setState({
-                        lstBusqDesc:res.data
-                    });
-                })
-                .catch();
-        }else{
-            Axios.get(Global.url+'matprimdisp',{ headers: authHeader() })
-                .then(res =>{
-                    this.setState({
-                        lstBusqDesc:res.data
-                    });
-                })
-                .catch();
-        }
-    }
+    if(this.state.desc !==''){
+        Axios.get(Global.url+'matprimdisp/filter/'+this.state.desc.toUpperCase(),{ headers: authHeader() })
+            .then(res =>{
+                this.setState({
+                    lstBusqDesc:res.data
+                });
+            })
+            .catch();
+    }else{
+      this.setState({
+        lstBusqDesc:[]
+      });
+    }  
   }
 
   busquedaCodigo = (e) =>{
@@ -120,7 +123,7 @@ export default class Addproddisp extends Component {
         return (x.codigo === this.state.codigo)
     });
     var matprima = {
-        porcentaje:this.porcentajeRef.current.value,
+        porcentaje:Number(this.porcentajeRef.current.value).toFixed(2),
         materiaprimadisponible:{
             codigo:this.codigoRef.current.value,    
             descripcion:this.descRef.current.value,
@@ -137,22 +140,25 @@ export default class Addproddisp extends Component {
         swal('La porcentaje no puede estar vacia o ser 0','Error','error');
         return;
     }else if(!this.isUpdt){
-        //console.log('agregar');
         lstMpTmp = this.state.lstMatPrim;
         lstMpTmp.push(matprima);
-        
-        
     }else if(this.isUpdt){
         lstMpTmp = this.state.lstMatPrim;
         lstMpTmp[this.state.idSelPd] = matprima;
         this.isUpdt=false;
+    }
+
+    let sumPor = 0;
+    for(let i=0;i<this.state.lstMatPrim.length;i++){
+      sumPor += Number(Number(this.state.lstMatPrim[i].porcentaje).toFixed(2));
     }
     this.setState({
         lstMatPrim:lstMpTmp,
         codigo:'',
         desc:'',
         porcentaje:0,
-        idSelPd:-1
+        idSelPd:-1,
+        sumaPorcentaje:Number(sumPor).toFixed(2)
     });
   }
 
@@ -173,7 +179,7 @@ export default class Addproddisp extends Component {
         desc:this.descRef.current.value,
         codigo:this.codigoRef.current.value,
         porcentaje:this.porcentajeRef.current.value,
-        nombre:this.nombreRef.current.value,
+        nombre:this.nombreRef.current.value.toUpperCase(),
         clave:this.claveRef.current.value,
         prodxcaja:this.prodxcajaRef.current.value
     }); 
@@ -222,7 +228,8 @@ export default class Addproddisp extends Component {
         lstMatPrim:[],
         nombre:'',
         clave:'',
-        porcentaje:''
+        porcentaje:'',
+        sumaPorcentaje:'0'
     });
     this.props.cancelar(null);
   }
@@ -238,12 +245,6 @@ export default class Addproddisp extends Component {
   selectRow = (i) => {
     this.setState({
       idSelPd: i
-    });
-  };
-
-  selectRowBus = (i)=>{
-    this.setState({
-        idSelPdBus:i
     });
   }
 
@@ -280,7 +281,11 @@ export default class Addproddisp extends Component {
   }
 
   render() {
+    var styleBusqueda={};
+    var height = '0px';
     if(this.state.lstBusqDesc.length > 0){
+      height = this.state.lstBusqDesc.length < 4 ? this.state.lstBusqDesc.length * 50 : 200
+      styleBusqueda={border:"solid 1px red",width:"60%",overflow:"auto",height:height+'px'};
         var rowsBusq = this.state.lstBusqDesc.map((mdisp,i)=>{
             if(this.state.idSelPdBus === i){
                 this.styleBusSel = "selected pointer";
@@ -288,7 +293,7 @@ export default class Addproddisp extends Component {
                 this.styleBusSel ={};
             }
             return(
-                <tr key={i} onClick={()=>{this.selectRowBus(i)}}  onDoubleClick={()=>{this.selectRowBusSelected(i)}} className={this.styleBusSel}>
+                <tr key={i}   onClick={()=>{this.selectRowBusSelected(i)}} className={this.styleBusSel}>
                     <td>{mdisp.codigo}</td>
                     <td>{mdisp.descripcion}</td>
                     <td>{mdisp.unidad.unidadMedida}</td>
@@ -297,6 +302,7 @@ export default class Addproddisp extends Component {
         });
     } 
     if(this.state.lstMatPrim.length > 0 ){
+        
         var rows = this.state.lstMatPrim.map((mpdis,i)=>{
             if (this.state.idSelPd === i) {
                 this.style = "selected pointer";
@@ -305,38 +311,48 @@ export default class Addproddisp extends Component {
               }
             return(
                 <tr key={i} onClick={() => {this.selectRow(i); }} onDoubleClick={()=>{this.selUpdtMatPrim(i)}} className={this.style}>
-                    <td>{i+1}</td>
+                    <td style={this.center}>{i+1}</td>
                     <td>{mpdis.materiaprimadisponible.codigo}</td>
                     <td>{mpdis.materiaprimadisponible.descripcion}</td>
-                    <td style={this.center}>{mpdis.porcentaje}</td>
+                    <td style={this.center}>{mpdis.porcentaje}%</td>
                 </tr>
             );
         });
     }
     
     return (
+      
       <form onSubmit={this.onSubmit} onChange={this.onSubmit}>
-        
+        <h4 className="center">Producto Disponible</h4>
         <div className="container-ng">
-          <div className="showcase-form card">
+          <div className="showcase-form card tbl-padding">
             <div className="grid-2-1">
               <div className="form-control">
                 <input type="text" name="nombre" placeholder="Nombre Producto" ref={this.nombreRef} defaultValue={this.state.nombre}  required/>
                 {this.validator.message('nombre',this.state.nombre,'required')}
               </div>
               <div className="form-control">
-                <input type="text" name="clave" placeholder="Clave" ref={this.claveRef} defaultValue={this.state.clave} onBlur={this.validaClave}/>
+                <input type="text" name="clave"  className="center" placeholder="Clave" ref={this.claveRef} defaultValue={this.state.clave} onBlur={this.validaClave}/>
                 {this.validator.message('clave',this.state.clave,'required')}
               </div>
             </div>
             <div className="grid-1-2">
-            <div className="form-control">
-            <input type="number" name="empxcaja" placeholder="Productos por caja" ref={this.prodxcajaRef} defaultValue={this.state.prodxcaja} />
-            </div>
+              <div className="form-control">
+                <input type="number" name="empxcaja" placeholder="Productos por caja" ref={this.prodxcajaRef} defaultValue={this.state.prodxcaja} />
+                {this.validator.message('empxcaja',this.state.prodxcaja,'required')}
+              </div>
+              <div>
+                {this.state.sumaPorcentaje===Global.PORCENTAJE_MAX &&
+                  <legend className="porcentaje-ok">{this.state.sumaPorcentaje}%</legend>
+                }
+                {this.state.sumaPorcentaje!==Global.PORCENTAJE_MAX &&
+                  <legend className="porcentaje-nok">{this.state.sumaPorcentaje}%</legend>
+                }
+              </div>
             </div>
           </div>
-          <div className="showcase-form card">
-            <h3 className="center">Materia prima para el producto</h3>
+          <div className="showcase-form card tbl-padding">
+            <h4 className="center">Materia prima para el producto</h4>
             <p></p>
             <div className="row">
               <div className="col-2">
@@ -359,42 +375,45 @@ export default class Addproddisp extends Component {
               </div>
               <div className="col-1">
               {this.state.lstMatPrim.length > 0 && this.state.idSelPd >= 0 &&
-                <Link onClick={this.delMatPrim}>
+                <Link to="#" onClick={this.delMatPrim}>
                     <FontAwesomeIcon icon={faMinusCircle} title="Elimina la MP seleccionada"/>
                 </Link>
               }
               </div>
               <div className="col-1">
               {(this.state.codigo || this.state.desc || this.state.porcentaje > 0 ) &&
-                <Link onClick={this.clearBusqMP}>
+                <Link to="#" onClick={this.clearBusqMP}>
                     <FontAwesomeIcon icon={faEraser} title="Limpia los campos de la Materia prima"/>
                 </Link>
               }
               </div>              
             </div>
             {this.state.lstBusqDesc.length > 0 &&
-            <div  className="table-ovfl-busq" style={this.styleBusqueda}>
+            <div  style={styleBusqueda}>
                 <table className="table " style={this.styleTblBus}>
+                  <colgroup>
                     <col width="25%"/>
                     <col width="60%"/>
                     <col width="15%"/>
-                    <tbody>
+                  </colgroup>
+                  <tbody>
                     {rowsBusq}
-                    </tbody>
+                  </tbody>
                 </table>              
             </div>
             }
           </div>
           <div className="showcase-form card">
             <table className="table table-dark table-bordered">
+              <colgroup>
                 <col width="10%"/>
                 <col width="20%"/>
                 <col width="50%"/>
                 <col width="20%"/>
-                
+              </colgroup>
               <thead>
                 <tr>
-                  <td>#</td>
+                  <td style={this.center}>#</td>
                   <td>Codigo</td>
                   <td>Descripcion</td>
                   <td style={this.center}>Porcentaje</td>
@@ -415,7 +434,7 @@ export default class Addproddisp extends Component {
           </div>
           <div className="row">
               <div className="col-2">
-                <input type="button" disabled={!this.state.lstMatPrim.length > 0} value={this.btnName} onClick={this.saveProdDisp} className="btn btn-success"/>        
+                <input type="button" disabled={!this.state.lstMatPrim.length > 0 || this.state.sumaPorcentaje!=='100.00'} value={this.btnName} onClick={this.saveProdDisp} className="btn btn-success"/>        
               </div>
               <div className="col-2">
                 <input type="button"  value="Cancelar"  onClick={this.cancelAdd} className="btn btn-danger"/>        

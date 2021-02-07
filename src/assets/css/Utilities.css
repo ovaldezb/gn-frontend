@@ -110,7 +110,12 @@
 }
 
 .tbl-lesshead{
-  margin-top: -15px !important;
+  margin-bottom: 0rem;
+  margin-top: -15px;
+}
+
+.tbl-padding{
+  padding: 10px !important;
 }
 
 .table-ovfl {
@@ -129,7 +134,7 @@
 }
 
 .table-ovfl-prddisp {
-  height: 154px;
+  height: 182px;
   overflow: auto;
 }
 

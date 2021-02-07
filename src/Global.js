@@ -1,5 +1,6 @@
 var Global = {
-    url:'http://35.224.209.5:8085/api/',
+    //url:'https://localhost:8443/api/',
+    url:'http://localhost:8085/api/',
     JWT_NAME:'USER',
     ADD_USER:'ADD_USER',
     UPDT_USER:'UPDT_USER',
@@ -22,7 +23,8 @@ var Global = {
     WTDEL:'WTDEL',
     CMPLT:'CMPLT',
     DELVRD:'DELVRD',
-    SIZE_DOC:8
+    SIZE_DOC:8,
+    PORCENTAJE_MAX:'100.00'
 };
 
 export default Global

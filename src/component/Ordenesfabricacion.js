@@ -7,13 +7,17 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPlusSquare,
   faEdit,
-  faTrash, faClipboardCheck
+  faTrash, faClipboardCheck,faPrint
 } from "@fortawesome/free-solid-svg-icons";
 import Paginacion from './Paginacion';
 import Addordenfab from "./Addordenfab";
 import NumberFormat from 'react-number-format';
 import swal from "sweetalert";
 import axios from 'axios';
+import Moment from 'react-moment';
+import momento from 'moment';
+import Logo from '../assets/images/logo.png'
+
 
 export default class Ordenesfabricacion extends Component {
   filterRef = React.createRef();
@@ -31,7 +35,8 @@ export default class Ordenesfabricacion extends Component {
     status: "",
     idSelOf: -1,
     ordenfab:{},
-    selected:false
+    selected:false,
+    oc:{}
   };
 
   componentDidMount() {
@@ -152,6 +157,63 @@ export default class Ordenesfabricacion extends Component {
     });
   }
 
+  printOf = () =>{
+    if(this.state.idSelOf === -1){
+      swal("Debe seleccionar una Orden de Fabricación");
+      return;
+    }
+    let printwind = window.open("");
+    let estilos = '<style> '+
+    '@media print{'+
+    '  .col1{'+
+    '      width: 50px;'+
+    '      text-align: center;'+
+    '  }'+
+    '  .col2{'+
+    '      width: 150px;'+
+    '      text-align: center;'+
+    '  }'+
+    '  .col3{'+
+    '      width: 220px;'+
+    '  }'+
+    '  .center{'+
+    '      text-align: center;'+
+    '  }'+
+    '  .left{'+
+    '      border-left: 2px solid black;'+
+    '  }'+
+    '  .right{'+
+    '      border-right: 2px solid black;'+
+    '  }'+
+    '  .top{'+
+    '      border-top: 2px solid black;'+
+    '  }'+
+    '  .bottom{'+
+    '      border-bottom: 2px solid black;'+
+    '  }'+
+    '  .font14{'+
+    '      font-size: 14px;'+
+    '  }'+
+    '} '  + 
+    '</style>';
+    var is_chrome = Boolean(window.chrome);
+    var is_safari = Boolean(window.safari);
+    printwind.document.write(estilos+' '+document.getElementById('print').innerHTML);
+    if (is_chrome) {
+      printwind.print();      
+    }
+    else if (is_safari) {
+      printwind.print();
+      setTimeout(()=>{
+        printwind.close();
+      },1000);
+    }
+    else {
+      printwind.print();
+      printwind.close();
+    }
+  }
+
   filtrado = () =>{
     var filter = this.filterRef.current.value;
     var nvoArray = this.state.lstOF.filter(element =>{
@@ -169,7 +231,7 @@ export default class Ordenesfabricacion extends Component {
       this.isActive = true;
     }
     this.setState({
-      idSelOf: i,
+      idSelOf: ((this.state.page-1)*10)+i
     });
   };
 
@@ -185,6 +247,7 @@ export default class Ordenesfabricacion extends Component {
  }
 
   render() {
+    const OF = this.state.lstOF[this.state.idSelOf];
     var style = {};
     if (this.state.lstOF.length > 0) {
       var lstOrdFabPI = this.state.pageOfItems.map((ordfab, i) => {
@@ -202,7 +265,7 @@ export default class Ordenesfabricacion extends Component {
         return (
           <tr key={i} onClick={() => {this.selectRow(i)}}  className={style}>
             <td style={this.center}>{this.pad(ordfab.noConsecutivo,Global.SIZE_DOC)}</td>
-            <td style={this.center}>{ordfab.oc}</td>
+            <td style={this.center}>{ordfab.oc.oc}</td>
             <td style={this.center}>{ordfab.lote}</td>
             <td style={this.center}><NumberFormat value={Number(ordfab.piezas)}displayType={'text'} thousandSeparator={true}/></td>
             <td style={this.center}>{ordfab.estatus}</td>
@@ -239,12 +302,14 @@ export default class Ordenesfabricacion extends Component {
                         </Link>
                       </li>
                       <li>
-                        
                             <Link to="#" onClick={this.updateOf} title="Actualiza la OF Seleccionada">
                           <FontAwesomeIcon icon={faEdit} />
-                          </Link>
-                          
-                        
+                          </Link>                        
+                      </li>
+                      <li>
+                        <Link to="#" onClick={this.printOf} title="Imprime la OF Seleccionada">
+                          <FontAwesomeIcon icon={faPrint} />
+                        </Link>
                       </li>
                       <li>
                         <Link to="#" onClick={this.deleteOf} title="Elimina la OF Seleccionada">
@@ -258,6 +323,7 @@ export default class Ordenesfabricacion extends Component {
                         }
                         </Link>                        
                       </li>
+                      
                     </ul>
                   </nav>
                 </div>
@@ -296,6 +362,107 @@ export default class Ordenesfabricacion extends Component {
               <div className="center">
                 <Paginacion items={this.state.lstOF} onChangePage={this.onChangePage} page={this.state.page} />
               </div>
+              {this.state.idSelOf !== -1 &&
+              <div id="print" style={{display:'none'}}>
+                <table>
+                  <tr>
+                    <td>
+                      <table style={{width: "100%",borderCollapse:'separate', borderSpacing:'0em'}}>
+                          <tr>
+                              <td rowspan="7" class="col1 right top bottom left">
+                              <img src={Logo} alt="" width="90%" />
+                              </td>
+                          </tr>
+                          <tr>
+                              <td rowspan="2" colSpan="3" class="col2 right top bottom">GRUPO NORDAN S.A de C.V.</td>
+                              <td class="col3 right top font14">ORDEN DE FABRICACION</td>
+                          </tr>
+                          <tr>
+                              <td class="right bottom center">{OF.noConsecutivo}</td>
+                          </tr>
+                          <tr>
+                              <td class="right font14">PRODUCTO</td>
+                              <td class="right font14">CLAVE</td>
+                              <td class="right font14">CLIENTE</td>
+                              <td class="right font14">CANTIDAD PZAS</td>
+                          </tr>
+                          <tr>
+                              <td class="right bottom">{OF.oc.producto.nombre}</td>
+                              <td class="right bottom">{OF.oc.clave}</td>
+                              <td class="right bottom">{OF.oc.cliente.nombre}</td>
+                              <td class="right bottom center">{OF.piezas}</td>
+                          </tr>
+                          <tr>
+                              <td class="right font14">FECHA ENTREGA</td>
+                              <td class="right font14">NUMERO LOTE</td>
+                              <td class="right font14">FECHA</td>
+                              <td class="right font14">FIRMA A. DIR:</td>
+                          </tr>
+                          <tr>
+                              <td class="right bottom"><Moment format="DD/MM/YYYY">{momento(OF.oc.fechaEntrega,'MM-DD-YYYY').format('YYYY-MM-DDTHH:mm:ss')}</Moment></td>
+                              <td class="right bottom">{OF.lote}</td>
+                              <td class="right bottom"><Moment format="DD/MM/YYYY">{new Date()}</Moment></td>
+                              <td class="right bottom">FECHA:</td>
+                          </tr>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      &nbsp;
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <table style={{width: '100%',borderCollapse:'separate', borderSpacing:'0em'}}>
+                          <colgroup>
+                              <col width="20%"/>
+                              <col width="15%"/>
+                              <col width="15%"/>
+                              <col width="5%"/>
+                              <col width="15%"/>
+                              <col width="20%"/>
+                              <col width="10%"/>
+                          </colgroup>
+                          <tr>
+                              <td className="top bottom left right">Integracion de Materia Prima</td>
+                              <td className="top bottom right center">&nbsp;</td>
+                              <td className="top bottom right center">%</td>
+                              <td className="top bottom right center">&nbsp;</td>
+                              <td className="top bottom right center">KGS</td>
+                              <td className="top bottom right center">&nbsp;</td>
+                              <td className="top bottom right center">LOTE</td>
+                          </tr>
+                          {
+                            OF.matprima.map((mp,i)=>{
+                              var mpObjetoFormula = OF.oc.producto.materiaPrimaUsada.filter(mpu => mpu.materiaprimadisponible.codigo===mp.codigo);
+                              return(
+                                <tr key={i}>
+                                  <td className="left right">{mp.nombre}</td>
+                                  <td className="right center"><NumberFormat value={Number(mpObjetoFormula[0].porcentaje/100)} format="#####" displayType={'text'}/></td>
+                                  <td className="right center">{Number(mpObjetoFormula[0].porcentaje).toFixed(2)}</td>
+                                  <td className="right">&nbsp;</td>
+                                  <td className="right center">{Number(mp.cantidad).toFixed(2)}</td>
+                                  <td className="right">{mp.nombre}</td>
+                                  <td className="right center">{mp.lote}</td>
+                                </tr>
+                              );
+                            })
+                          }  
+                          <tr>
+                              <td className="left top right bottom">Total</td>
+                              <td className="right top bottom center">1</td>
+                              <td className="right top bottom center">100%</td>
+                              <td className="right top bottom">&nbsp;</td>
+                              <td className="right top bottom center">1,080</td>
+                              <td className="right top bottom" colSpan="2">Tamaños del Lote</td>
+                          </tr>                
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              }
             </React.Fragment>
           )}
         </React.Fragment>

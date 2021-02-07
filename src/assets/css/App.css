@@ -362,3 +362,13 @@ background-color: #f50707;
   overflow: scroll;
 }
 
+/* Color BackGround Porcentaje*/
+.porcentaje-ok{
+  text-align: center;
+  background: rgb(9, 255, 0);
+}
+
+.porcentaje-nok{
+  text-align: center;
+  background: red;
+}

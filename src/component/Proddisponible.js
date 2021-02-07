@@ -61,6 +61,10 @@ export default class Proddisponible extends Component {
 
   addPd = () => {
     this.displayAdd = true;
+    this.isAdd = true;
+    this.setState({
+      proddisp:{}
+    });
     this.forceUpdate();
   };
 

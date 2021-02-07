@@ -157,8 +157,9 @@ export default class Addordenfab extends Component {
     var ordenFabTmp = this.state.ordenfab;
     ordenFabTmp.noConsecutivo=Number(this.state.counter);
     ordenFabTmp.matprima=this.state.lstMatPrimResp;
-    ordenFabTmp.estatus=Global.TEP;    
-    //ordenFabTmp.cliente=this.state.cliente;
+    ordenFabTmp.estatus=Global.TEP;
+    //esto se hace para enviar solo el id
+    ordenFabTmp.oc = {id:this.state.ordenfab.id}
     
     Axios.post(Global.url+'ordenfab',ordenFabTmp,{ headers: authHeader() })
       .then(res=>{
@@ -250,10 +251,12 @@ export default class Addordenfab extends Component {
       Axios.get(Global.url+'ordencompra/oc/'+(this.state.ordenfab.oc===undefined?'vacio':this.state.ordenfab.oc===''?'vacio':this.state.ordenfab.oc),{ headers: authHeader() })
       .then(res=>{        
         if(res.data.length===1){
+          console.log(res.data);
           let of = this.state.ordenfab;
           of.presentacion=res.data[0].presentacion;
           of.nombre=res.data[0].producto.nombre;
           of.oc = res.data[0].oc;
+          of.id = res.data[0].id;
           this.setState({
             ordenfab:of,
             piezasPendientes:res.data[0].piezas - res.data[0].piezasFabricadas,

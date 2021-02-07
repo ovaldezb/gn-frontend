@@ -37,11 +37,11 @@ export default class Addproveedor extends Component {
     enviarFormulario = (event) =>{
         event.preventDefault();
         var prov = {
-            nombre:this.nombreRef.current.value,
+            nombre:this.nombreRef.current.value.toUpperCase(),
             direccion:this.direccionRef.current.value,
             telefono:this.telRef.current.value,
             email:this.emailRef.current.value,
-            rfc:this.rfcRef.current.value,
+            rfc:this.rfcRef.current.value.toUpperCase(),
             contacto:this.contactoRef.current.value,
             activo:true
         }

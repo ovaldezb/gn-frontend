@@ -115,7 +115,7 @@ export default class Materiasprimas extends Component {
     this.displayAdd = true;
     this.isAdd = false;
     let i = ((this.state.page-1)*10)+ this.state.idSelMp
-    console.log('Update');
+    
     this.setState({
       matprima:this.state.lstMatPrim[i],
       idSelMp: -1
