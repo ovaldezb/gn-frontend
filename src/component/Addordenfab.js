@@ -13,6 +13,7 @@ export default class Addordenfab extends Component {
   obsRef =React.createRef();
   selAllRef = React.createRef();
   valorRef = React.createRef()
+  loteAguaRef = React.createRef();
   center = {textAlign:"center"}
   right = {textAlign:"right"}
   left = {textAlign:"left"}
@@ -79,13 +80,16 @@ export default class Addordenfab extends Component {
     if(this.valorRef.current !== null){
       this.valorRef.current.focus();
     }
+    if(this.loteAguaRef.current !== null){
+      this.loteAguaRef.current.focus();
+    }
   }
 
   getCounter(){
-    Axios.get(Global.url+'utils/count',{ headers: authHeader() })
+    Axios.get(Global.url+'ordenfab/count',{ headers: authHeader() })
     .then(res=>{
       this.setState({
-        counter:this.pad(Number(res.data.counter),Global.SIZE_DOC)
+        counter:this.pad(Number(res.data.counter) + 1,Global.SIZE_DOC)
       });
     })
     .catch();
@@ -154,12 +158,11 @@ export default class Addordenfab extends Component {
 
     this.isErrorInit = true;
     var ordenFabTmp = this.state.ordenfab;
-    ordenFabTmp.noConsecutivo=Number(this.state.counter);
+    //ordenFabTmp.noConsecutivo=Number(this.state.counter);
     ordenFabTmp.matprima=this.state.lstMatPrimResp;
     ordenFabTmp.estatus=Global.TEP;
     //esto se hace para enviar solo el id
     ordenFabTmp.oc = {id:this.state.ordenfab.id}
-    
     Axios.post(Global.url+'ordenfab',ordenFabTmp,{ headers: authHeader() })
       .then(res=>{
           swal('Se guardó la Orden de Fabricación con éxito',this.pad(ordenFabTmp.noConsecutivo,Global.SIZE_DOC),'success');
@@ -200,6 +203,11 @@ export default class Addordenfab extends Component {
         piezasPendientes:this.state.piezasTotales -  this.state.piezasFabricadas - this.piezasRef.current.value
       });
     }
+    if(this.loteAguaRef.current){
+      this.setState({
+        loteAgua: this.loteAguaRef.current.value
+      });
+    }
   }
   
   clean = () =>{
@@ -238,7 +246,24 @@ export default class Addordenfab extends Component {
       lstMatPrimResp:mpArray,
       valor:Number(qty)
     });
-    
+  }
+
+  updateFolioAgua = (index,loteAgua) =>{
+    if(this.state.lstMatPrimResp[index].codigo === Global.CODIGO_AGUA){
+      let mpArray = this.state.lstMatPrimResp.map((mp,j)=>{
+        if(index === j){
+          mp.loteAgua = true;
+          return mp;
+        }else{
+          mp.loteAgua = false;
+          return mp;
+        }
+      });
+      this.setState({
+        lstMatPrimResp:mpArray,
+        loteAgua:loteAgua
+      });
+    }
   }
 
   //|| e._reactName === 'onBlur'
@@ -281,7 +306,6 @@ export default class Addordenfab extends Component {
             cliente:'',
             producto:''
           });
-          
         }
       });
     }
@@ -293,6 +317,18 @@ export default class Addordenfab extends Component {
     mpArray[i].valor = -1;
     this.setState({
       lstMatPrimResp:mpArray,
+    });
+  }
+
+  updtRowLote = (i) =>{
+    let mpArray = this.state.lstMatPrimResp;
+    if(this.loteAguaRef.current){
+      mpArray[i].lote = this.loteAguaRef.current.value;
+    }    
+    mpArray[i].loteAgua = false;
+    this.setState({
+      lstMatPrimResp:mpArray,
+      loteAgua:mpArray[i].lote
     });
   }
 
@@ -331,7 +367,7 @@ export default class Addordenfab extends Component {
     return (
       <React.Fragment>
         <form onSubmit={this.enviarFormulario} onChange={this.enviarFormulario}>
-          <h2 className="center" >Agregar Orden de Fabricación</h2>
+          <h2 className="center"> Orden de Fabricación</h2>
           <div className="grid">
             <div className="showcase-form card">
               <div className="form-control grid">
@@ -341,7 +377,7 @@ export default class Addordenfab extends Component {
               </div>
               <div className="form-control grid">
                 <div>
-                  <input type="text" name="oc" placeholder="Orden de Compra" ref={this.ocRef} value={this.state.ordenfab.oc} onKeyUp={this.validaOC} />
+                  <input type="text" name="oc" placeholder="Orden de Compra" ref={this.ocRef} defaultValue={this.state.ordenfab.oc} onKeyUp={this.validaOC} />
                   {this.validator.message('oc',this.state.ordenfab.oc,'required')}
                   {this.state.lstOC.length > 1 &&
                   <div className="tbl-oc">
@@ -386,17 +422,20 @@ export default class Addordenfab extends Component {
           {this.state.lstMatPrimResp.length > 0 &&
           <div className="container">
             <table className="table table-dark table-bordered tbl-lesshead-1 header-font">
+              <colgroup>
               <col width="15%"/>
               <col width="34%"/>
               <col width="10%"/>
               <col width="12%"/>
               <col width="9%"/>
               <col width="20%"/>
+              </colgroup>
               <thead>
                 <tr>
                   <th style={this.center}>Codigo</th>
                   <th style={this.center}>Materia prima</th>
                   <th style={this.center}>Cantidad</th>
+                  <th style={this.center}>Lote</th>
                   <th style={this.center}>Estatus</th>
                   <th style={this.center}><button className="btn is-small" onClick={this.selectAll}>Seleccionar</button></th>
                 </tr>
@@ -407,11 +446,11 @@ export default class Addordenfab extends Component {
               <table className="table table-bordered table-hover header-font">
                 <colgroup>
                   <col width="15%"/>
-                  <col width="35%"/>
+                  <col width="33%"/>
                   <col width="10%"/>
-                  <col width="10%"/>
+                  <col width="12%"/>
                   <col width="9%"/>
-                  <col width="21%"/>
+                  <col width="19%"/>
                 </colgroup>
                 <tbody>
                 {this.state.lstMatPrimResp.map((matprimres,i)=>{
@@ -419,7 +458,6 @@ export default class Addordenfab extends Component {
                   if(matprimres.estatus===Global.OK){
                     style = "suficiente";
                   }else if(matprimres.estatus===Global.ERROR){
-
                     style = "escaso";
                   }
                   return (
@@ -432,6 +470,15 @@ export default class Addordenfab extends Component {
                     {matprimres.valor && matprimres.valor !==-1 &&
                       <td><input type="number" className="valor" value={this.state.valor} ref={this.valorRef} onChange={this.getCantUpdt} onBlur={()=>{this.updtRow(i)}}/></td>
                     }
+                    
+                    {( matprimres.loteAgua===undefined || matprimres.loteAgua===false) &&
+                      <td onClick={()=>{this.updateFolioAgua(i,this.state.loteAgua)}}>{matprimres.lote}</td>
+                    }
+
+                    {( matprimres.loteAgua===true) &&
+                      <td><input type="text" className="valor" ref={this.loteAguaRef} defaultValue={this.state.loteAgua} onBlur={() => this.updtRowLote(i)}/></td>
+                    }
+                    
                     <td className={style} style={this.center}>{matprimres.estatus}</td>
                     <td><input type="checkbox" name={'val'+i} id={'val'+i} /></td>
                   </tr>

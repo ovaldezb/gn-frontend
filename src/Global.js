@@ -26,7 +26,8 @@ var Global = {
     CMPLT:'CMPLT',
     DELVRD:'DELVRD',
     SIZE_DOC:8,
-    PORCENTAJE_MAX:'100.00'
+    PORCENTAJE_MAX:'100.00',
+    CODIGO_AGUA:'AGUA001'
 };
 
 export default Global

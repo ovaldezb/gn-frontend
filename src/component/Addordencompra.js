@@ -80,7 +80,6 @@ export default class Addordencompra extends Component {
       Axios.get(Global.url+'prodisp/'+this.state.ordencompra.clave,{ headers: authHeader() })
           .then(res=>{
             let oc = this.state.ordencompra;
-            console.log(res);
             if(res.data !== null){     
               oc.clave = res.data.clave;
               oc.producto = res.data;              
@@ -335,7 +334,7 @@ export default class Addordencompra extends Component {
             </div>
           </div>
       </form>
-        <div className="container center">
+        <div className="container">
             <div className="grid">
                 <button className="btn btn-success" onClick={this.guardaOC}>{this.btnName}</button>
                 <button className="btn btn-danger" onClick={this.cancelarOC}>Cancelar</button>
