@@ -115,7 +115,8 @@
 }
 
 .tbl-padding{
-  padding: 10px !important;
+  padding: 5px !important;
+  margin: 5px !important;
 }
 
 .table-ovfl {
@@ -134,8 +135,11 @@
 }
 
 .table-ovfl-prddisp {
-  height: 182px;
+  height: 283px;
   overflow: auto;
+  border: 2px solid grey;
+  margin-bottom: 2px;
+  margin-top: -16px;
 }
 
 .table-ovfl-busq {

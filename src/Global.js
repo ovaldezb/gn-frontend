@@ -1,5 +1,6 @@
 var Global = {
     //url:'https://localhost:8443/api/',
+    //url:'http://ready2solve.club:8085/api/',
     url:'http://localhost:8085/api/',
     JWT_NAME:'USER',
     ADD_USER:'ADD_USER',
@@ -18,6 +19,7 @@ var Global = {
     OK:'OK',
     ERROR:'ERROR',
     OPEN:'OPEN',
+    APRVD:'APRVD',
     DRAFT:'DRAFT',
     TEP:'TEP',
     WTDEL:'WTDEL',

@@ -44,9 +44,8 @@ export default class Addmatprima extends Component {
     messages:{
         required:'requerido'
     }
-});
+  });
   
-
   componentDidMount(){
     if(!this.props.tipo){
       this.btnName = "Actualizar";
@@ -164,25 +163,6 @@ export default class Addmatprima extends Component {
     }
   }
 
-  /*busqProve = (event) =>{
-    if(event.keyCode === 13){
-      Axios.get(Global.url+'proveedor/'+(this.state.materiaPrima.proveedor===''?'vacio':this.state.materiaPrima.proveedor),{ headers: authHeader() })
-      .then(res =>{
-        console.log(res.data);
-        if(res.data.length === 1){
-          let mp = this.state.materiaPrima;
-          mp.proveedor = res.data[0].nombre;
-          mp.id = res.data[0].id;
-          this.setState({
-            materiaPrima:mp
-          });
-        }
-      })
-      .catch(err=>{
-        console.log(err);
-      });
-    }
-  }*/
   onChange = () =>{
 
   }

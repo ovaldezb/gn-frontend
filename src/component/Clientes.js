@@ -82,7 +82,7 @@ export default class Clientes extends Component {
 
     selectRow = (i) => {
         this.setState({
-          idSelCli: i,
+          idSelCli: ((this.state.page-1)*10) + i,
         });
       };
 

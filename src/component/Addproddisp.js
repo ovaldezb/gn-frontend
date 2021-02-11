@@ -403,7 +403,7 @@ export default class Addproddisp extends Component {
             </div>
             }
           </div>
-          <div className="showcase-form card">
+          <div className="showcase-form">
             <table className="table table-dark table-bordered">
               <colgroup>
                 <col width="10%"/>
@@ -422,10 +422,12 @@ export default class Addproddisp extends Component {
             </table>
             <div className="table-ovfl-prddisp">
                 <table className="table table-bordered tbl-lesshead">
-                  <col width="10%"/>
-                  <col width="20%"/>
-                  <col width="50%"/>
-                  <col width="20%"/>
+                  <colgroup>
+                    <col width="10%"/>
+                    <col width="20%"/>
+                    <col width="50%"/>
+                    <col width="20%"/>
+                  </colgroup>
                     <tbody>
                     {rows}
                     </tbody>

@@ -40,11 +40,11 @@ export default class Ordenesfabricacion extends Component {
   };
 
   componentDidMount() {
-      this.loadAactiveOF();
+      this.loadAactiveOF(false);
   }
 
-  loadAactiveOF() {
-    Axios.get(Global.url + "ordenfab/active/false", { headers: authHeader() })
+  loadAactiveOF(estatus) {
+    Axios.get(Global.url + 'ordenfab/active/'+estatus, { headers: authHeader() })
       .then((res) => {
         if (res.data.length > 0) {
           this.setState({
@@ -59,27 +59,9 @@ export default class Ordenesfabricacion extends Component {
       .catch();
   }
 
-  selectAllOF = () =>{
-    Axios.get(Global.url + "ordenfab/active/true", { headers: authHeader() })
-    .then((res) => {
-      if (res.data.length > 0) {
-        this.setState({
-          lstOF: res.data,
-        });
-      }
-    })
-    .catch();
-  }
-
   selectType = () =>{
-    if(this.selAllRef.current.checked){
-      this.selectAllOF();
-    }else{
-      this.loadAactiveOF();
-    }
-    // this.setState({
-    //   selected:this.selAllRef.current.checked
-    // });
+    this.loadAactiveOF(this.selAllRef.current.checked);
+    
   }
 
   addOF = () => {
@@ -247,6 +229,7 @@ export default class Ordenesfabricacion extends Component {
  }
 
   render() {
+    var cantidadTotal = 0;
     const OF = this.state.lstOF[this.state.idSelOf];
     var style = {};
     if (this.state.lstOF.length > 0) {
@@ -291,7 +274,7 @@ export default class Ordenesfabricacion extends Component {
                   <ul>
                     <li>Filtro:</li>
                     <li><input className="input"  type="text"  name="filtro" ref={this.filterRef} onKeyUp={this.filtrado}/></li>
-                    <li><input type="checkbox" ref={this.selAllRef} onChange={this.selectType} checked={this.selAllRef.current.checked}/></li>
+                    <li><input type="checkbox" ref={this.selAllRef} onChange={this.selectType} /></li>
                   </ul>
                   <h2>Orden de Fabricación</h2>
                   <nav>
@@ -302,8 +285,8 @@ export default class Ordenesfabricacion extends Component {
                         </Link>
                       </li>
                       <li>
-                            <Link to="#" onClick={this.updateOf} title="Actualiza la OF Seleccionada">
-                          <FontAwesomeIcon icon={faEdit} />
+                          <Link to="#" onClick={this.updateOf} title="Actualiza la OF Seleccionada">
+                            <FontAwesomeIcon icon={faEdit} />
                           </Link>                        
                       </li>
                       <li>
@@ -328,7 +311,7 @@ export default class Ordenesfabricacion extends Component {
                   </nav>
                 </div>
               </div>
-              <table className="table table-bordered header-font">
+              <table className="table table-dark header-font">
                 <colgroup>
                   <col width="18%"/>
                   <col width="18%"/>
@@ -337,7 +320,7 @@ export default class Ordenesfabricacion extends Component {
                   <col width="18%"/>
                   <col width="10%"/>
                 </colgroup>
-                <thead className="thead-light">                   
+                <thead className="thead-dark">                   
                   <tr>
                     <th scope="col">No de Orden</th>
                     <th scope="col">OC</th>
@@ -350,12 +333,14 @@ export default class Ordenesfabricacion extends Component {
               </table>
               <div className="table-ovfl table-hover tbl-lesshead">
                 <table className="table table-bordered table-lst" id="ordenFabricacion">
+                  <colgroup>
                   <col width="18%"/>
                   <col width="18%"/>
                   <col width="18%"/>
                   <col width="18%"/>
                   <col width="18%"/>
                   <col width="10%"/>
+                  </colgroup>
                   <tbody>{lstOrdFabPI}</tbody>
                 </table>              
               </div>
@@ -365,6 +350,7 @@ export default class Ordenesfabricacion extends Component {
               {this.state.idSelOf !== -1 &&
               <div id="print" style={{display:'none'}}>
                 <table>
+                  <tbody>
                   <tr>
                     <td>
                       <table style={{width: "100%",borderCollapse:'separate', borderSpacing:'0em'}}>
@@ -378,7 +364,7 @@ export default class Ordenesfabricacion extends Component {
                               <td class="col3 right top font14">ORDEN DE FABRICACION</td>
                           </tr>
                           <tr>
-                              <td class="right bottom center">{OF.noConsecutivo}</td>
+                              <td class="right bottom center">{this.pad(OF.noConsecutivo,Global.SIZE_DOC)}</td>
                           </tr>
                           <tr>
                               <td class="right font14">PRODUCTO</td>
@@ -390,7 +376,7 @@ export default class Ordenesfabricacion extends Component {
                               <td class="right bottom">{OF.oc.producto.nombre}</td>
                               <td class="right bottom">{OF.oc.clave}</td>
                               <td class="right bottom">{OF.oc.cliente.nombre}</td>
-                              <td class="right bottom center">{OF.piezas}</td>
+                              <td class="right bottom center"><NumberFormat value={Number(OF.piezas)} displayType={'text'} thousandSeparator={true}/></td>
                           </tr>
                           <tr>
                               <td class="right font14">FECHA ENTREGA</td>
@@ -419,32 +405,41 @@ export default class Ordenesfabricacion extends Component {
                               <col width="20%"/>
                               <col width="15%"/>
                               <col width="15%"/>
-                              <col width="5%"/>
                               <col width="15%"/>
                               <col width="20%"/>
                               <col width="10%"/>
+                              <col width="5%"/>
                           </colgroup>
                           <tr>
                               <td className="top bottom left right">Integracion de Materia Prima</td>
                               <td className="top bottom right center">&nbsp;</td>
                               <td className="top bottom right center">%</td>
-                              <td className="top bottom right center">&nbsp;</td>
                               <td className="top bottom right center">KGS</td>
                               <td className="top bottom right center">&nbsp;</td>
                               <td className="top bottom right center">LOTE</td>
+                              <td className="top bottom right center">&nbsp;</td>
                           </tr>
                           {
                             OF.matprima.map((mp,i)=>{
                               var mpObjetoFormula = OF.oc.producto.materiaPrimaUsada.filter(mpu => mpu.materiaprimadisponible.codigo===mp.codigo);
+                              cantidadTotal += mp.cantidad;
                               return(
                                 <tr key={i}>
                                   <td className="left right">{mp.nombre}</td>
                                   <td className="right center"><NumberFormat value={Number(mpObjetoFormula[0].porcentaje/100)} format="#####" displayType={'text'}/></td>
                                   <td className="right center">{Number(mpObjetoFormula[0].porcentaje).toFixed(2)}</td>
-                                  <td className="right">&nbsp;</td>
                                   <td className="right center">{Number(mp.cantidad).toFixed(2)}</td>
                                   <td className="right">{mp.nombre}</td>
                                   <td className="right center">{mp.lote}</td>
+                                  <td className="right">
+                                    <table style={{width: '100%'}}>
+                                      <tbody>
+                                        <tr>
+                                          <td className="left right top bottom">&nbsp;</td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                  </td>
                                 </tr>
                               );
                             })
@@ -453,13 +448,69 @@ export default class Ordenesfabricacion extends Component {
                               <td className="left top right bottom">Total</td>
                               <td className="right top bottom center">1</td>
                               <td className="right top bottom center">100%</td>
-                              <td className="right top bottom">&nbsp;</td>
-                              <td className="right top bottom center">1,080</td>
+                              <td className="right top bottom center">{Number(cantidadTotal).toFixed(2)}</td>
+                              <td className="right top bottom">&nbsp;</td>                              
                               <td className="right top bottom" colSpan="2">Tamaños del Lote</td>
                           </tr>                
                       </table>
                     </td>
                   </tr>
+                  <tr>
+                    <td>&nbsp;</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <table style={{width: '100%',borderCollapse:'separate', borderSpacing:'0em'}}>
+                        <tbody>
+                          <tr>
+                            <td className="left right top">
+                              Observaciones
+                            </td>
+                          </tr>
+                          <tr>
+                            <td className="left right bottom">&nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td className="left right ">&nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td className="left right bottom">&nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td className="left right ">&nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td className="left right bottom">&nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td className="left right ">&nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td className="left right bottom">&nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td className="left right ">&nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td className="left right bottom">&nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td className="left right ">&nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td className="left right bottom">&nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td className="left right ">&nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td className="left right bottom">&nbsp;</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                  </tbody>
                 </table>
               </div>
               }

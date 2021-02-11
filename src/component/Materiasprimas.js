@@ -80,7 +80,7 @@ export default class Materiasprimas extends Component {
 
   selectRow = (i) => {
     this.setState({
-      idSelMp: i,
+      idSelMp: ((this.state.page-1)*10) + i,
     });
   };
 
@@ -114,7 +114,7 @@ export default class Materiasprimas extends Component {
     
     this.displayAdd = true;
     this.isAdd = false;
-    let i = ((this.state.page-1)*10)+ this.state.idSelMp
+    let i = this.state.idSelMp
     
     this.setState({
       matprima:this.state.lstMatPrim[i],

@@ -89,8 +89,6 @@ export default class Productoterminado extends Component {
     );
   }
 
-
-
   filtrado = () =>{
     var filter = this.filterRef.current.value;
     var nvoArray = this.state.lstPdrTerm.filter(element =>{
@@ -104,7 +102,7 @@ export default class Productoterminado extends Component {
   selectRow = (i, activar) => {
     this.showTruck = activar;
     this.setState({
-      idSelPt: i,
+      idSelPt: ((this.state.page-1)*10) + i,
     });
   };
 

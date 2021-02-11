@@ -64,7 +64,7 @@ export default class Ordenescompra extends Component {
       swal('Debe seleccionar una OC');
       return;
     }
-    let i = ((this.state.page-1)*10)+ this.state.idSelOc
+    let i =  this.state.idSelOc
       this.setState({
         ordencompra:this.state.pageOfItems[i]
       });
@@ -84,9 +84,6 @@ export default class Ordenescompra extends Component {
 
   selectType = () =>{
     this.loadOC(this.selAllRef.current.checked);
-    // this.setState({
-    //   selected:this.selAllRef.current.checked
-    // });
   }
 
   deleteOc = () =>{
@@ -128,9 +125,35 @@ export default class Ordenescompra extends Component {
 
   selectRow = (i) => {
     this.setState({
-      idSelOc: i,
+      idSelOc: ((this.state.page - 1) * 10) + i,
     });
   };
+
+  changeSttus = () =>{
+    if(this.state.lstOC[this.state.idSelOc].estatus === Global.OPEN){
+      swal({
+        title: "Desea aprobar la OC "+this.state.lstOC[this.state.idSelOc].oc+" ?",
+        text: "Una vez aprobada, se podrá comenzar con la(s) orden(es) de fabricación ",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+      })
+      .then((willDelete) => {
+        if(willDelete){
+          let oc = this.state.lstOC[this.state.idSelOc];
+          oc.aprobado = true;
+          oc.estatus = Global.APRVD;
+          axios.put(Global.url+'ordencompra/'+oc.id,oc,{ headers: authHeader() })
+          .then(res =>{
+            this.loadOC(false);
+            swal("Se cambio el estatus de la Orde de Compra");
+          })
+          .catch();
+        }
+        })
+      .catch();
+    }
+  }
 
   onChangePage = (pageOfItems,page) => {
     // update state with new page of items
@@ -153,12 +176,12 @@ export default class Ordenescompra extends Component {
         }
         
         return (
-          <tr key={i} onClick={() => {this.selectRow(i)}}  className={style}>
+          <tr key={i} onClick={() => {this.selectRow(i)}}   onDoubleClick={()=>{this.changeSttus(i)}} className={style}>
             <td>{ordcomp.oc}</td>
             <td>{ordcomp.producto.nombre}</td>
             <td style={this.center}>{ordcomp.clave}</td>
+            <td style={this.center}>{ordcomp.lote}</td>
             <td style={this.center}><NumberFormat value={Number(ordcomp.piezas)}displayType={'text'} thousandSeparator={true}/></td>
-            <td style={this.center}><NumberFormat value={Number(ordcomp.piezasFabricadas)}displayType={'text'} thousandSeparator={true}/></td>
             <td><Moment format="DD MMM YYYY">{momento(ordcomp.fechaFabricacion,'MM-DD-YYYY').format('YYYY-MM-DDTHH:mm:ss')}</Moment></td>
             <td><Moment format="DD MMM YYYY">{momento(ordcomp.fechaEntrega,'MM-DD-YYYY').format('YYYY-MM-DDTHH:mm:ss')}</Moment></td>
             <td>{ordcomp.cliente.nombre}</td>
@@ -179,7 +202,7 @@ export default class Ordenescompra extends Component {
                   <ul>
                     <li>Filtro:</li>
                     <li><input className="input"  type="text"  name="filtro" ref={this.filterRef} onKeyUp={this.filtrado}/></li>
-                    <li><input type="checkbox" ref={this.selAllRef} onChange={this.selectType} checked={this.selAllRef.current.checked}/></li>
+                    <li><input type="checkbox" ref={this.selAllRef} onChange={this.selectType} /></li>
                   </ul>
                   <h2>Orden de Compra</h2>
                   <nav>
@@ -211,6 +234,7 @@ export default class Ordenescompra extends Component {
                 </div>
               </div>
               <table className="table table-bordered header-font">
+                <colgroup>
                   <col width="7%"/>
                   <col width="30%"/>
                   <col width="8%"/>
@@ -220,12 +244,13 @@ export default class Ordenescompra extends Component {
                   <col width="12%"/>
                   <col width="10%"/>
                   <col width="7%"/>
+                </colgroup>
                 <thead className="thead-light">                   
                   <tr>
                     <th scope="col">OC</th>
                     <th scope="col">Producto</th>
                     <th scope="col">Clave</th>
-                    <th scope="col">Piezas</th>
+                    <th scope="col">Lote</th>
                     <th scope="col">OF</th>
                     <th scope="col">Fabricación</th>
                     <th scope="col">Entrega</th>
@@ -236,6 +261,7 @@ export default class Ordenescompra extends Component {
               </table>
               <div className="table-ovfl tbl-lesshead">
                 <table className="table table-bordered table-lst" id="ordenFabricacion">
+                  <colgroup>
                   <col width="7%"/>
                   <col width="30%"/>
                   <col width="8%"/>
@@ -245,6 +271,7 @@ export default class Ordenescompra extends Component {
                   <col width="12%"/>
                   <col width="10%"/>
                   <col width="7%"/>
+                  </colgroup>
                   <tbody>{lstOrdComPI}</tbody>
                 </table>              
               </div>

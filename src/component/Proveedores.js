@@ -80,7 +80,7 @@ export default class Proveedores extends Component {
 
     selectRow = (i) => {
         this.setState({
-          idSelProv: i,
+          idSelProv: ((this.state.page-1)*10) + i,
         });
       };
 

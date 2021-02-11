@@ -143,7 +143,7 @@ export default class Proddisponible extends Component {
 
   selectRow = (i) => {
     this.setState({
-      idSelPd: i
+      idSelPd:((this.state.page-1)*10) + i,
     });
   };
 

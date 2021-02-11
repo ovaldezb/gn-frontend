@@ -16,13 +16,13 @@ export default class Addordencompra extends Component {
   piezasRef = React.createRef();
   obsRef =React.createRef();
   tipoPresRef = React.createRef();
+  loteRef = React.createRef();
   btnName = 'Guardar';
   isErrorInit = true;
   right = {textAlign:"right"}
   center = {textAlign:"center"}
   state={
       ordencompra:{},
-      
       lstMatPrim:[],
       lstMatPrimResp:[],
       lstErr:[],
@@ -105,6 +105,7 @@ export default class Addordencompra extends Component {
       ordenCompraTmp.estatus=Global.OPEN;
       ordenCompraTmp.piezasCompletadas=0;
       ordenCompraTmp.piezasEntregadas=0;
+      ordenCompraTmp.aprobado = false;
       Axios.post(Global.url+'ordencompra',ordenCompraTmp,{ headers: authHeader() })
         .then(res=>{
           console.log(res);
@@ -146,6 +147,7 @@ export default class Addordencompra extends Component {
     ordenComp.presentacion=this.presRef.current.value;
     ordenComp.observaciones=this.obsRef.current.value;
     ordenComp.tipoPresentacion=this.tipoPresRef.current.value;
+    ordenComp.lote = this.loteRef.current.value;
 
     this.setState({
       ordencompra:ordenComp
@@ -213,7 +215,7 @@ export default class Addordencompra extends Component {
       
       <React.Fragment>
         <form onSubmit={this.enviarFormulario} onChange={this.enviarFormulario}>
-          <h3 className="center">Agregar orden de compra</h3>
+          <h3 className="center">Orden de Compra</h3>
           <div className="grid">
             <div className="showcase-form card">
             <div className="form-control grid">
@@ -222,7 +224,8 @@ export default class Addordencompra extends Component {
                   {this.validator.message('oc',ordencompra.oc,'required')}
                 </div>
                 <div>
-                  
+                <input type="text" name="lote" placeholder="Lote" ref={this.loteRef} value={ordencompra.lote} onChange={this.occhange} />
+                  {this.validator.message('lote',ordencompra.lote,'required')}
                 </div>
               </div>
               <div className="form-control grid-1-2">

@@ -75,8 +75,8 @@ export default class Usuarios extends Component {
     event.preventDefault();
 
     let user = {
-      nombre: this.nombreRef.current.value,
-      apellido: this.apellidoRef.current.value,
+      nombre: this.nombreRef.current.value.toUpperCase(),
+      apellido: this.apellidoRef.current.value.toUpperCase(),
       username: this.usernameRef.current.value,
       password: this.passwordRef.current.value,
       area: { id: this.areaRef.current.value },
@@ -91,7 +91,7 @@ export default class Usuarios extends Component {
 
   submitFormulario = (event) => {
     event.preventDefault();
-    let user = {
+    /*let user = {
       nombre: this.nombreRef.current.value,
       apellido: this.apellidoRef.current.value,
       username: this.usernameRef.current.value,
@@ -99,13 +99,12 @@ export default class Usuarios extends Component {
       area: { id: this.areaRef.current.value },
       activo: this.estatusRef.current.checked,
     };
-
+    
     this.setState({
       usuario: user,
-    });
+    });*/
     if (this.validator.allValid()) {
       if(!(this.passwordRef.current.value === this.passwordverifRef.current.value)){
-        
         swal('La contraseña no coincide','Favor de corregir','warning');
         return;
       }
@@ -124,17 +123,12 @@ export default class Usuarios extends Component {
             swal("Ocurrio un error al crear el usuario", "Error", "error");
           });
       } else {
-        Axios.put(
-          Global.url +
-            "usuario/" +
-            this.state.lstUsers[(this.state.page - 1) * 10 + this.state.idSelMp]
-              .id,
+        Axios.put(Global.url +"usuario/"+this.state.lstUsers[(this.state.page - 1) * 10 + this.state.idSelMp].id,
           this.state.usuario,
           { headers: authHeader() }
         )
           .then((res) => {
             if (res.status === 200) {
-              //lstTmp[this.state.idSelMp] = res.data;
               this.getListUsers();
               Bitacora(
                 Global.UPDT_USER,
@@ -159,10 +153,10 @@ export default class Usuarios extends Component {
     if (this.state.idSelMp !== -1) {
       this.setState({
         usuario: this.state.lstUsers[
-          (this.state.page - 1) * 10 + this.state.idSelMp
+          this.state.idSelMp
         ],
         usuarioPrevio: this.state.lstUsers[
-          (this.state.page - 1) * 10 + this.state.idSelMp
+           this.state.idSelMp
         ],
         btnNombre: "Actualizar",
       });
@@ -186,7 +180,7 @@ export default class Usuarios extends Component {
         Axios.delete(
           Global.url +
             "usuario/" +
-            this.state.lstUsers[(this.state.page - 1) * 10 + this.state.idSelMp]
+            this.state.lstUsers[this.state.idSelMp]
               .id,
           { headers: authHeader() }
         )
@@ -197,7 +191,7 @@ export default class Usuarios extends Component {
                 Global.ADD_USER,
                 JSON.stringify(
                   this.state.lstUsers[
-                    (this.state.page - 1) * 10 + this.state.idSelMp
+                    this.state.idSelMp
                   ]
                 ),
                 ""
@@ -242,7 +236,7 @@ export default class Usuarios extends Component {
 
   selectRow = (i) => {
     this.setState({
-      idSelMp: i,
+      idSelMp: ((this.state.page-1)*10) + i,
     });
   };
 
@@ -294,16 +288,12 @@ export default class Usuarios extends Component {
           <div className="container-gn grid-1-2">
             <div className="showcase-form card">
               <div className="form-control">
-                <input type="text" name="nombre" placeholder="Nombre" ref={this.nombreRef} defaultValue={usuario.nombre} value={usuario.nombre} />
+                <input type="text" name="nombre" placeholder="Nombre" ref={this.nombreRef} value={usuario.nombre}  />
                 {this.validator.message("nombre",this.state.usuario.nombre,"required")}
               </div>
               <div className="form-control">
-                <input type="text" name="apellido" placeholder="Apellido" ref={this.apellidoRef} defaultValue={usuario.apellido} value={usuario.apellido} />
-                {this.validator.message(
-                  "apellido",
-                  this.state.usuario.apellido,
-                  "required"
-                )}
+                <input type="text" name="apellido" placeholder="Apellido" ref={this.apellidoRef}  value={usuario.apellido} />
+                {this.validator.message("apellido",this.state.usuario.apellido,"required" )}
               </div>
               <div className="container grid-1-3">
                 <label className="label">Area:</label>
@@ -333,15 +323,10 @@ export default class Usuarios extends Component {
                 <input
                   type="text"
                   placeholder="username"
-                  ref={this.usernameRef}
-                  defaultValue={usuario.username}
+                  ref={this.usernameRef}                  
                   value={usuario.username}
                 />
-                {this.validator.message(
-                  "username",
-                  this.state.usuario.username,
-                  "required"
-                )}
+                {this.validator.message("username",this.state.usuario.username,"required")}
               </div>
 
               <div className="form-control">
@@ -393,17 +378,19 @@ export default class Usuarios extends Component {
                   </nav>
                 </div>
               </div>
-              <table className="table table-bordered table-dark center">
+              <table className="table table-bordered center" style={{width:'100%'}}>
+                <colgroup>
                 <col width="26%" />
                 <col width="22%" />
                 <col width="37%" />
                 <col width="15%" />
-                <thead className="thead-light">
+                </colgroup>
+                <thead className="thead-dark">
                   <tr>
-                    <td>Nombre</td>
-                    <td>Usuario</td>
-                    <td>Area</td>
-                    <td>Estatus</td>
+                    <th>Nombre</th>
+                    <th>Usuario</th>
+                    <th>Area</th>
+                    <th>Estatus</th>
                   </tr>
                 </thead>
               </table>

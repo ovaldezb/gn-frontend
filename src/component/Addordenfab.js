@@ -9,7 +9,6 @@ import NumberFormat from 'react-number-format';
 
 export default class Addordenfab extends Component {
   ocRef = React.createRef();
-  loteRef = React.createRef();
   piezasRef = React.createRef();
   obsRef =React.createRef();
   selAllRef = React.createRef();
@@ -83,16 +82,16 @@ export default class Addordenfab extends Component {
   }
 
   getCounter(){
-    Axios.get(Global.url+'ordenfab/count',{ headers: authHeader() })
+    Axios.get(Global.url+'utils/count',{ headers: authHeader() })
     .then(res=>{
       this.setState({
-        counter:this.pad(Number(res.data.counter) + 1,Global.SIZE_DOC)
+        counter:this.pad(Number(res.data.counter),Global.SIZE_DOC)
       });
     })
     .catch();
   }
 
-   validarOF = () =>{
+  validarOF = () =>{
     if(this.btnNameValida === 'Reset'){
       this.cancelarOF(true);
     }else if(this.validator.allValid()){
@@ -185,7 +184,6 @@ export default class Addordenfab extends Component {
     e.preventDefault();
     var ordenFab = this.state.ordenfab;
     ordenFab.oc=this.ocRef.current.value;
-    ordenFab.lote=this.loteRef.current.value;
     ordenFab.noConsecutivo=this.state.counter;
     ordenFab.observaciones=this.obsRef.current.value;  
     if(this.state.piezasTotales - this.state.piezasFabricadas - this.piezasRef.current.value < 0){
@@ -202,14 +200,12 @@ export default class Addordenfab extends Component {
         piezasPendientes:this.state.piezasTotales -  this.state.piezasFabricadas - this.piezasRef.current.value
       });
     }
-    
   }
   
   clean = () =>{
     this.setState({
       ordenfab:{
         oc:'',
-        lote:'',
         piezas:'',
        observaciones:''
       },
@@ -219,10 +215,10 @@ export default class Addordenfab extends Component {
   }
 
   selectAll = () =>{
-  this.state.lstMatPrimResp.forEach((mp,i)=>{
-    document.getElementById("val"+i).checked = !this.selAll;
-  });
-  this.selAll = !this.selAll;
+    this.state.lstMatPrimResp.forEach((mp,i)=>{
+      document.getElementById("val"+i).checked = !this.selAll;
+    });
+    this.selAll = !this.selAll;
   }
 
   updateQty = (i,qty) =>{
@@ -251,12 +247,12 @@ export default class Addordenfab extends Component {
       Axios.get(Global.url+'ordencompra/oc/'+(this.state.ordenfab.oc===undefined?'vacio':this.state.ordenfab.oc===''?'vacio':this.state.ordenfab.oc),{ headers: authHeader() })
       .then(res=>{        
         if(res.data.length===1){
-          console.log(res.data);
           let of = this.state.ordenfab;
           of.presentacion=res.data[0].presentacion;
           of.nombre=res.data[0].producto.nombre;
           of.oc = res.data[0].oc;
           of.id = res.data[0].id;
+          of.lote = res.data[0].lote;
           this.setState({
             ordenfab:of,
             piezasPendientes:res.data[0].piezas - res.data[0].piezasFabricadas,
@@ -270,8 +266,11 @@ export default class Addordenfab extends Component {
           this.setState({
             lstOC:res.data
           });
-        }else{
-          swal('No existe la OC '+this.state.ordenfab.oc,'no es posible continuar con la OF','warning');
+        }
+      })
+      .catch(err=>{
+        if(err.message.includes("400")){
+          swal('La orden de compra '+this.state.ordenfab.oc+' no existe o aún no ha sido aprobada','No se puede iniciar la fabricación','error');
           let of = this.state.ordenfab;
           of.oc = ''
           this.setState({
@@ -282,10 +281,8 @@ export default class Addordenfab extends Component {
             cliente:'',
             producto:''
           });
-        }
-      })
-      .catch(err=>{
           
+        }
       });
     }
   }
@@ -310,6 +307,8 @@ export default class Addordenfab extends Component {
     of.presentacion=this.state.lstOC[index].presentacion;
     of.nombre=this.state.lstOC[index].producto.nombre;
     of.oc = this.state.lstOC[index].oc;
+    of.id = this.state.lstOC[index].id;
+    of.lote = this.state.lstOC[index].lote;
     this.setState({
       ordenfab:of,
       piezasPendientes:this.state.lstOC[index].piezas - this.state.lstOC[index].piezasFabricadas,
@@ -361,8 +360,7 @@ export default class Addordenfab extends Component {
                   }
                 </div>
                 <div>
-                  <input type="text" name="lote" placeholder="Lote" ref={this.loteRef} value={this.state.ordenfab.lote} />
-                  {this.validator.message('lote',this.state.ordenfab.lote,'required')}
+                  <legend className="producto">{this.state.ordenfab.lote}</legend>
                 </div>
               </div>
             </div>
@@ -399,7 +397,6 @@ export default class Addordenfab extends Component {
                   <th style={this.center}>Codigo</th>
                   <th style={this.center}>Materia prima</th>
                   <th style={this.center}>Cantidad</th>
-                  <th style={this.center}>Lote</th>
                   <th style={this.center}>Estatus</th>
                   <th style={this.center}><button className="btn is-small" onClick={this.selectAll}>Seleccionar</button></th>
                 </tr>
@@ -408,15 +405,16 @@ export default class Addordenfab extends Component {
           
             <div className="table-ovfl-of-val">
               <table className="table table-bordered table-hover header-font">
-                <col width="15%"/>
-                <col width="35%"/>
-                <col width="10%"/>
-                <col width="10%"/>
-                <col width="9%"/>
-                <col width="21%"/>
+                <colgroup>
+                  <col width="15%"/>
+                  <col width="35%"/>
+                  <col width="10%"/>
+                  <col width="10%"/>
+                  <col width="9%"/>
+                  <col width="21%"/>
+                </colgroup>
                 <tbody>
                 {this.state.lstMatPrimResp.map((matprimres,i)=>{
-                  
                   var style = {};
                   if(matprimres.estatus===Global.OK){
                     style = "suficiente";
@@ -434,7 +432,6 @@ export default class Addordenfab extends Component {
                     {matprimres.valor && matprimres.valor !==-1 &&
                       <td><input type="number" className="valor" value={this.state.valor} ref={this.valorRef} onChange={this.getCantUpdt} onBlur={()=>{this.updtRow(i)}}/></td>
                     }
-                    <td>{matprimres.lote}</td>
                     <td className={style} style={this.center}>{matprimres.estatus}</td>
                     <td><input type="checkbox" name={'val'+i} id={'val'+i} /></td>
                   </tr>
