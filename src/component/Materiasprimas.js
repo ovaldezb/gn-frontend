@@ -285,11 +285,11 @@ export default class Materiasprimas extends Component {
                 <col width="15%"/>
                 <col width="10%"/>
                 </colgroup>
-                <thead className="thead-light">
+                <thead className="thead-dark">
                   <tr>
                     <th style={this.center}>Descripción</th>
-                    <th style={this.center}>Inv Físico</th>
-                    <th style={this.center}>Inv Disponible</th>
+                    <th style={this.center}>Físico</th>
+                    <th style={this.center}>Disponible</th>
                     <th style={this.center}>Unidad</th>
                     <th style={this.center}>Código</th>
                     <th style={this.center}>Proveedor</th>
@@ -298,7 +298,7 @@ export default class Materiasprimas extends Component {
                   </tr>
                 </thead>
               </table>
-              <div className="table-ovfl tbl-lesshead">
+              <div className="table-ovfl-mp tbl-lesshead">
                 <table className="table table-bordered table-hover header-font" id="materiaprima">
                   <colgroup>
                 <col width="21%"/>

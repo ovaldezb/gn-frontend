@@ -277,11 +277,16 @@ export default class Productoterminado extends Component {
                         </Link>
                       </li>
                       <li>
+                        {this.state.idSelPt !== -1 && this.showTruck &&
                         <Link to="#" onClick={this.deliverPT}>
-                          {this.state.idSelPt !== -1 && this.showTruck &&
                           <FontAwesomeIcon icon={faTruck} size="2x" />
-                          }
                         </Link>
+                        }
+                        {(this.state.idSelPt === -1 || !this.showTruck) &&
+                        <Link to="#" >
+                          <FontAwesomeIcon icon={faTruck} size="2x" style={{color:'grey'}} />
+                        </Link>
+                        }
                       </li>                                              
                     </ul>
                   </nav>
@@ -297,7 +302,7 @@ export default class Productoterminado extends Component {
                 <col width="13%"/>
                 <col width="13%"/>
                 <col width="11%"/>
-                <thead>
+                <thead className="thead-dark">
                   <tr>
                     <th>No OF</th>
                     <th>Producto</th>
@@ -371,7 +376,10 @@ export default class Productoterminado extends Component {
                     <tbody>
                       <tr>
                         <td><b>Remisión #</b></td>
-                        <td className="center">{this.state.lstPdrTerm[this.state.idSelPt].noRemision}</td>
+                        {this.state.lstPdrTerm[this.state.idSelPt].noRemision &&
+                          <td className="center">{this.state.lstPdrTerm[this.state.idSelPt].noRemision}</td>
+                        }
+                        
                       </tr>
                       <tr>
                         <td colSpan="2"><b>Fecha</b></td>

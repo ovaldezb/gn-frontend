@@ -14,8 +14,8 @@ import Addproddisp from './Addproddisp'
 export default class Proddisponible extends Component {
   displayAdd = false;
   isAdd = true;
-  col1 = { width: '10%' };
-  col2 = { width: "50%" };
+  col1 = { width: '10%', textAlign:'center' };
+  col2 = { width: "50%", textAlign:'center' };
   col3 = { width: "20%", textAlign: "center" };
   col4 = { width: '20%', textAlign: "center" };
   filterRef = React.createRef();
@@ -205,7 +205,7 @@ export default class Proddisponible extends Component {
                           </div>
                         </div>
                           <table className="table table-bordered">
-                          <thead className="thead-light">
+                          <thead className="thead-dark">
                             <tr>
                                 <th scope="col" style={this.col1}>#</th>
                                 <th scope="col" style={this.col2}>Nombre</th>

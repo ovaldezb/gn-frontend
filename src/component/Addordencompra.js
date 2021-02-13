@@ -10,7 +10,6 @@ import {TextField} from '@material-ui/core';
 export default class Addordencompra extends Component {
   ocRef = React.createRef();
   claveRef = React.createRef();
-  
   presRef = React.createRef();
   clienteRef = React.createRef();
   piezasRef = React.createRef();
@@ -57,7 +56,7 @@ export default class Addordencompra extends Component {
     if(event.keyCode === 13){
       Axios.get(Global.url+'cliente/'+(this.clienteRef.current.value === '' ? 'vacio':this.clienteRef.current.value),{ headers: authHeader() })
       .then(res =>{
-        console.log(res.data.length);
+
         if(res.data.length === 1){
           let oc = this.state.ordencompra;
           oc.cliente = res.data[0];
@@ -101,6 +100,11 @@ export default class Addordencompra extends Component {
     this.isErrorInit = true;
     var ordenCompraTmp = this.state.ordencompra;
     if(this.btnName==='Guardar'){
+      if(ordenCompraTmp.cliente === undefined || ordenCompraTmp.cliente.rfc===''){
+          swal('No se ha hecho la búsqueda del Cliente','EL campo de RFC debe contener algún valor','warning');
+          return;
+      }
+      
       ordenCompraTmp.estatus=Global.OPEN;
       ordenCompraTmp.piezasCompletadas=0;
       ordenCompraTmp.piezasEntregadas=0;
@@ -138,6 +142,9 @@ export default class Addordencompra extends Component {
     ordenComp.oc=this.ocRef.current.value;
     ordenComp.clave=this.claveRef.current.value;    
     if(ordenComp.cliente !== undefined){
+      if(this.clienteRef.current.value===''){
+        ordenComp.cliente.rfc=''
+      }
       ordenComp.cliente.nombre = this.clienteRef.current.value;    
     }    
     ordenComp.fechaFabricacion=this.state.ordencompra.fechaFabricacion;
@@ -217,28 +224,7 @@ export default class Addordencompra extends Component {
           <h3 className="center">Orden de Compra</h3>
           <div className="grid">
             <div className="showcase-form card">
-            <div className="form-control grid">
-                <div>
-                  <input type="text" name="oc" placeholder="Orden de Compra" ref={this.ocRef} value={ordencompra.oc} onChange={this.occhange} />
-                  {this.validator.message('oc',ordencompra.oc,'required')}
-                </div>
-                <div>
-                <input type="text" name="lote" placeholder="Lote" ref={this.loteRef} value={ordencompra.lote} onChange={this.occhange} />
-                  {this.validator.message('lote',ordencompra.lote,'required')}
-                </div>
-              </div>
-              <div className="form-control grid-1-2">
-                <div>
-                  <input type="text" name="clave" placeholder="Clave" onKeyUp={this.busProductoClave} ref={this.claveRef} value={ordencompra.clave} onBlur={this.busProductoClave} onChange={this.occhange}/>
-                  {this.validator.message('clave',ordencompra.clave,'required')}
-                </div>
-                <div>
-                  {ordencompra.producto && 
-                  <legend><b>{ordencompra.producto.nombre}</b></legend>
-                  }
-                </div>
-              </div>
-              <div className="form-control grid-2-1">
+              <div className="form-control grid-3">
                 <div>
                   {ordencompra.cliente && 
                   <input type="text" 
@@ -257,7 +243,7 @@ export default class Addordencompra extends Component {
                   }
                   {ordencompra.cliente && this.validator.message('cliente',ordencompra.cliente.nombre,'required')}
                   {this.state.lstCliente.length > 1 &&
-                  <div >
+                  <div className="cli-search">
                     <table className="tbl-cli">
                       <tbody>
                         {this.state.lstCliente.map((cli,i)=>{
@@ -272,11 +258,41 @@ export default class Addordencompra extends Component {
                     </div>
                   }
                 </div>
+                <div className="center">
+                  {ordencompra.cliente && 
+                    <legend>{ordencompra.cliente.rfc}</legend>
+                  }
+                  {(!ordencompra.cliente || ordencompra.cliente.rfc==='')   && 
+                    <legend>RFC</legend>
+                  }
+                </div>
                 <div>
                   <input type="number" name="piezas" style={this.center} placeholder="Piezas Totales" ref={this.piezasRef} value={this.state.ordencompra.piezas} onChange={this.occhange}/>
                   {this.validator.message('piezas',ordencompra.piezas,'required')}
                 </div>
               </div>
+            <div className="form-control grid">
+                <div>
+                  <input type="text" name="oc" placeholder="Orden de Compra" ref={this.ocRef} value={ordencompra.oc} onChange={this.occhange} />
+                  {this.validator.message('oc',ordencompra.oc,'required')}
+                </div>
+                <div>
+                <input type="text" name="lote" placeholder="Lote" ref={this.loteRef} value={ordencompra.lote} onChange={this.occhange} />
+                  {this.validator.message('lote',ordencompra.lote,'required')}
+                </div>
+              </div>
+              <div className="form-control grid-1-2">
+                <div>
+                  <input type="text" name="clave" placeholder="Clave Prod Disp" onKeyUp={this.busProductoClave} ref={this.claveRef} value={ordencompra.clave} onBlur={this.busProductoClave} onChange={this.occhange}/>
+                  {this.validator.message('clave',ordencompra.clave,'required')}
+                </div>
+                <div>
+                  {ordencompra.producto && 
+                  <legend><b>{ordencompra.producto.nombre}</b></legend>
+                  }
+                </div>
+              </div>
+              
             </div>
             <div className="showcase-form card">
               <div className="form-control grid">

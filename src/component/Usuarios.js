@@ -394,7 +394,7 @@ export default class Usuarios extends Component {
                   </tr>
                 </thead>
               </table>
-              <div className="table-ovfl-user tbl-lesshead">
+              <div className="table-ovfl-user">
                 <table className="table table-hover" id="usuarios">
                   <colgroup>
                   <col width="26%" />

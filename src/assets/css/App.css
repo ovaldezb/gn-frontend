@@ -92,6 +92,12 @@ textarea{
   margin-bottom: -20px !important;
 }
 
+.cli-search{
+  z-index: 1000;
+  position: absolute;
+  height: auto;
+}
+
 .showcase-form input[type='text'],
 .showcase-form input[type='textarea'],
 .showcase-form input[type='email'],
@@ -346,11 +352,14 @@ background-color: #f50707;
 
 .tbl-cli{
   border:2px solid #1255e7;
-  height: 55px;
+  height: 115px;
   overflow: scroll;
-  width: 150px;
+  width: 192px;
   cursor: pointer;
   display: block;
+  position: absolute;
+  background: rgb(226, 240, 250);
+  color: rgb(69, 70, 70);
 }
 
 .tbl-oc{

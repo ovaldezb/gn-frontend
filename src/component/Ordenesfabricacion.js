@@ -73,7 +73,7 @@ export default class Ordenesfabricacion extends Component {
     this.displayAdd = false;
     this.isAdd =true;
     if(ordenfab){
-      this.loadAactiveOF();
+      this.loadAactiveOF(false);
     }
     this.forceUpdate();
   }
@@ -231,6 +231,7 @@ export default class Ordenesfabricacion extends Component {
   render() {
     var cantidadTotal = 0;
     const OF = this.state.lstOF[this.state.idSelOf];
+    console.log(OF);
     var style = {};
     if (this.state.lstOF.length > 0) {
       var lstOrdFabPI = this.state.pageOfItems.map((ordfab, i) => {
@@ -295,12 +296,33 @@ export default class Ordenesfabricacion extends Component {
                         </Link>
                       </li>
                       <li>
-                        <Link to="#" onClick={this.deleteOf} title="Elimina la OF Seleccionada">
-                          <FontAwesomeIcon icon={faTrash} />
-                        </Link>
+                        {(OF===undefined ) &&
+                          <Link to="#"  title="Elimina la OF Seleccionada">
+                            <FontAwesomeIcon icon={faTrash} style={{color:'grey'}}/>
+                          </Link>
+                          
+                        }
+                        {(OF!==undefined ) &&
+                        <React.Fragment>
+                            {OF.estatus===Global.CMPLT && 
+                            <Link to="#" title="Elimina la OF Seleccionada">
+                            <FontAwesomeIcon icon={faTrash} style={{color:'grey'}} />
+                            </Link>
+                            }
+                            {OF.estatus===Global.TEP && 
+                            <Link to="#" onClick={this.deleteOf} title="Elimina la OF Seleccionada">
+                            <FontAwesomeIcon icon={faTrash} />
+                            </Link>
+                            }
+                          </React.Fragment>
+                        }
+                        
                       </li>
                       <li>                        
                         <Link to="#" onClick={this.completeOF} title="Completa la OF Seleccionada">
+                        {!this.isComplete &&
+                          <FontAwesomeIcon icon={faClipboardCheck} style={{color:'grey'}}/>
+                        }
                         {this.isComplete &&
                           <FontAwesomeIcon icon={faClipboardCheck} />
                         }
@@ -354,42 +376,44 @@ export default class Ordenesfabricacion extends Component {
                   <tr>
                     <td>
                       <table style={{width: "100%",borderCollapse:'separate', borderSpacing:'0em'}}>
+                        <tbody>
                           <tr>
-                              <td rowspan="7" class="col1 right top bottom left">
+                              <td rowSpan="7" className="col1 right top bottom left">
                               <img src={Logo} alt="" width="90%" />
                               </td>
                           </tr>
                           <tr>
-                              <td rowspan="2" colSpan="3" class="col2 right top bottom">GRUPO NORDAN S.A de C.V.</td>
-                              <td class="col3 right top font14">ORDEN DE FABRICACION</td>
+                              <td rowspan="2" colSpan="3" className="col2 right top bottom">GRUPO NORDAN S.A de C.V.</td>
+                              <td className="col3 right top font14">ORDEN DE FABRICACION</td>
                           </tr>
                           <tr>
-                              <td class="right bottom center">{this.pad(OF.noConsecutivo,Global.SIZE_DOC)}</td>
+                              <td className="right bottom center">{this.pad(OF.noConsecutivo,Global.SIZE_DOC)}</td>
                           </tr>
                           <tr>
-                              <td class="right font14">PRODUCTO</td>
-                              <td class="right font14">CLAVE</td>
-                              <td class="right font14">CLIENTE</td>
-                              <td class="right font14">CANTIDAD PZAS</td>
+                              <td className="right font14">PRODUCTO</td>
+                              <td className="right font14">CLAVE</td>
+                              <td className="right font14">CLIENTE</td>
+                              <td className="right font14">CANTIDAD PZAS</td>
                           </tr>
                           <tr>
-                              <td class="right bottom">{OF.oc.producto.nombre}</td>
-                              <td class="right bottom">{OF.oc.clave}</td>
-                              <td class="right bottom">{OF.oc.cliente.nombre}</td>
-                              <td class="right bottom center"><NumberFormat value={Number(OF.piezas)} displayType={'text'} thousandSeparator={true}/></td>
+                              <td className="right bottom">{OF.oc.producto.nombre}</td>
+                              <td className="right bottom">{OF.oc.clave}</td>
+                              <td className="right bottom">{OF.oc.cliente.nombre}</td>
+                              <td className="right bottom center"><NumberFormat value={Number(OF.piezas)} displayType={'text'} thousandSeparator={true}/></td>
                           </tr>
                           <tr>
-                              <td class="right font14">FECHA ENTREGA</td>
-                              <td class="right font14">NUMERO LOTE</td>
-                              <td class="right font14">FECHA</td>
-                              <td class="right font14">FIRMA A. DIR:</td>
+                              <td className="right font14">FECHA ENTREGA</td>
+                              <td className="right font14">NUMERO LOTE</td>
+                              <td className="right font14">FECHA</td>
+                              <td className="right font14">FIRMA A. DIR:</td>
                           </tr>
                           <tr>
-                              <td class="right bottom"><Moment format="DD/MM/YYYY">{momento(OF.oc.fechaEntrega,'MM-DD-YYYY').format('YYYY-MM-DDTHH:mm:ss')}</Moment></td>
-                              <td class="right bottom">{OF.lote}</td>
-                              <td class="right bottom"><Moment format="DD/MM/YYYY">{new Date()}</Moment></td>
-                              <td class="right bottom">FECHA:</td>
+                              <td className="right bottom"><Moment format="DD/MM/YYYY">{momento(OF.oc.fechaEntrega,'MM-DD-YYYY').format('YYYY-MM-DDTHH:mm:ss')}</Moment></td>
+                              <td className="right bottom">{OF.lote}</td>
+                              <td className="right bottom"><Moment format="DD/MM/YYYY">{new Date()}</Moment></td>
+                              <td className="right bottom">FECHA:</td>
                           </tr>
+                        </tbody>
                       </table>
                     </td>
                   </tr>
@@ -410,6 +434,7 @@ export default class Ordenesfabricacion extends Component {
                               <col width="10%"/>
                               <col width="5%"/>
                           </colgroup>
+                          <tbody>
                           <tr>
                               <td className="top bottom left right">Integracion de Materia Prima</td>
                               <td className="top bottom right center">&nbsp;</td>
@@ -451,7 +476,8 @@ export default class Ordenesfabricacion extends Component {
                               <td className="right top bottom center">{Number(cantidadTotal).toFixed(2)}</td>
                               <td className="right top bottom">&nbsp;</td>                              
                               <td className="right top bottom" colSpan="2">Tamaños del Lote</td>
-                          </tr>                
+                          </tr> 
+                          </tbody>               
                       </table>
                     </td>
                   </tr>
@@ -536,7 +562,6 @@ export default class Ordenesfabricacion extends Component {
                     <li>
                       <Link to="#" onClick={this.addOF}><FontAwesomeIcon icon={faPlusSquare} /></Link>
                     </li>
-                    
                   </ul>
                 </nav>
               </div>

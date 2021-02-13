@@ -119,18 +119,18 @@
   margin: 5px !important;
 }
 
-.table-ovfl {
-  height: 405px;
+.table-ovfl-mp {
+  height: 463px;
   overflow: auto;
 }
 
 .table-ovfl-user {
-  height: 250px;
+  height: 376px;
   overflow: auto;
 }
 
 .table-ovfl-of-val{
-  height: 310px;
+  height: 326px;
   overflow: auto;
 }
 
@@ -235,4 +235,9 @@ input:checked + .slider:before {
 .producto{
   font-size: 12px;
   font-weight: bold;
+}
+
+/* Btn de seleccionar todos los  checkboxs de las MPs*/
+.btn-select-all{
+  line-height: 0.5 !important;
 }

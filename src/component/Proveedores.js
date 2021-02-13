@@ -147,18 +147,32 @@ export default class Proveedores extends Component {
                         </div>
                     </div>
                     <table className="table table-dark">
+                        <colgroup>
+                            <col width="25%"/>
+                            <col width="20%"/>
+                            <col width="15%"/>
+                            <col width="20%"/>
+                            <col width="20%"/>
+                        </colgroup>
                         <thead>
                             <tr>
-                                <th>Nombre</th>
-                                <th>RFC</th>
-                                <th>Telefono</th>
-                                <th>Correo</th>
-                                <th>Contacto</th>
+                                <th style={{textAlign:'center'}}>Nombre</th>
+                                <th style={{textAlign:'center'}}>RFC</th>
+                                <th style={{textAlign:'center'}}>Telefono</th>
+                                <th style={{textAlign:'center'}}>Correo</th>
+                                <th style={{textAlign:'center'}}>Contacto</th>
                             </tr>
                         </thead>
                     </table>
                     <div className="table-ovfl tbl-lesshead">
-                        <table className="table table-hover">
+                        <table className="table table-hover table-bordered">
+                            <colgroup>
+                                <col width="25%"/>
+                                <col width="20%"/>
+                                <col width="15%"/>
+                                <col width="20%"/>
+                                <col width="20%"/>
+                            </colgroup>
                             <tbody>
                                 {this.state.pageOfItems.map((prov,i)=>{
                                     var style = {};

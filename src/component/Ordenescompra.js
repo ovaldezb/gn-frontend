@@ -245,13 +245,13 @@ export default class Ordenescompra extends Component {
                   <col width="10%"/>
                   <col width="7%"/>
                 </colgroup>
-                <thead className="thead-light">                   
+                <thead className="thead-dark">                   
                   <tr>
                     <th scope="col">OC</th>
                     <th scope="col">Producto</th>
                     <th scope="col">Clave</th>
                     <th scope="col">Lote</th>
-                    <th scope="col">OF</th>
+                    <th scope="col">Piezas</th>
                     <th scope="col">Fabricación</th>
                     <th scope="col">Entrega</th>
                     <th scope="col">Cliente</th>
