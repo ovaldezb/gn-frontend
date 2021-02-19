@@ -9,6 +9,7 @@ import Moment from 'react-moment';
 import 'moment/locale/es';
 import Paginacion from './Paginacion';
 import JSONViewer from 'react-json-viewer';
+import AuthService from '../services/auth.service';
 
 export default class Bitacora extends Component {
   filterRef = React.createRef();
@@ -34,7 +35,7 @@ export default class Bitacora extends Component {
           });
       })
       .catch((err) => {
-        console.log(err);
+        AuthService.isExpired(err.message);
       });
   }
 
@@ -57,7 +58,7 @@ export default class Bitacora extends Component {
         });
       })
       .catch(err=>{
-        console.log(err);
+        AuthService.isExpired(err.message);
       });
     
      this.show = true;
@@ -74,7 +75,6 @@ export default class Bitacora extends Component {
     this.setState({
       bitacora:undefined
     });
-    //console.log(this.state.pageOfItems,this.state.page);
     this.onChangePage(this.state.pageOfItems,this.state.page);
   }
 

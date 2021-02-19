@@ -50,7 +50,7 @@ export default class Addordenfab extends Component {
     console.log('Component DId Mount');
     if(!this.props.tipo){
       this.isErrorInit=false;
-      console.log(this.props.ordenfab);
+      //console.log(this.props.ordenfab);
       this.btnEnviar = 'Actualizar';
       await this.setState({
         ordenfab:this.props.ordenfab,
@@ -144,13 +144,22 @@ export default class Addordenfab extends Component {
 
   guardaOf = () =>{
     var msg = '';
+    var loteagua = false;
     this.state.lstMatPrimResp.forEach((mp,i)=>{
       if(!document.getElementById("val"+i).checked){
         msg = msg +'->'+mp.nombre+'\n';
       }
+      if(mp.codigo===Global.CODIGO_AGUA && !mp.lote){
+        loteagua = true;
+      }
     });
     if(msg!==''){
       swal('Es necesario aprobar la(s) MP:\n'+msg);
+      return;
+    }
+
+    if(loteagua){
+      swal('Es necesario agregar un lote al Agua');
       return;
     }
 
@@ -223,10 +232,11 @@ export default class Addordenfab extends Component {
   clean = () =>{
     this.setState({
       ordenfab:{
-        oc:'',
+        oc:{oc:''},
         piezas:'',
        observaciones:''
       },
+      cliente:'',
       lstMatPrimResp:[],
       piezasPendientes:''
     });
@@ -282,6 +292,10 @@ export default class Addordenfab extends Component {
       Axios.get(Global.url+'ordencompra/oc/'+(this.state.ordenfab.oc.oc===undefined?'vacio':this.state.ordenfab.oc.oc===''?'vacio':this.state.ordenfab.oc.oc),{ headers: authHeader() })
       .then(res=>{        
         if(res.data.length===1){
+          if(res.data[0].piezas === res.data[0].piezasFabricadas){
+            swal('Todas las piezas de la OC:'+this.state.ordenfab.oc.oc+' cuentan con una OF','No es posible fabricar más','warning');
+            return;
+          }
           let of = this.state.ordenfab;
           of.presentacion=res.data[0].presentacion;
           of.nombre=res.data[0].producto.nombre;
@@ -387,9 +401,7 @@ export default class Addordenfab extends Component {
               </div>
               <div className="form-control grid">
                 <div>
-                  
-                  <input type="text" name="oc" placeholder="Orden de Compra" ref={this.ocRef} defaultValue={this.state.ordenfab.oc.oc} onKeyUp={this.validaOC} />
-                  
+                  <input type="text" name="oc" placeholder="Orden de Compra" ref={this.ocRef} value={this.state.ordenfab.oc.oc} onKeyUp={this.validaOC} />
                   {this.validator.message('oc',this.state.ordenfab.oc,'required')}
                   {this.state.lstOC.length > 1 &&
                   <div className="tbl-oc">

@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import SimpleReactValidator from 'simple-react-validator';
 import swal from 'sweetalert';
 import authHeader from "../services/auth-header";
-
+import AuthService from '../services/auth.service';
 
 export default class Addcliente extends Component {
     btnMsg = 'Enviar';
@@ -61,7 +61,7 @@ export default class Addcliente extends Component {
                     this.cancelarCli();
                 })
                 .catch(err=>{
-                    console.log(err);
+                    AuthService.isExpired(err.message);
                 });
             }else{
               Axios
@@ -73,7 +73,7 @@ export default class Addcliente extends Component {
                     }
                 )
                 .catch(err =>{
-                    console.log(err);
+                    AuthService.isExpired(err.message);
                 });
             }
         }else{

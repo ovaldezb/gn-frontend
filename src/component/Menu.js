@@ -2,7 +2,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faPumpSoap, faBong, 
   faListOl, faReceipt, 
   faArchive, faUserTie, 
-  faUsers, faHandshake, faShoppingCart } from "@fortawesome/free-solid-svg-icons";
+  faUsers, faHandshake, faShoppingCart,faTruckLoading } from "@fortawesome/free-solid-svg-icons";
 import React, { Component } from 'react'
 import { Link } from "react-router-dom";
 
@@ -57,8 +57,15 @@ export default class Menu extends Component {
                     </span>
                     Producto Terminado
                   </Link> 
-                  
-                  </li>
+                </li>
+                <li>
+                  <Link to={"/productoentregado"} >
+                    <span>
+                      <FontAwesomeIcon icon={faTruckLoading}className="icon-menu" />
+                    </span>
+                    Producto Entregado
+                  </Link> 
+                </li>
                 <li>
                   <Link to="clientes" >
                     <span>

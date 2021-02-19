@@ -1,5 +1,7 @@
 import axios from 'axios'
 import Global from '../Global';
+import swal from "sweetalert";
+import {Redirect} from 'react-router-dom';
 
 class AuthService{
 
@@ -21,7 +23,6 @@ class AuthService{
     }
 
     logout(){
-        
         localStorage.removeItem(Global.JWT_NAME);
     }
 
@@ -35,6 +36,14 @@ class AuthService{
     getCurrentUser(){
         //console.log(localStorage.getItem(Global.JWT_NAME));
         return JSON.parse(localStorage.getItem(Global.JWT_NAME));
+    }
+
+    isExpired(message){
+        if(message.includes('401')){
+            this.logout();
+            swal("La sesión ha caducado","Por favor vuélvase a conectar","warning");
+            return  <Redirect  to="/login" />
+        }
     }
 }
 

@@ -105,9 +105,9 @@ export default class Addproddisp extends Component {
         })
         .catch(err =>{
             if(err.message.includes("401")){
-                this.setState({
+                /*this.setState({
                   status:'logout'
-                });
+                });*/
                 authServices.logout();
                 swal("La sesión ha caducado","Por favor vuélvase a conectar","warning");
               }else{

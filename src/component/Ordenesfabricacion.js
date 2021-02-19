@@ -17,7 +17,7 @@ import axios from 'axios';
 import Moment from 'react-moment';
 import momento from 'moment';
 import Logo from '../assets/images/logo.png'
-
+import AuthService from '../services/auth.service';
 
 export default class Ordenesfabricacion extends Component {
   filterRef = React.createRef();
@@ -56,7 +56,9 @@ export default class Ordenesfabricacion extends Component {
           });
         }
       })
-      .catch();
+      .catch(err=>{
+        AuthService.isExpired(err.message);
+      });
   }
 
   selectType = () =>{
@@ -99,7 +101,7 @@ export default class Ordenesfabricacion extends Component {
               this.loadAactiveOF();
             }).catch(
               err =>{
-                console.log('Error '+err.message);
+                AuthService.isExpired(err.message);
               }
             );
       } 
@@ -132,7 +134,7 @@ export default class Ordenesfabricacion extends Component {
               this.loadAactiveOF();
             }).catch(
               err =>{
-                console.log('Error '+err.message);
+                AuthService.isExpired(err.message);
               }
             );
       } 

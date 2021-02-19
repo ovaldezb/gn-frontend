@@ -16,6 +16,7 @@ import NumberFormat from 'react-number-format';
 import swal from "sweetalert";
 import Addordencompra from "./Addordencompra";
 import axios from 'axios';
+import AuthService from '../services/auth.service';
 
 export default class Ordenescompra extends Component {
   filterRef = React.createRef();
@@ -51,7 +52,9 @@ export default class Ordenescompra extends Component {
           });
         }
       })
-      .catch();
+      .catch(err=>{
+        AuthService.isExpired(err.message);
+      });
   }
 
   addOC = () => {
@@ -106,7 +109,7 @@ export default class Ordenescompra extends Component {
               this.loadOC(false);
             }).catch(
               err =>{
-                console.log('Error '+err.message);
+                AuthService.isExpired(err.message);
               }
             );
       } 
@@ -151,7 +154,9 @@ export default class Ordenescompra extends Component {
           .catch();
         }
         })
-      .catch();
+      .catch(err=>{
+        AuthService.isExpired(err.message);
+      });
     }
   }
 
@@ -181,7 +186,7 @@ export default class Ordenescompra extends Component {
             <td>{ordcomp.producto.nombre}</td>
             <td style={this.center}>{ordcomp.clave}</td>
             <td style={this.center}>{ordcomp.lote}</td>
-            <td style={this.center}><NumberFormat value={Number(ordcomp.piezas)}displayType={'text'} thousandSeparator={true}/></td>
+            <td style={this.center}><NumberFormat value={Number(ordcomp.piezas)}displayType={'text'} thousandSeparator={true} title={'Piezas fabricadas: '+ ordcomp.piezasFabricadas +'\n Piezas Completadas:'+ordcomp.piezasCompletadas+' \n Piezas Entregadas: '+ordcomp.piezasEntregadas}/></td>
             <td><Moment format="DD MMM YYYY">{momento(ordcomp.fechaFabricacion,'MM-DD-YYYY').format('YYYY-MM-DDTHH:mm:ss')}</Moment></td>
             <td><Moment format="DD MMM YYYY">{momento(ordcomp.fechaEntrega,'MM-DD-YYYY').format('YYYY-MM-DDTHH:mm:ss')}</Moment></td>
             <td>{ordcomp.cliente.nombre}</td>

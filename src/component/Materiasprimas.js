@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import Paginacion from './Paginacion';
 import authHeader from "../services/auth-header";
-import authServices from '../services/auth.service';
 import axios from "axios";
 import Global from "../Global";
 import "moment/locale/es-mx";
@@ -14,6 +13,7 @@ import swal from "sweetalert";
 import Bitacora from '../services/bitacora-service';
 import Moment from 'react-moment';
 import NumberFormat from 'react-number-format';
+import AuthService from '../services/auth.service';
 
 export default class Materiasprimas extends Component {
   url = Global.url;
@@ -59,15 +59,7 @@ export default class Materiasprimas extends Component {
         }
       })
       .catch((err) => {
-        if(err.message.includes("401")){
-          this.setState({
-            status:'logout'
-          });
-          authServices.logout();
-          swal("La sesión ha caducado","Por favor vuélvase a conectar","warning");
-        }else{
-          swal("Ha ocurrido un error, contacte al Administrador",err.message,"error");
-        }
+        AuthService.isExpired(err.message);
       });
   }
 
@@ -144,7 +136,7 @@ export default class Materiasprimas extends Component {
               this.forceUpdate();
             }).catch(
               err =>{
-                console.log('Error '+err.message);
+                AuthService.isExpired(err.message);
               }
             );
       } 

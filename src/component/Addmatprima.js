@@ -9,7 +9,7 @@ import swal from "sweetalert";
 import authHeader from "../services/auth-header";
 import Bitacora from '../services/bitacora-service';
 import {TextField} from '@material-ui/core';
-
+import AuthService from '../services/auth.service';
 
 export default class Addmatprima extends Component {
   idMatPrima = '';
@@ -81,7 +81,9 @@ export default class Addmatprima extends Component {
               lstProv:res.data
             });
         }
-    );
+    ).catch(err=>{
+      AuthService.isExpired(err.message);
+    });
   }
 
   selectDayEnt = (event) => {
@@ -143,8 +145,8 @@ export default class Addmatprima extends Component {
                   Bitacora(Global.ADD_MATPRIM,null,JSON.stringify(matprimaAdded));
                 }
             }).catch(err=>{
-                console.log(err);
-                swal('Ourrio un error al inserta la Materia Prima',err.message,'error');
+              AuthService.isExpired(err.message);
+                //swal('Ourrio un error al inserta la Materia Prima',err.message,'error');
             });
       }else{
         Axios.put(Global.url+'matprima/'+this.idMatPrima,this.state.materiaPrima,{ headers: authHeader() })
@@ -154,7 +156,7 @@ export default class Addmatprima extends Component {
           Bitacora(Global.UPDT_MATPRIM ,JSON.stringify(this.props.matprima),JSON.stringify(res.data));
         })
         .catch(err=>{
-          console.log(err);
+          AuthService.isExpired(err.message);
         });
       }
     }else{

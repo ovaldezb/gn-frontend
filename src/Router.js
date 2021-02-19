@@ -5,7 +5,6 @@ import Principal from "./component/Principal";
 import Register from "./component/Register";
 import Footer from "./component/Footer";
 import Materiaprima from './component/Materiaprima';
-import Testpag from './component/Testpag';
 import Lordenfab from "./component/Lordenfab";
 import Lprodterm from "./component/Lprodterm";
 import Lproddisp from './component/Lproddisp';
@@ -14,6 +13,7 @@ import Lusuarios from './component/Lusuarios';
 import Lordencompra from "./component/Lordencompra";
 import Lcliente from './component/Lcliente';
 import Lproveedor from './component/Lproveedor';
+import Lproductoentregado from './component/Lprodentregado';
 
 class Router extends Component {
   
@@ -29,13 +29,13 @@ class Router extends Component {
           <Route exact path="/login" component={Login} />
           <Route exact path="/signup" component={Register} />
           <Route exact path="/usuarios" component={Lusuarios} />
-          <Route exact path="/pag" component={Testpag} />
           <Route exact path="/bitacora" component={Lbitacora} />
           <Route exact path="/ordenfabricacion" component={Lordenfab} />
           <Route exact path="/proddispon" component={Lproddisp} />
           <Route exact path="/ordencompra" component={Lordencompra} />
           <Route exact path="/clientes" component={Lcliente} />
           <Route exact path="/proveedores" component={Lproveedor} />
+          <Route exact path="/productoentregado" component={Lproductoentregado} />
         </Switch>
         
         <div className="clearfix"></div>

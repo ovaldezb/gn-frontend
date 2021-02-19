@@ -9,6 +9,7 @@ import {faPlusSquare, faEdit,  faTrash,} from "@fortawesome/free-solid-svg-icons
 import Paginacion from './Paginacion';
 import swal from "sweetalert";
 import axios from "axios";
+import AuthService from '../services/auth.service';
 
 export default class Proveedores extends Component {
     displayAdd = false;
@@ -35,7 +36,7 @@ export default class Proveedores extends Component {
             });
         } )
         .catch(err=>{
-
+            AuthService.isExpired(err.message);
         });
     }
 
@@ -65,7 +66,7 @@ export default class Proveedores extends Component {
                     
                   }).catch(
                     err =>{
-                      console.log('Error '+err.message);
+                        AuthService.isExpired(err.message);
                     }
                   );
             } 

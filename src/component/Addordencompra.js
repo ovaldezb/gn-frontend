@@ -6,6 +6,7 @@ import authHeader from "../services/auth-header";
 import SimpleReactValidator from 'simple-react-validator';
 import Moment from 'moment';
 import {TextField} from '@material-ui/core';
+import AuthService from '../services/auth.service';
 
 export default class Addordencompra extends Component {
   ocRef = React.createRef();
@@ -26,8 +27,10 @@ export default class Addordencompra extends Component {
       lstMatPrimResp:[],
       lstErr:[],
       lstCliente:[],
+      lstCliPro:[],
       idCliente:'',
       idOrdenCompra:'',
+      idSelCliProd:-1
       
   }
 
@@ -56,7 +59,6 @@ export default class Addordencompra extends Component {
     if(event.keyCode === 13){
       Axios.get(Global.url+'cliente/'+(this.clienteRef.current.value === '' ? 'vacio':this.clienteRef.current.value),{ headers: authHeader() })
       .then(res =>{
-
         if(res.data.length === 1){
           let oc = this.state.ordencompra;
           oc.cliente = res.data[0];
@@ -64,14 +66,32 @@ export default class Addordencompra extends Component {
             ordencompra:oc,
             idCliente:res.data[0].id
           });
+          this.getProdByCliente(res.data[0].id);
         }else if(res.data.length > 1){
           this.setState({
             lstCliente:res.data
           });
         }
       })
-      .catch(err=>{   });
+      .catch(err=>{  AuthService.isExpired(err.message); });
     }
+  }
+
+  existeOC = () =>{
+    Axios.get(Global.url+'ordencompra/oc/'+this.state.ordencompra.oc,{ headers: authHeader() })
+    .then(res=>{
+      if(res.data.length > 0){
+        swal('La OC: '+this.state.ordencompra.oc+' ya existe');
+        let oc = this.state.ordencompra;
+        oc.oc = '';
+        this.setState({
+          ordencompra:oc
+        });
+      }
+    })
+    .catch(err=>{
+      AuthService.isExpired(err.message);
+    });
   }
 
   busProductoClave = (event) =>{
@@ -84,14 +104,15 @@ export default class Addordencompra extends Component {
               oc.producto = res.data;              
               this.setState({
                 ordencompra:oc,
-                lstMatPrim:res.data.materiaPrimaUsada
+                lstMatPrim:res.data.materiaPrimaUsada,
+                lstCliPro:[]
               });
             }else{
               swal('Producto no encontrado',this.state.ordencompra.clave,'error');
             }
           })
           .catch(err=>{
-
+            AuthService.isExpired(err.message);
           });
     }
   }
@@ -104,19 +125,17 @@ export default class Addordencompra extends Component {
           swal('No se ha hecho la búsqueda del Cliente','EL campo de RFC debe contener algún valor','warning');
           return;
       }
-      
       ordenCompraTmp.estatus=Global.OPEN;
       ordenCompraTmp.piezasCompletadas=0;
       ordenCompraTmp.piezasEntregadas=0;
       ordenCompraTmp.aprobado = false;
       Axios.post(Global.url+'ordencompra',ordenCompraTmp,{ headers: authHeader() })
         .then(res=>{
-          console.log(res);
-            swal('Se guardó la Orden de Compra con éxito',ordenCompraTmp.oc,'success');
-            this.cancelarOC();
+          swal('Se guardó la Orden de Compra con éxito',ordenCompraTmp.oc,'success');
+          this.cancelarOC();
         })
         .catch(err=>{
-          console.log(err);
+          AuthService.isExpired(err.message);
         });
     }else{
       Axios.put(Global.url+'ordencompra/'+this.state.idOrdenCompra,ordenCompraTmp,{ headers: authHeader() })
@@ -125,7 +144,7 @@ export default class Addordencompra extends Component {
           this.cancelarOC(res.data);
       })
       .catch(err=>{
-        console.log(err);
+        AuthService.isExpired(err.message);
       });
     }
   }
@@ -143,7 +162,10 @@ export default class Addordencompra extends Component {
     ordenComp.clave=this.claveRef.current.value;    
     if(ordenComp.cliente !== undefined){
       if(this.clienteRef.current.value===''){
-        ordenComp.cliente.rfc=''
+        ordenComp.cliente.rfc='';
+        this.setState({
+          lstCliPro:[]
+        });
       }
       ordenComp.cliente.nombre = this.clienteRef.current.value;    
     }    
@@ -181,6 +203,8 @@ export default class Addordencompra extends Component {
     let oc = this.state.ordencompra;
     oc.cliente = this.state.lstCliente[index];    
     let id = this.state.lstCliente[index].id;
+    //aqui
+    this.getProdByCliente(id);
     this.setState({
       ordencompra:oc,
       idCliente:id,
@@ -199,6 +223,37 @@ export default class Addordencompra extends Component {
        observaciones:'',
        presentacion:''
       }
+    });
+  }
+
+  selProductoCliente = (index) =>{
+    let oc = this.state.ordencompra;
+    oc.clave = this.state.lstCliPro[index].clave;
+    if(oc.producto){
+      oc.producto.nombre = this.state.lstCliPro[index].producto;
+    }else{
+      oc.producto = {nombre:this.state.lstCliPro[index].producto}
+    }
+    
+    this.setState({
+      ordencompra:oc,
+      lstCliPro:[]
+    });
+  }
+
+  getProdByCliente = (idCliente) =>{
+    Axios.get(Global.url+'ordencompra/cp/'+idCliente,{ headers: authHeader() })
+    .then(
+      res=>{
+        if(res.data.length > 0){
+          this.setState({
+            lstCliPro:res.data
+          });
+        }
+      }
+    )
+    .catch(err=>{
+      AuthService.isExpired(err.message);
     });
   }
 
@@ -273,7 +328,7 @@ export default class Addordencompra extends Component {
               </div>
             <div className="form-control grid">
                 <div>
-                  <input type="text" name="oc" placeholder="Orden de Compra" ref={this.ocRef} value={ordencompra.oc} onChange={this.occhange} />
+                  <input type="text" name="oc" placeholder="Orden de Compra" ref={this.ocRef} value={ordencompra.oc} onChange={this.occhange} onBlur={this.existeOC} />
                   {this.validator.message('oc',ordencompra.oc,'required')}
                 </div>
                 <div>
@@ -292,7 +347,33 @@ export default class Addordencompra extends Component {
                   }
                 </div>
               </div>
-              
+              {this.state.lstCliPro.length > 0 &&
+                    <div style={{width:'100%'}}>
+                      <table style={{width:'100%'}}>
+                        <tbody>
+                          <tr>
+                            <td>
+                              <table style={{width:'100%',border:'2px solid blue'}}>
+                                <tbody>
+                                {this.state.lstCliPro.map((clip,i) =>{
+                                  return(
+                                    <tr key={i} onClick={()=>this.selProductoCliente(i)}>
+                                      <td>{clip.clave}</td>
+                                      <td>{clip.producto}</td>
+                                    </tr>
+                                  );
+                                })}
+                                </tbody>
+                              </table>
+                            </td>
+                            <td>
+                              *
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  }
             </div>
             <div className="showcase-form card">
               <div className="form-control grid">

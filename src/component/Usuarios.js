@@ -9,6 +9,7 @@ import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import swal from "sweetalert";
 import Bitacora from "../services/bitacora-service";
 import Paginacion from "./Paginacion";
+import AuthService from '../services/auth.service';
 
 export default class Usuarios extends Component {
   nombreRef = React.createRef();
@@ -57,7 +58,7 @@ export default class Usuarios extends Component {
         }
       })
       .catch((err) => {
-        console.log(err);
+        AuthService.isExpired(err.message);
       });
   }
 
@@ -68,7 +69,9 @@ export default class Usuarios extends Component {
           lstAreas: res.data,
         });
       })
-      .catch((err) => {});
+      .catch((err) => {
+        AuthService.isExpired(err.message);
+      });
   }
 
   onChangeFormulario = (event) => {
@@ -91,18 +94,6 @@ export default class Usuarios extends Component {
 
   submitFormulario = (event) => {
     event.preventDefault();
-    /*let user = {
-      nombre: this.nombreRef.current.value,
-      apellido: this.apellidoRef.current.value,
-      username: this.usernameRef.current.value,
-      password: this.passwordRef.current.value,
-      area: { id: this.areaRef.current.value },
-      activo: this.estatusRef.current.checked,
-    };
-    
-    this.setState({
-      usuario: user,
-    });*/
     if (this.validator.allValid()) {
       if(!(this.passwordRef.current.value === this.passwordverifRef.current.value)){
         swal('La contraseña no coincide','Favor de corregir','warning');
@@ -120,7 +111,7 @@ export default class Usuarios extends Component {
             }
           })
           .catch((err) => {
-            swal("Ocurrio un error al crear el usuario", "Error", "error");
+            AuthService.isExpired(err.message);
           });
       } else {
         Axios.put(Global.url +"usuario/"+this.state.lstUsers[(this.state.page - 1) * 10 + this.state.idSelMp].id,
@@ -140,7 +131,7 @@ export default class Usuarios extends Component {
             }
           })
           .catch((err) => {
-            swal("Ocurrio un error al crear el usuario", "Error", "error");
+            AuthService.isExpired(err.message);
           });
       }
     } else {
@@ -189,12 +180,7 @@ export default class Usuarios extends Component {
             if (res.status === Global.HTTP_OK) {
               Bitacora(
                 Global.ADD_USER,
-                JSON.stringify(
-                  this.state.lstUsers[
-                    this.state.idSelMp
-                  ]
-                ),
-                ""
+                JSON.stringify(this.state.lstUsers[this.state.idSelMp]),""
               );
               this.getListUsers();
               swal("El usuario ha sido eliminado!", { icon: "success" });
@@ -204,7 +190,7 @@ export default class Usuarios extends Component {
             }
           })
           .catch((err) => {
-            console.log("Error " + err.message);
+            AuthService.isExpired(err.message);
           });
       }
     });

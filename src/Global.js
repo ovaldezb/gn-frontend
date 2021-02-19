@@ -25,6 +25,7 @@ var Global = {
     WTDEL:'WTDEL',
     CMPLT:'CMPLT',
     DELVRD:'DELVRD',
+    EEP:'EEP',
     SIZE_DOC:8,
     PORCENTAJE_MAX:'100.00',
     CODIGO_AGUA:'AGUA001'
