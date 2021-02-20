@@ -7,6 +7,8 @@ import SimpleReactValidator from 'simple-react-validator';
 import Moment from 'moment';
 import {TextField} from '@material-ui/core';
 import AuthService from '../services/auth.service';
+import { faTimesCircle } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default class Addordencompra extends Component {
   ocRef = React.createRef();
@@ -22,7 +24,11 @@ export default class Addordencompra extends Component {
   right = {textAlign:"right"}
   center = {textAlign:"center"}
   state={
-      ordencompra:{},
+      ordencompra:{
+        cliente:{
+          nombre:''
+        }
+      },
       lstMatPrim:[],
       lstMatPrimResp:[],
       lstErr:[],
@@ -95,6 +101,9 @@ export default class Addordencompra extends Component {
   }
 
   busProductoClave = (event) =>{
+    if(this.state.ordencompra.clave === ''){
+      return;
+    }
     if(event.keyCode === 13 || event._reactName === 'onBlur'){
       Axios.get(Global.url+'prodisp/'+this.state.ordencompra.clave,{ headers: authHeader() })
           .then(res=>{
@@ -118,35 +127,43 @@ export default class Addordencompra extends Component {
   }
 
   guardaOC = () =>{
-    this.isErrorInit = true;
-    var ordenCompraTmp = this.state.ordencompra;
-    if(this.btnName==='Guardar'){
-      if(ordenCompraTmp.cliente === undefined || ordenCompraTmp.cliente.rfc===''){
-          swal('No se ha hecho la búsqueda del Cliente','EL campo de RFC debe contener algún valor','warning');
-          return;
-      }
-      ordenCompraTmp.estatus=Global.OPEN;
-      ordenCompraTmp.piezasCompletadas=0;
-      ordenCompraTmp.piezasEntregadas=0;
-      ordenCompraTmp.aprobado = false;
-      Axios.post(Global.url+'ordencompra',ordenCompraTmp,{ headers: authHeader() })
+    if(this.validator.allValid()){
+      this.isErrorInit = true;
+      var ordenCompraTmp = this.state.ordencompra;
+      if(this.btnName==='Guardar'){
+        if(ordenCompraTmp.cliente === undefined || ordenCompraTmp.cliente.rfc===''){
+            swal('No se ha hecho la búsqueda del Cliente','EL campo de RFC debe contener algún valor','warning');
+            return;
+        }
+        ordenCompraTmp.estatus=Global.OPEN;
+        ordenCompraTmp.piezasCompletadas=0;
+        ordenCompraTmp.piezasEntregadas=0;
+        ordenCompraTmp.aprobado = false;
+        Axios.post(Global.url+'ordencompra',ordenCompraTmp,{ headers: authHeader() })
+          .then(res=>{
+            swal('Se guardó la Orden de Compra con éxito',ordenCompraTmp.oc,'success');
+            this.cancelarOC();
+          })
+          .catch(err=>{
+            AuthService.isExpired(err.message);
+          });
+      }else{
+        Axios.put(Global.url+'ordencompra/'+this.state.idOrdenCompra,ordenCompraTmp,{ headers: authHeader() })
         .then(res=>{
-          swal('Se guardó la Orden de Compra con éxito',ordenCompraTmp.oc,'success');
-          this.cancelarOC();
+            swal('Se actualizó la Orden de Compra con éxito',''+res.data.oc,'success');
+            this.cancelarOC(res.data);
         })
         .catch(err=>{
           AuthService.isExpired(err.message);
         });
+      }
     }else{
-      Axios.put(Global.url+'ordencompra/'+this.state.idOrdenCompra,ordenCompraTmp,{ headers: authHeader() })
-      .then(res=>{
-          swal('Se actualizó la Orden de Compra con éxito',''+res.data.oc,'success');
-          this.cancelarOC(res.data);
-      })
-      .catch(err=>{
-        AuthService.isExpired(err.message);
-      });
-    }
+      if(this.clienteRef.current.value===''){
+        this.validator.showMessageFor('cliente');
+      }
+      this.validator.showMessages();
+      this.forceUpdate();
+  }
   }
 
   cancelarOC = () => {
@@ -231,10 +248,16 @@ export default class Addordencompra extends Component {
     oc.clave = this.state.lstCliPro[index].clave;
     if(oc.producto){
       oc.producto.nombre = this.state.lstCliPro[index].producto;
+      oc.producto.id = this.state.lstCliPro[index].idProducto;
+      oc.producto.clave = this.state.lstCliPro[index].clave;
     }else{
-      oc.producto = {nombre:this.state.lstCliPro[index].producto}
+      oc.producto = {
+        nombre:this.state.lstCliPro[index].producto,
+        id:this.state.lstCliPro[index].idProducto,
+        clave: this.state.lstCliPro[index].clave
+      }
     }
-    
+    console.log(oc);
     this.setState({
       ordencompra:oc,
       lstCliPro:[]
@@ -261,6 +284,12 @@ export default class Addordencompra extends Component {
     
   }
 
+  closeCliProdList = () =>{
+    this.setState({
+      lstCliPro:[]
+    });
+  }
+
   pad(num, size) {
     num = num.toString();
     while (num.length < size) num = "0" + num;
@@ -279,24 +308,20 @@ export default class Addordencompra extends Component {
           <h3 className="center">Orden de Compra</h3>
           <div className="grid">
             <div className="showcase-form card">
+              <div className="form-control grid">
+                <div>
+                  <input type="text" name="oc" placeholder="Orden de Compra" ref={this.ocRef} value={ordencompra.oc} onChange={this.occhange} onBlur={this.existeOC} />
+                  {this.validator.message('oc',ordencompra.oc,'required')}
+                </div>
+                <div>
+                <input type="text" name="lote" placeholder="Lote" ref={this.loteRef} value={ordencompra.lote} onChange={this.occhange} />
+                  {this.validator.message('lote',ordencompra.lote,'required')}
+                </div>
+              </div>
               <div className="form-control grid-3">
                 <div>
-                  {ordencompra.cliente && 
-                  <input type="text" 
-                    name="cliente" 
-                    placeholder="Cliente" 
-                    ref={this.clienteRef} 
-                    value={ordencompra.cliente.nombre} 
-                    onKeyUp={this.buscaCliente} onChange={this.occhange}/>                  
-                  }
-                  {!ordencompra.cliente && 
-                  <input type="text" 
-                    name="cliente" 
-                    placeholder="Cliente" 
-                    ref={this.clienteRef}                     
-                    onKeyUp={this.buscaCliente} onKeyBlur={this.buscaCliente} />                  
-                  }
-                  {ordencompra.cliente && this.validator.message('cliente',ordencompra.cliente.nombre,'required')}
+                  <input type="text" name="cliente" placeholder="Cliente" ref={this.clienteRef} value={ordencompra.cliente.nombre} onKeyUp={this.buscaCliente} onChange={this.occhange}/>   
+                  {this.validator.message('cliente',ordencompra.cliente.nombre,'required')}
                   {this.state.lstCliente.length > 1 &&
                   <div className="cli-search">
                     <table className="tbl-cli">
@@ -326,16 +351,6 @@ export default class Addordencompra extends Component {
                   {this.validator.message('piezas',ordencompra.piezas,'required')}
                 </div>
               </div>
-            <div className="form-control grid">
-                <div>
-                  <input type="text" name="oc" placeholder="Orden de Compra" ref={this.ocRef} value={ordencompra.oc} onChange={this.occhange} onBlur={this.existeOC} />
-                  {this.validator.message('oc',ordencompra.oc,'required')}
-                </div>
-                <div>
-                <input type="text" name="lote" placeholder="Lote" ref={this.loteRef} value={ordencompra.lote} onChange={this.occhange} />
-                  {this.validator.message('lote',ordencompra.lote,'required')}
-                </div>
-              </div>
               <div className="form-control grid-1-2">
                 <div>
                   <input type="text" name="clave" placeholder="Clave Prod Disp" onKeyUp={this.busProductoClave} ref={this.claveRef} value={ordencompra.clave} onBlur={this.busProductoClave} onChange={this.occhange}/>
@@ -353,11 +368,11 @@ export default class Addordencompra extends Component {
                         <tbody>
                           <tr>
                             <td>
-                              <table style={{width:'100%',border:'2px solid blue'}}>
+                              <table className="table-hover" style={{width:'100%',border:'2px solid blue'}}>
                                 <tbody>
                                 {this.state.lstCliPro.map((clip,i) =>{
                                   return(
-                                    <tr key={i} onClick={()=>this.selProductoCliente(i)}>
+                                    <tr key={i} onClick={()=>this.selProductoCliente(i)} style={{cursor:'pointer'}}>
                                       <td>{clip.clave}</td>
                                       <td>{clip.producto}</td>
                                     </tr>
@@ -367,7 +382,7 @@ export default class Addordencompra extends Component {
                               </table>
                             </td>
                             <td>
-                              *
+                            <FontAwesomeIcon icon={faTimesCircle} title="Cerrar" onClick={this.closeCliProdList} style={{cursor:'pointer'}} />
                             </td>
                           </tr>
                         </tbody>
@@ -377,7 +392,8 @@ export default class Addordencompra extends Component {
             </div>
             <div className="showcase-form card">
               <div className="form-control grid">
-                <input type="number" placeholder="Presentación" ref={this.presRef} value={ordencompra.presentacion} onChange={this.occhange}/>
+                <input type="number" name="presentacion" className="center" placeholder="Presentación" ref={this.presRef} value={ordencompra.presentacion} onChange={this.occhange}/>
+                {this.validator.message('presentacion',ordencompra.presentacion,'required')}
                 <div>
                     <select ref={this.tipoPresRef}>
                       <option value="milimililitros">mililitros</option>

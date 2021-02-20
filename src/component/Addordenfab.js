@@ -5,7 +5,7 @@ import Global from "../Global";
 import authHeader from "../services/auth-header";
 import SimpleReactValidator from 'simple-react-validator';
 import NumberFormat from 'react-number-format';
-
+import AuthService from '../services/auth.service';
 
 export default class Addordenfab extends Component {
   ocRef = React.createRef();
@@ -47,7 +47,6 @@ export default class Addordenfab extends Component {
   }
 
   async componentDidMount(){
-    console.log('Component DId Mount');
     if(!this.props.tipo){
       this.isErrorInit=false;
       //console.log(this.props.ordenfab);
@@ -90,7 +89,9 @@ export default class Addordenfab extends Component {
         counter:this.pad(Number(res.data.counter) + 1,Global.SIZE_DOC)
       });
     })
-    .catch();
+    .catch(err=>{
+      AuthService.isExpired(err.message);
+    });
   }
 
   validarOF = () =>{
@@ -100,7 +101,8 @@ export default class Addordenfab extends Component {
       if(this.btnNameValida === 'Validar OF'){
         this.isErrorInit = false;
         this.setState({
-          lstMatPrimResp:[]
+          lstMatPrimResp:[],
+          lstErr:[]
         });
         Axios.get(Global.url+'prodisp/'+this.state.clave,{ headers: authHeader() })
         .then(
@@ -109,32 +111,30 @@ export default class Addordenfab extends Component {
               Axios.get(Global.url+'ordenfab/validar/'+
                     matPrim.materiaprimadisponible.codigo+'/'+
                     matPrim.porcentaje+'/'+
-                    this.state.ordenfab.piezas+'/'+this.state.ordenfab.presentacion,
-                    { headers: authHeader() })
+                    this.state.ordenfab.piezas+'/'+this.state.ordenfab.presentacion,{ headers: authHeader() })
                 .then( res =>{
                   var lstTmpMP = this.state.lstMatPrimResp;
-                  lstTmpMP.push(res.data[0]);
+                  var lstErrTmp = this.state.lstErr
+                  if(res.data[0].estatus==='ERROR'){
+                    lstErrTmp.push(res.data[0]);
+                  }
+                  res.data.forEach((mpr,i)=>{
+                    lstTmpMP.push(mpr);
+                  });
                   this.setState({
-                    lstMatPrimResp:lstTmpMP
+                    lstMatPrimResp:lstTmpMP,
+                    lstErr:lstErrTmp
                   });
                 })
                 .catch(err =>{
-                  console.log(err);
+                  AuthService.isExpired(err.message);
                 });
-                let lstErrTmp = this.state.lstMatPrimResp.filter(mpr =>{
-                  return mpr.estatus === 'ERROR';
-                });
-                this.setState({
-                  lstErr:lstErrTmp
-                });
-                this.btnNameValida = 'Reset'
             });
+            this.btnNameValida = 'Reset'
           }
         ).catch(err =>{
-          console.log(err);
+          AuthService.isExpired(err.message);
         });
-      }else{
-
       }
     }else{
       this.validator.showMessages();
@@ -176,7 +176,7 @@ export default class Addordenfab extends Component {
           this.props.cancelar(res.data);
       })
       .catch(err=>{
-        console.log(err);
+        AuthService.isExpired(err.message);
       });
     }else{
       console.log(ordenFabTmp);
@@ -187,7 +187,7 @@ export default class Addordenfab extends Component {
         this.cancelarOF(false);
       })
       .catch(err=>{
-
+        AuthService.isExpired(err.message);
       });
     }
   }
@@ -226,7 +226,6 @@ export default class Addordenfab extends Component {
         loteAgua: this.loteAguaRef.current.value
       });
     }
-    console.log(this.state.ordenfab);
   }
   
   clean = () =>{
@@ -240,6 +239,8 @@ export default class Addordenfab extends Component {
       lstMatPrimResp:[],
       piezasPendientes:''
     });
+    this.piezasRef.current.value = '';
+    this.ocRef.current.value = '';
   }
 
   selectAll = () =>{
@@ -318,6 +319,7 @@ export default class Addordenfab extends Component {
         }
       })
       .catch(err=>{
+        AuthService.isExpired(err.message);
         if(err.message.includes("400")){
           swal('La orden de compra '+this.state.ordenfab.oc+' no existe o aún no ha sido aprobada','No se puede iniciar la fabricación','error');
           let of = this.state.ordenfab;
@@ -401,8 +403,8 @@ export default class Addordenfab extends Component {
               </div>
               <div className="form-control grid">
                 <div>
-                  <input type="text" name="oc" placeholder="Orden de Compra" ref={this.ocRef} value={this.state.ordenfab.oc.oc} onKeyUp={this.validaOC} />
-                  {this.validator.message('oc',this.state.ordenfab.oc,'required')}
+                  <input type="text" name="oc" placeholder="Orden de Compra" ref={this.ocRef} defaultValue={this.state.ordenfab.oc.oc} onKeyUp={this.validaOC} />
+                  {this.validator.message('oc',this.state.ordenfab.oc.oc,'required')}
                   {this.state.lstOC.length > 1 &&
                   <div className="tbl-oc">
                     <table style={width}>
@@ -427,7 +429,7 @@ export default class Addordenfab extends Component {
             <div className="showcase-form card">
               <div className="form-control grid-3-l">
                 <div>
-                  <input type="number" name="piezas" placeholder="Piezas" ref={this.piezasRef} value={this.state.ordenfab.piezas} />
+                  <input type="number" name="piezas" placeholder="Piezas" ref={this.piezasRef} defaultValue={this.state.ordenfab.piezas} />
                   {this.validator.message('piezas',this.state.ordenfab.piezas,'required')}
                 </div>
                 <div>
@@ -438,7 +440,7 @@ export default class Addordenfab extends Component {
                 </div>
               </div>
               <div className="form-control">
-                <textarea placeholder="Observaciones" ref={this.obsRef} value={this.state.ordenfab.observaciones}></textarea>
+                <textarea placeholder="Observaciones" ref={this.obsRef} defaultValue={this.state.ordenfab.observaciones}></textarea>
               </div>
             </div>
           </div>
@@ -503,7 +505,7 @@ export default class Addordenfab extends Component {
                       <td><input type="text" className="valor" ref={this.loteAguaRef} defaultValue={this.state.loteAgua} onBlur={() => this.updtRowLote(i)}/></td>
                     }
                     
-                    <td className={style} style={this.center}>{matprimres.estatus}</td>
+                    <td className={style} style={this.center} title={matprimres.comentarios}>{matprimres.estatus}</td>
                     <td><input type="checkbox" name={'val'+i} id={'val'+i} /></td>
                   </tr>
                   )

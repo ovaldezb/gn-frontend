@@ -90,7 +90,7 @@ export default class Ordenesfabricacion extends Component {
     })
     .then((willDelete) => {
       if (willDelete) {
-        axios.get(Global.url+'ordenfab/complete/'+this.state.lstOF[((this.state.page-1)*10)+this.state.idSelOf].id,{ headers: authHeader() })
+        axios.put(Global.url+'ordenfab/complete/'+this.state.lstOF[((this.state.page-1)*10)+this.state.idSelOf].id,{ headers: authHeader() })
             .then(res=>{
               
               //var mp = this.state.lstMatPrim[this.state.idSelMp];
@@ -233,7 +233,6 @@ export default class Ordenesfabricacion extends Component {
   render() {
     var cantidadTotal = 0;
     const OF = this.state.lstOF[this.state.idSelOf];
-    console.log(OF);
     var style = {};
     if (this.state.lstOF.length > 0) {
       var lstOrdFabPI = this.state.pageOfItems.map((ordfab, i) => {

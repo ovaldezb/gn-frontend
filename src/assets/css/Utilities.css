@@ -147,6 +147,11 @@
   overflow: auto;
 }
 
+.table-ovfl-prodent {
+  height: 337px;
+  overflow: auto;
+}
+
 .pointer {
   cursor: pointer;
 } 

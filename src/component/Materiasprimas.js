@@ -23,17 +23,10 @@ export default class Materiasprimas extends Component {
   //idSelMp = 0;
   displayAdd = false;
   newItem=false;
-  center = {textAlign:"center"}
+  center = {textAlign:"center",fontSize:'14px'}
   right = {textAlign:"right"}
-  left = {textAlign:"left"}
-  col1 = { width: 20 };
-  col2 = { width: 140 };
-  col3 = { width: 50, textAlign: "center" };
-  col4 = { width: 96 };
-  col5 = { width: 100 };
-  col6 = { width: 150 };
-  col7 = { width: 150 };
-  col8 = { width: 100 };
+  left = {textAlign:"left",fontSize:'12px'}
+
   state = {
     lstMatPrim: [],
     pageOfItems: [],
@@ -62,13 +55,6 @@ export default class Materiasprimas extends Component {
         AuthService.isExpired(err.message);
       });
   }
-
-  dblClick = (i) => {
-    this.idMatprim = this.state.lstMatPrim[i].id;
-    this.setState({
-      status: "go",
-    });
-  };
 
   selectRow = (i) => {
     this.setState({
@@ -170,9 +156,6 @@ export default class Materiasprimas extends Component {
   }
 
   render() {
-    if (this.state.status === "go") {
-      return <Redirect to={"/materiaprima/" + this.idMatprim} />;
-    }
     
     var style = {};
     var styleDisp={};
@@ -215,15 +198,15 @@ export default class Materiasprimas extends Component {
         } 
 
         return (
-          <tr key={i} onDoubleClick={() => this.dblClick(i)} onClick={() => {this.selectRow(i); }} className={style} >
-            
+          <tr key={i} onClick={() => {this.selectRow(i); }} className={style} >
             <td style={this.left}>{matprim.descripcion}</td>
-            <td className={styleCell} style={this.col3}><NumberFormat value={Number(matprim.cantidad).toFixed(2)} displayType={'text'} thousandSeparator={true} /></td>
-            <td className={styleDisp} style={this.col3}><NumberFormat value={Number(matprim.cantidad - matprim.apartado ).toFixed(2)} displayType={'text'} thousandSeparator={true} /></td>
-            <td style={this.col4}>{matprim.unidad.unidadMedida}</td>
-            <td style={this.col5}>{matprim.codigo}</td>
-            <td style={this.col6}>{matprim.proveedor.nombre}</td>
-            <td style={this.col7}>{momento(matprim.fechaEntrada,'MM-DD-YYYY').format('DD MMM YYYY')}</td>
+            <td className={styleCell} style={{fontSize:'12px'}}><NumberFormat value={Number(matprim.cantidad).toFixed(2)} displayType={'text'} thousandSeparator={true} /></td>
+            <td className={styleDisp} style={{fontSize:'12px'}}><NumberFormat value={Number(matprim.cantidad - matprim.apartado ).toFixed(2)} displayType={'text'} thousandSeparator={true} /></td>
+            <td style={{fontSize:'12px'}}>{matprim.unidad.unidadMedida}</td>
+            <td style={{fontSize:'12px'}}>{matprim.codigo}</td>
+            <td style={{fontSize:'12px'}}>{matprim.lote}</td>
+            <td style={{fontSize:'12px'}}>{matprim.proveedor.nombre}</td>
+            <td style={{fontSize:'12px'}}>{momento(matprim.fechaEntrada,'MM-DD-YYYY').format('DD MMM YYYY')}</td>
             <td className={styleFecCad} style={this.col7}><Moment fromNow>{fc}</Moment></td>
           </tr>
         );
@@ -268,24 +251,26 @@ export default class Materiasprimas extends Component {
 
               <table className="table table-bordered header-font">
                 <colgroup>
-                <col width="21%"/>
-                <col width="8%"/>
-                <col width="8%"/>
-                <col width="9%"/>
-                <col width="12%"/>
-                <col width="17%"/>
-                <col width="15%"/>
-                <col width="10%"/>
+                  <col width="19%"/>
+                  <col width="8%"/>
+                  <col width="8%"/>
+                  <col width="9%"/>
+                  <col width="9%"/>
+                  <col width="12%"/>
+                  <col width="15%"/>
+                  <col width="9%"/>
+                  <col width="10%"/>
                 </colgroup>
                 <thead className="thead-dark">
                   <tr>
                     <th style={this.center}>Descripción</th>
                     <th style={this.center}>Físico</th>
-                    <th style={this.center}>Disponible</th>
+                    <th style={this.center}>Disp</th>
                     <th style={this.center}>Unidad</th>
                     <th style={this.center}>Código</th>
+                    <th style={this.center}>Lote</th>
                     <th style={this.center}>Proveedor</th>
-                    <th style={this.center}>Fecha Entrada</th>
+                    <th style={this.center}>F. Ent</th>
                     <th style={this.center}>Caducidad</th>
                   </tr>
                 </thead>
@@ -293,15 +278,16 @@ export default class Materiasprimas extends Component {
               <div className="table-ovfl-mp tbl-lesshead">
                 <table className="table table-bordered table-hover header-font" id="materiaprima">
                   <colgroup>
-                <col width="21%"/>
-                <col width="8%"/>
-                <col width="8%"/>
-                <col width="9%"/>
-                <col width="12%"/>
-                <col width="17%"/>
-                <col width="15%"/>
-                <col width="10%"/>
-                </colgroup>
+                    <col width="21%"/>
+                    <col width="8%"/>
+                    <col width="8%"/>
+                    <col width="9%"/>
+                    <col width="8%"/>
+                    <col width="10%"/>
+                    <col width="16%"/>
+                    <col width="10%"/>
+                    <col width="10%"/>
+                  </colgroup>
                   <tbody>{lstMp}</tbody>
                 </table>              
               </div>

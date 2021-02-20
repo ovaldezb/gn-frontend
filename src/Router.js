@@ -4,7 +4,6 @@ import Login from "./component/Login";
 import Principal from "./component/Principal";
 import Register from "./component/Register";
 import Footer from "./component/Footer";
-import Materiaprima from './component/Materiaprima';
 import Lordenfab from "./component/Lordenfab";
 import Lprodterm from "./component/Lprodterm";
 import Lproddisp from './component/Lproddisp';
@@ -24,7 +23,6 @@ class Router extends Component {
         <Switch>
           <Route exact path="/" component={Login} />
           <Route exact path="/principal" component={Principal} />
-          <Route exact path="/materiaprima/:id" component={Materiaprima} />
           <Route exact path="/prodterminado" component={Lprodterm} />
           <Route exact path="/login" component={Login} />
           <Route exact path="/signup" component={Register} />

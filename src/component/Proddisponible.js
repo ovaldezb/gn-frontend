@@ -132,7 +132,6 @@ export default class Proddisponible extends Component {
     });
   }
 
-
   selectRow = (i) => {
     this.setState({
       idSelPd:((this.state.page-1)*10) + i,
@@ -227,7 +226,6 @@ export default class Proddisponible extends Component {
               </div>
             </React.Fragment>    
         )
-        
     }else{
         return (
           <React.Fragment>

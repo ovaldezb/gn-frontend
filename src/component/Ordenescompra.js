@@ -186,7 +186,7 @@ export default class Ordenescompra extends Component {
             <td>{ordcomp.producto.nombre}</td>
             <td style={this.center}>{ordcomp.clave}</td>
             <td style={this.center}>{ordcomp.lote}</td>
-            <td style={this.center}><NumberFormat value={Number(ordcomp.piezas)}displayType={'text'} thousandSeparator={true} title={'Piezas fabricadas: '+ ordcomp.piezasFabricadas +'\n Piezas Completadas:'+ordcomp.piezasCompletadas+' \n Piezas Entregadas: '+ordcomp.piezasEntregadas}/></td>
+            <td style={this.center}><NumberFormat value={Number(ordcomp.piezas)}displayType={'text'} thousandSeparator={true} title={'Piezas fabricadas: '+ ordcomp.piezasFabricadas +'\nPiezas Completadas:'+ordcomp.piezasCompletadas+' \nPiezas Entregadas: '+ordcomp.piezasEntregadas}/></td>
             <td><Moment format="DD MMM YYYY">{momento(ordcomp.fechaFabricacion,'MM-DD-YYYY').format('YYYY-MM-DDTHH:mm:ss')}</Moment></td>
             <td><Moment format="DD MMM YYYY">{momento(ordcomp.fechaEntrega,'MM-DD-YYYY').format('YYYY-MM-DDTHH:mm:ss')}</Moment></td>
             <td>{ordcomp.cliente.nombre}</td>

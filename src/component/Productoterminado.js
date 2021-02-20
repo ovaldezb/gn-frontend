@@ -7,7 +7,7 @@ import Moment from 'react-moment';
 import momento from 'moment';
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTruck, faPrint } from "@fortawesome/free-solid-svg-icons";
+import { faTruck } from "@fortawesome/free-solid-svg-icons";
 import NumberFormat from 'react-number-format';
 import swal from 'sweetalert';
 import Logo from '../assets/images/logo.png'
@@ -101,25 +101,50 @@ export default class Productoterminado extends Component {
   }
 
   entregaProductos = () =>{
-    let noRemision = document.getElementById('noremision').value;
-    if(noRemision===''){
-      swal('Es necesario ingresar el No de Remisión');
+    let isEmptyPzas = false;
+    let of = '';
+    let isEmptyRemi = false;
+    
+    this.state.lstPTEntregado.forEach((ptent,i)=>{
+      
+      if(document.getElementById('pzasent'+ptent.noConsecutivo).value === ''){
+        isEmptyPzas = true;
+        of = this.pad(ptent.noConsecutivo,Global.SIZE_DOC);
+      }
+    });
+    if(isEmptyPzas){
+      swal('Es necesario ingresar la cantidad de piezas a entregar para la OF: '+of);
       return;
     }
     this.state.lstPTEntregado.forEach((ptent,i)=>{
-      ptent.piezasEntregadas = document.getElementById('pzasent'+ptent.noConsecutivo).value;
-      ptent.noRemision = noRemision
-      Axios.put(Global.url+'prodterm/dlvr/'+this.state.lstPdrTerm[this.state.idSelPt].id,ptent,{ headers: authHeader() })
-      .then(res =>{
-
-      })
-      .catch(err=>{
-        AuthService.isExpired(err.message);
-      });
+      if(document.getElementById('noremision'+ptent.noConsecutivo).value === ''){
+        isEmptyRemi = true;
+        of = this.pad(ptent.noConsecutivo,Global.SIZE_DOC);
+      }
     });
-    this.isModalActive = false;
-    this.printPT();
-    this.forceUpdate();
+    if(isEmptyRemi){
+      swal('Es necesario ingresar la remisión la OF: '+of);
+      return;
+    }
+
+    let lstPtEntDelv = this.state.lstPTEntregado.map((ptent,i) =>{
+        ptent.noRemision = document.getElementById('noremision'+ptent.noConsecutivo).value;
+        ptent.piezasEntregadas = document.getElementById('pzasent'+ptent.noConsecutivo).value;
+        ptent.fechaRemision = new Date();
+        return ptent;
+    });
+    Axios.put(Global.url+'prodterm/dlvr',lstPtEntDelv,{ headers: authHeader() })
+    .then(res =>{
+      this.isModalActive = false;
+      this.setState({
+        lstPTEntregado:lstPtEntDelv
+      });
+      this.printPT();
+      this.loadProdTerm(true);
+    })
+    .catch(err=>{
+      AuthService.isExpired(err.message);
+    });
   }
   
   printPT = () =>{
@@ -320,31 +345,27 @@ export default class Productoterminado extends Component {
                       <span aria-hidden="true">&times;</span>
                     </button>
                   </div>
-                  <div className="modal-body center" >
-                    <table style={{width:'100%'}}>
-                      <tbody>
-                      <tr>
-                          <td>Remisión</td>
-                          <td><input type="text" className="input" id="noremision"/></td>
-                        </tr>
-                      </tbody>
-                    </table>
+                  <div className="modal-body center-100" >
                     <div style={{border:'1px solid blue',width:'104%',marginTop:'15px'}}>
-                    <table className="table">
+                    <table className="table" style={{width:'100%'}}>
                         <thead className="thead-dark">                      
-                        <tr>
-                          <th style={{textAlign:'center'}}>No OF</th>
-                          <th style={{textAlign:'center'}}>Cantidad a entregar</th>
-                        </tr>
+                          <tr>
+                            <th style={{textAlign:'center'}}>No OF</th>
+                            <th style={{textAlign:'center'}}>Piezas a entregar</th>
+                            <th style={{textAlign:'center'}}>Remisión</th>
+                          </tr>
                         </thead>
+
                         <tbody>
                         {this.state.lstPTEntregado.map((pten,i)=>{
                           return(
                             <tr key={i}>
                               <td>{this.pad(pten.noConsecutivo,Global.SIZE_DOC)}</td>
                               <td><input type="number" className="input center" size='3' defaultValue={pten.piezas - pten.piezasEntregadas} id={'pzasent'+pten.noConsecutivo}/></td>
+                              <td><input type="text"   className="input center" size='5' id={'noremision'+pten.noConsecutivo}/></td>
                             </tr>
                           );
+                          
                         })}
                       </tbody>
                     </table>
@@ -360,7 +381,9 @@ export default class Productoterminado extends Component {
             }
             {this.state.idSelPt !==-1 && 
             <div id="print" style={{display:'none'}}>
-              <table className="table-main">
+            {this.state.lstPTEntregado.map((pt,i)=>{
+            return(
+              <table className="table-main" key={i}>
                 <tbody>
                   <tr>
                     <td className="width70">
@@ -386,63 +409,59 @@ export default class Productoterminado extends Component {
                         <tbody>
                           <tr>
                             <td><b>Remisión #</b></td>
-                        {this.state.lstPTEntregado[0] &&
-                          <td className="center">{this.state.lstPTEntregado[0].noRemision}</td>
-                        }
-                        
-                      </tr>
-                      <tr>
-                        <td colSpan="2"><b>Fecha</b></td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2"><Clock format={'DD-MMMM-YYYY'} ticking={false}  /></td>
-                      </tr>
-                      </tbody>
-                    </table>
-                  </td>
-                </tr>
-                <tr>
-                  <td colSpan="2">
-                    <table className="table-2">
-                      <colgroup>
-                      <col width="20%" />
-                      <col width="15%" />
-                      <col width="65%" />
-                      </colgroup>
-                      <tbody>
-                      <tr>
-                        <td>&nbsp;</td>
-                        <td>Cliente:</td>
-                        <td>{this.state.lstPdrTerm[this.state.idSelPt].cliente.nombre}</td>
-                      </tr>
-                      <tr>
-                        <td>&nbsp;</td>
-                        <td>Direccion:</td>
-                        <td>{this.state.lstPdrTerm[this.state.idSelPt].cliente.direccion}</td>
-                      </tr>
-                      <tr>
-                        <td>&nbsp;</td>
-                        <td>RFC:</td>
-                        <td>{this.state.lstPdrTerm[this.state.idSelPt].cliente.rfc}</td>
-                      </tr>
-                      </tbody>
-                    </table>
-                  </td>
-                </tr>
-                <tr>
-                  <td colSpan="2">
-                    <table className="table-3">
-                      <thead>
+                            <td className="center">{pt.noRemision}</td>
+                          </tr>
+                          <tr>
+                            <td colSpan="2"><b>Fecha</b></td>
+                          </tr>
+                          <tr>
+                            <td colSpan="2"><Clock format={'DD-MMMM-YYYY'} ticking={false}  /></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colSpan="2">
+                      <table className="table-2">
+                        <colgroup>
+                          <col width="20%" />
+                          <col width="15%" />
+                          <col width="65%" />
+                        </colgroup>
+                        <tbody>
                         <tr>
-                          <th>Cantidad</th>
-                          <th>Clave</th>
-                          <th>Descripcion</th>
-                          <th>OC</th>
+                          <td>&nbsp;</td>
+                          <td>Cliente:</td>
+                          <td>{pt.cliente.nombre}</td>
                         </tr>
-                      </thead>
-                      <tbody>
-                      {this.state.lstPTEntregado.map((pt,i)=>{
-                        return(
+                        <tr>
+                          <td>&nbsp;</td>
+                          <td>Direccion:</td>
+                          <td>{pt.cliente.direccion}</td>
+                        </tr>
+                        <tr>
+                          <td>&nbsp;</td>
+                          <td>RFC:</td>
+                          <td>{pt.cliente.rfc}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td colSpan="2">
+                    <div>
+                      <table className="table-3">
+                        <thead>
+                          <tr>
+                            <th>Cantidad</th>
+                            <th>Clave</th>
+                            <th>Descripcion</th>
+                            <th>OC</th>
+                          </tr>
+                        </thead>
+                        <tbody>
                           <tr key={i}>
                             <td style={this.center_top}>{pt.piezasEntregadas}</td>
                             <td style={this.center_top}>{pt.clave}</td>
@@ -459,20 +478,20 @@ export default class Productoterminado extends Component {
                               </p>
                             </td>
                             <td style={this.center_top}>{pt.oc}</td>
-                          </tr>
-                        );
-                      })}
-                      </tbody>
-                    </table>
+                          </tr>  
+                        </tbody>
+                      </table>
+                    </div>
                   </td>
                 </tr>
                 </tbody>
               </table>
+              );
+            })}
             </div>
             }
           </React.Fragment>
         );
-
       }else{
         return (
             <React.Fragment>
