@@ -130,9 +130,10 @@ export default class Productoterminado extends Component {
     let lstPtEntDelv = this.state.lstPTEntregado.map((ptent,i) =>{
         ptent.noRemision = document.getElementById('noremision'+ptent.noConsecutivo).value;
         ptent.piezasEntregadas = document.getElementById('pzasent'+ptent.noConsecutivo).value;
-        ptent.fechaRemision = new Date();
+        ptent.fechaRemision = momento(new Date()).format('YYYY-MM-DD HH:mm:ss.sss') ;
         return ptent;
     });
+    
     Axios.put(Global.url+'prodterm/dlvr',lstPtEntDelv,{ headers: authHeader() })
     .then(res =>{
       this.isModalActive = false;

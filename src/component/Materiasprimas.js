@@ -5,7 +5,7 @@ import axios from "axios";
 import Global from "../Global";
 import "moment/locale/es-mx";
 import momento from 'moment';
-import { Redirect, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faPlusSquare, faEdit,  faTrash,} from "@fortawesome/free-solid-svg-icons";
 import Addmatprima from "./Addmatprima";
@@ -129,25 +129,13 @@ export default class Materiasprimas extends Component {
     });
   }
 
-  updateLstMp(){
-    this.isAdd = true;
-    this.loadMatPrim();
-  }
-
   cancelarAdd = (matprima) => {
     this.displayAdd = false;
     if(matprima){
-      if(this.isAdd){
-        let lstTmp = this.state.lstMatPrim;
-        lstTmp.push(matprima);
-        this.setState({
-          lstMatPrim:lstTmp
-        });
-      }else{
-        this.updateLstMp();
-      }
+      this.loadMatPrim();
+      this.isAdd = true;
     }
-    this.forceUpdate();
+    //this.forceUpdate();
   }
 
   onChangePage = (pageOfItems,page) => {

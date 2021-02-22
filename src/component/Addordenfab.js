@@ -209,7 +209,7 @@ export default class Addordenfab extends Component {
     ordenFab.observaciones=this.obsRef.current.value;  
     if(this.state.piezasTotales - this.state.piezasFabricadas - this.piezasRef.current.value < 0){
       ordenFab.piezas = '';
-      swal('La cantidad de piezas a fabricar excede la cantidad de piezas requeridas en la OC '+this.state.ordenfab.oc);
+      swal('La cantidad de piezas a fabricar excede la cantidad de piezas requeridas en la OC '+this.state.ordenfab.oc.oc);
       this.setState({
         ordenfab:ordenFab,
         piezasPendientes:this.state.piezasTotales -  this.state.piezasFabricadas

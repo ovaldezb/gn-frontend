@@ -90,7 +90,7 @@ export default class Ordenesfabricacion extends Component {
     })
     .then((willDelete) => {
       if (willDelete) {
-        axios.put(Global.url+'ordenfab/complete/'+this.state.lstOF[((this.state.page-1)*10)+this.state.idSelOf].id,{ headers: authHeader() })
+        axios.get(Global.url+'ordenfab/complete/'+this.state.lstOF[((this.state.page-1)*10)+this.state.idSelOf].id,{ headers: authHeader() })
             .then(res=>{
               
               //var mp = this.state.lstMatPrim[this.state.idSelMp];
@@ -384,7 +384,7 @@ export default class Ordenesfabricacion extends Component {
                               </td>
                           </tr>
                           <tr>
-                              <td rowspan="2" colSpan="3" className="col2 right top bottom">GRUPO NORDAN S.A de C.V.</td>
+                              <td rowSpan="2" colSpan="3" className="col2 right top bottom">GRUPO NORDAN S.A de C.V.</td>
                               <td className="col3 right top font14">ORDEN DE FABRICACION</td>
                           </tr>
                           <tr>
