@@ -30,7 +30,11 @@ export default class Addmatprima extends Component {
     selectedDayEnt: null,
     unidades:[],
     lstProv:[],
-    materiaPrima:{},
+    materiaPrima:{
+      unidad:{
+        unidadMedida:''
+      }
+    },
     date: new Date('2019-12-06 00:00:00'),
     locale: { name: 'en-US', label: 'English' },
     existencia: {
@@ -52,6 +56,7 @@ export default class Addmatprima extends Component {
       this.idMatPrima = this.props.matprima.id;
       this.fechaEntrada = this.props.matprima.fechaEntrada;
       this.fechaCaducidad = this.props.matprima.fechaCaducidad;
+      
       this.setState({
         materiaPrima: this.props.matprima
       });
@@ -111,25 +116,21 @@ export default class Addmatprima extends Component {
       abundante:Number(this.necesarioRef.current.value) + 1
     };
     var materiaprima = this.state.materiaPrima;
-     
     materiaprima.descripcion=this.descripcionRef.current.value.toUpperCase();
     materiaprima.cantidad=this.cantidadRef.current.value;
-    materiaprima.unidad=this.state.unidades[this.unidadRef.current.value];
+    //materiaprima.unidad=this.state.unidades[this.unidadRef.current.value];
+    materiaprima.unidad.id=this.unidadRef.current.value;
     materiaprima.codigo=this.claveRef.current.value;
     materiaprima.proveedor= this.state.lstProv[this.proveedorRef.current.selectedIndex];
-    //=this.state.materiaPrima.fechaEntrada,
-    //materiaprima.fechaCaducidadthis.state.materiaPrima.,
     materiaprima.observaciones=this.observacionesRef.current.value;
     materiaprima.lote=this.loteRef.current.value;
     materiaprima.necesario=this.necesarioRef.current.value;
     materiaprima.escaso=this.escasoRef.current.value;
     materiaprima.tipo=this.tipoRef.current.value;
-    
     this.setState({
       existencia: existeData,
       materiaPrima:materiaprima
     });
-    
   };
 
   agregarMateriaPrima = () =>{
@@ -146,7 +147,6 @@ export default class Addmatprima extends Component {
                 }
             }).catch(err=>{
               AuthService.isExpired(err.message);
-                //swal('Ourrio un error al inserta la Materia Prima',err.message,'error');
             });
       }else{
         Axios.put(Global.url+'matprima/'+this.idMatPrima,this.state.materiaPrima,{ headers: authHeader() })
@@ -182,14 +182,14 @@ export default class Addmatprima extends Component {
       const fechaCaducidad = matprima.fechaCaducidad ? Moment(matprima.fechaCaducidad,'MM-DD-YYYY').format('YYYY-MM-DD') : '';
       if(this.state.unidades.length > 0){
           var optnLst = this.state.unidades.map((unidad,i)=>{
-              return <option key={i} value={i}>{unidad.unidadMedida}</option>
+              return <option key={i} value={unidad.id}>{unidad.unidadMedida}</option>
           });
       }
     return (
       <React.Fragment>
       <form onSubmit={this.enviarFormulario} onChange={this.enviarFormulario}>
-        <h3 className="center">{this.btnName} Materia Prima</h3>
-        <div className=" grid">
+        <h3 className="center">Materia Prima</h3>
+        <div className="grid">
           <div>
             <div className="showcase-form card">
               <div className="form-control">
@@ -198,7 +198,7 @@ export default class Addmatprima extends Component {
               </div>
               <div className="form-control grid">
                 <input type="number" name="cantidad" placeholder="Cantidad"  ref={this.cantidadRef} defaultValue={matprima.cantidad} required/>
-                <select className="custom-select" ref={this.unidadRef}>
+                <select className="custom-select" ref={this.unidadRef} value={matprima.unidad!==undefined ? matprima.unidad.id : '' }>
                   {optnLst}
                 </select>
                 {this.validator.message('cantidad',matprima.cantidad,'required')}

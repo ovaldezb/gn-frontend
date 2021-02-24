@@ -27,6 +27,27 @@ export default class Menu extends Component {
             <div className="menu">
               <ul>
                 <li>
+                  <Link to={"/usuarios"}>
+                    <span>
+                      <FontAwesomeIcon icon={faUsers}className="icon-menu" />
+                    </span>
+                    Usuarios</Link> 
+                </li>
+                <li>
+                  <Link to="clientes" >
+                    <span>
+                      <FontAwesomeIcon icon={faHandshake}className="icon-menu" />
+                    </span>
+                    Clientes
+                  </Link> 
+                </li>
+                <li>
+                  <Link to="proveedores">
+                    <span><FontAwesomeIcon icon={faUserTie}className="icon-menu" /></span>
+                    Proveedores
+                  </Link> 
+                </li>
+                <li>
                   <Link to={"/principal"} onClick={()=>{this.click(0)}} className={this.state.lstActive[0] ? 'selected' : ''}>
                     <span><FontAwesomeIcon icon={faBong} size="1x" className="icon-menu" /></span>
                     Materia Prima
@@ -66,26 +87,6 @@ export default class Menu extends Component {
                     Producto Entregado
                   </Link> 
                 </li>
-                <li>
-                  <Link to="clientes" >
-                    <span>
-                      <FontAwesomeIcon icon={faHandshake}className="icon-menu" />
-                    </span>
-                    Clientes
-                  </Link> 
-                </li>
-                <li>
-                  <Link to="proveedores">
-                    <span><FontAwesomeIcon icon={faUserTie}className="icon-menu" /></span>
-                    Proveedores
-                  </Link> 
-                </li>
-                <li>
-                  <Link to={"/usuarios"}>
-                  <span>
-                      <FontAwesomeIcon icon={faUsers}className="icon-menu" />
-                    </span>
-                  Usuarios</Link> </li>
                 <li>
                   <Link to={"/bitacora"}>
                     <span><FontAwesomeIcon icon={faArchive}className="icon-menu" /></span>

@@ -2,7 +2,7 @@ import Axios from "axios";
 import React, { Component } from "react";
 import Global from "../Global";
 import authHeader from "../services/auth-header";
-import authServices from '../services/auth.service';
+import AuthService from '../services/auth.service';
 import swal from "sweetalert";
 import SimpleReactValidator from 'simple-react-validator'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -71,11 +71,6 @@ export default class Addproddisp extends Component {
           sumaPorcentaje:Number(sumPor).toFixed(2)
       });
     }
-    
-    
-    this.setState({
-      
-    });
   }
   
   busquedaDesc = (e)=>{
@@ -86,7 +81,9 @@ export default class Addproddisp extends Component {
                     lstBusqDesc:res.data
                 });
             })
-            .catch();
+            .catch(err=>{
+              AuthService.isExpired(err.message);
+            });
     }else{
       this.setState({
         lstBusqDesc:[]
@@ -104,15 +101,7 @@ export default class Addproddisp extends Component {
             });
         })
         .catch(err =>{
-            if(err.message.includes("401")){
-                /*this.setState({
-                  status:'logout'
-                });*/
-                authServices.logout();
-                swal("La sesión ha caducado","Por favor vuélvase a conectar","warning");
-              }else{
-                swal("Ha ocurrido un error, contacte al Administrador",err.message,"error");
-              }
+          AuthService.isExpired(err.message);
         });
       } 
   }
@@ -202,19 +191,18 @@ export default class Addproddisp extends Component {
               Bitacora(Global.ADD_PRDDISP,'',JSON.stringify(prdDispSave));
             })
             .catch(err=>{
-
+              AuthService.isExpired(err.message);
             });
         }else{
             Axios.put(Global.url+'prodisp/'+this.idPrdDisp,prdDispSave,{ headers: authHeader() })
             .then(res =>{
-                console.log(res.data.id);
                 if(res.data.id){
                     swal('Se actualizó correctamente el producto',prdDispSave.nombre,'success');
                     this.props.cancelar(res.data);
                 }
             })
             .catch(err=>{
-
+              AuthService.isExpired(err.message);
             });
         }
       }else{
@@ -269,11 +257,14 @@ export default class Addproddisp extends Component {
   validaClave = () =>{
     Axios.get(Global.url+'prodisp/'+this.state.clave,{ headers: authHeader() })
     .then(res=>{
-      if(res.data ){
-        swal('Ya existe un producto con este código',res.data.nombre,'warning');
+      if(res.data.nombre ){
+        swal('Ya existe un producto con este código',this.state.clave,'warning');
+        this.claveRef.current.value = '';
       }
     })
-    .catch();
+    .catch(err=>{
+      AuthService.isExpired(err.message);
+    });
   }
 
   descChange = () =>{
@@ -328,7 +319,7 @@ export default class Addproddisp extends Component {
           <div className="showcase-form card tbl-padding">
             <div className="grid-2-1">
               <div className="form-control">
-                <input type="text" name="nombre" placeholder="Nombre Producto" ref={this.nombreRef} defaultValue={this.state.nombre}  required/>
+                <input type="text" name="nombre" placeholder="Nombre Producto" ref={this.nombreRef} value={this.state.nombre}  onChange={this.descChange} required/>
                 {this.validator.message('nombre',this.state.nombre,'required')}
               </div>
               <div className="form-control">

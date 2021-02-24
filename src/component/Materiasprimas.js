@@ -45,11 +45,9 @@ export default class Materiasprimas extends Component {
     axios
       .get(this.url + "matprima", { headers: authHeader() },{ responseType: 'application/json' })
       .then((res) => {
-        if (res.data.length > 0) {
-          this.setState({
-            lstMatPrim: res.data,
-          });
-        }
+        this.setState({
+          lstMatPrim: res.data,
+        });
       })
       .catch((err) => {
         AuthService.isExpired(err.message);
@@ -89,11 +87,9 @@ export default class Materiasprimas extends Component {
   };
 
   updateMp = () =>{
-    
     this.displayAdd = true;
     this.isAdd = false;
     let i = this.state.idSelMp
-    
     this.setState({
       matprima:this.state.lstMatPrim[i],
       idSelMp: -1
@@ -132,9 +128,11 @@ export default class Materiasprimas extends Component {
   cancelarAdd = (matprima) => {
     this.displayAdd = false;
     if(matprima){
-      this.loadMatPrim();
+      this.isAdd = false;
+    }else{
       this.isAdd = true;
     }
+    this.loadMatPrim();
     //this.forceUpdate();
   }
 
