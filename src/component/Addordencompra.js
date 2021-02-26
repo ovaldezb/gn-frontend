@@ -37,7 +37,6 @@ export default class Addordencompra extends Component {
       idCliente:'',
       idOrdenCompra:'',
       idSelCliProd:-1
-      
   }
 
   constructor(){
@@ -257,7 +256,7 @@ export default class Addordencompra extends Component {
         clave: this.state.lstCliPro[index].clave
       }
     }
-    console.log(oc);
+    
     this.setState({
       ordencompra:oc,
       lstCliPro:[]

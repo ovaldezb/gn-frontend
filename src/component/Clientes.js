@@ -48,6 +48,10 @@ export default class Clientes extends Component {
     }
 
     deleteCl = () =>{
+      if(this.state.idSelCli===-1){
+        swal('Seleccione un cliente');
+        return;
+      }
         swal({
             title: "Estas seguro?",
             text: "Una vez eliminado, no se podrá recuperar el cliente",
@@ -78,6 +82,9 @@ export default class Clientes extends Component {
     cancelarCli = ()=>{
         this.displayAdd = false;
         this.isUpdt = false;
+        this.setState({
+          idSelCli:-1
+        });
         this.getClientes();
     }
 
@@ -88,10 +95,14 @@ export default class Clientes extends Component {
       };
 
     updateCl = () =>{
+        if(this.state.idSelCli===-1){
+          swal('Seleccione un cliente');
+          return;
+        }
         this.displayAdd = true;
         this.isUpdt = true;
         this.setState({
-            cliente:this.state.lstClientes[((this.state.page-1)*10)+this.state.idSelCli]
+            cliente:this.state.lstClientes[this.state.idSelCli]
         });
     }
 
@@ -188,9 +199,9 @@ export default class Clientes extends Component {
                                         <tr key={i} onClick={() => {this.selectRow(i); }} className={style} >
                                             <td>{cli.nombre}</td>
                                             <td style={this.center}>{cli.rfc}</td>
-                                            <td style={this.center}>{cli.telefono}</td>
-                                            <td style={this.center}>{cli.email}</td>
-                                            <td style={this.center}>{cli.contacto}</td>
+                                            <td style={this.center}>{cli.contactos[0].telefono}</td>
+                                            <td style={this.center}>{cli.contactos[0].email}</td>
+                                            <td style={this.center}>{cli.contactos[0].nombre}</td>
                                         </tr>
                                     );
                                 })}

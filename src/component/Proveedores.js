@@ -153,15 +153,17 @@ export default class Proveedores extends Component {
                             <col width="20%"/>
                             <col width="15%"/>
                             <col width="20%"/>
-                            <col width="20%"/>
+                            <col width="10%"/>
+                            <col width="10%"/>
                         </colgroup>
                         <thead>
                             <tr>
                                 <th style={{textAlign:'center'}}>Nombre</th>
                                 <th style={{textAlign:'center'}}>RFC</th>
-                                <th style={{textAlign:'center'}}>Telefono</th>
+                                <th style={{textAlign:'center'}}>Teléfono P.</th>
                                 <th style={{textAlign:'center'}}>Correo</th>
                                 <th style={{textAlign:'center'}}>Contacto</th>
+                                <th style={{textAlign:'center'}}>Teléfono C.</th>
                             </tr>
                         </thead>
                     </table>
@@ -172,7 +174,8 @@ export default class Proveedores extends Component {
                                 <col width="20%"/>
                                 <col width="15%"/>
                                 <col width="20%"/>
-                                <col width="20%"/>
+                                <col width="10%"/>
+                                <col width="10%"/>
                             </colgroup>
                             <tbody>
                                 {this.state.pageOfItems.map((prov,i)=>{
@@ -186,9 +189,10 @@ export default class Proveedores extends Component {
                                         <tr key={i} onClick={() => {this.selectRow(i); }} className={style} >
                                             <td>{prov.nombre}</td>
                                             <td>{prov.rfc}</td>
-                                            <td>{prov.telefono}</td>
-                                            <td>{prov.email}</td>
-                                            <td>{prov.contacto}</td>
+                                            <td>{prov.telefonoPrincipal}</td>
+                                            <td>{prov.contactos[0].email}</td>
+                                            <td>{prov.contactos[0].nombre}</td>
+                                            <td>{prov.contactos[0].telefono}</td>
                                         </tr>
                                     );
                                 })}

@@ -142,6 +142,9 @@ export default class Productoterminado extends Component {
       });
       this.printPT();
       this.loadProdTerm(true);
+      this.state.lstPdrTerm.forEach((ptent,i)=>{
+        document.getElementById('check'+i).checked = false;
+      });
     })
     .catch(err=>{
       AuthService.isExpired(err.message);
@@ -277,14 +280,15 @@ export default class Productoterminado extends Component {
             
               <table className="table table-dark header-font table-bordered">
                 <colgroup>
-                <col width="7%"/>
-                <col width="31%"/>
-                <col width="8%"/>
-                <col width="8%"/>
-                <col width="9%"/>
-                <col width="13%"/>
-                <col width="13%"/>
-                <col width="11%"/>
+                  <col width="7%"/>
+                  <col width="30%"/>
+                  <col width="8%"/>
+                  <col width="8%"/>
+                  <col width="8%"/>
+                  <col width="11%"/>
+                  <col width="11%"/>
+                  <col width="11%"/>
+                  <col width="6%"/>
                 </colgroup>
                 <thead className="thead-dark">
                   <tr>
@@ -304,13 +308,14 @@ export default class Productoterminado extends Component {
                 <table className="table table-lst table-bordered">
                   <colgroup>
                   <col width="7%"/>
-                  <col width="31%"/>
+                  <col width="30%"/>
                   <col width="8%"/>
                   <col width="8%"/>
-                  <col width="9%"/>
-                  <col width="13%"/>
-                  <col width="13%"/>
+                  <col width="8%"/>
                   <col width="11%"/>
+                  <col width="11%"/>
+                  <col width="11%"/>
+                  <col width="6%"/>
                   </colgroup>
                   <tbody>
                     {
@@ -318,15 +323,15 @@ export default class Productoterminado extends Component {
                         style = this.state.idSelPt === i ? "selected pointer":{};
                         return(
                           <tr key={i} onClick={() => {this.selectRow(i,(prodterm.estatus.codigo === Global.WTDEL || prodterm.estatus.codigo === Global.EEP))}}  className={style}>
-                            <td>{this.pad(prodterm.noConsecutivo,Global.SIZE_DOC)}</td>
+                            <td>{this.pad(prodterm.noConsecutivo,Global.SIZE_DOC_RED)}</td>
                             <td>{prodterm.producto.nombre}</td>
                             <td>{prodterm.oc}</td>
                             <td>{prodterm.lote}</td>
                             <td style={this.center}><NumberFormat value={Number(prodterm.piezas)}displayType={'text'} thousandSeparator={true} title={'Piezas Entregadas:'+prodterm.piezasEntregadas}/></td>
-                            <td style={this.center}><Moment format="DD MMMM YYYY">{momento(prodterm.fechaFabricacion,'YYYY-MM-DD').format('YYYY-MM-DD')}</Moment></td>
-                            <td style={this.center}><Moment format="DD MMMM YYYY">{momento(prodterm.fechaEntrega,'YYYY-MM-DD').format('YYYY-MM-DD')}</Moment></td>
+                            <td style={this.center}><Moment format="DD/MM/YYYY">{momento(prodterm.fechaFabricacion,'YYYY-MM-DD').format('YYYY-MM-DD')}</Moment></td>
+                            <td style={this.center}><Moment format="DD/MM/YYYY">{momento(prodterm.fechaEntrega,'YYYY-MM-DD').format('YYYY-MM-DD')}</Moment></td>
                             <td style={this.center} title={prodterm.cliente.nombre}>{prodterm.estatus.label}</td>
-                            <td><input type="checkbox" id={'check'+i}/></td>
+                            <td style={this.center}><input type="checkbox" id={'check'+i}/></td>
                           </tr>
                         );
                       })

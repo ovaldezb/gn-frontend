@@ -23,6 +23,27 @@ export default class Productoentregado extends Component {
       }
   };
 
+  componentDidMount(){
+    this.getProductosEntregados();
+  }
+
+  getProductosEntregados = () =>{
+    Axios.get(Global.url+'prodent',{ headers: authHeader() })
+      .then(res=>{
+        let pef = res.data.map((pe,i)=>{
+          delete pe.id;
+          delete pe.cliente.id;
+          return pe;
+        });
+        this.setState({
+            lstProdEnt:pef
+        });
+      })
+      .catch(err=>{
+        console.log(err);
+        AuthService.isExpired(err.message);
+      });
+  }
 
   filtrado = () =>{
     var filter = this.filterRef.current.value;

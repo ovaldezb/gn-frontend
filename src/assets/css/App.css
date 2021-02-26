@@ -386,3 +386,24 @@ background-color: #f50707;
   text-align: center;
   background: red;
 }
+
+/* Bar Nav para Clientes*/
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+.barnav-cli{
+  background-color: var(--secondary-color);
+  color: rgb(34, 89, 238);
+  height: 30px;
+  margin-top: -15px;
+}
+
+.barnav-cli li{
+ display: inline;
+ margin: 25px;
+ padding: 5%;
+
+ margin-left: -15px;
+}
