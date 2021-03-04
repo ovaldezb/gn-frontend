@@ -246,3 +246,12 @@ input:checked + .slider:before {
 .btn-select-all{
   line-height: 0.5 !important;
 }
+
+/* Modal */
+modal-width{
+  max-width: 950px !important;
+  margin: 1.75rem auto !important;
+  position: relative !important;
+  width: auto !important;
+  box-sizing: border-box !important;
+}

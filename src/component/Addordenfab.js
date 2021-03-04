@@ -8,8 +8,7 @@ import NumberFormat from 'react-number-format';
 import AuthService from '../services/auth.service';
 
 export default class Addordenfab extends Component {
-  ocRef = React.createRef();
-  piezasRef = React.createRef();
+  loteRef = React.createRef();
   obsRef =React.createRef();
   selAllRef = React.createRef();
   valorRef = React.createRef()
@@ -21,6 +20,7 @@ export default class Addordenfab extends Component {
   btnEnviar = 'Guardar';
   isErrorInit = true;
   selAll = false;
+  lstMatPrimRespBase=[];
   state={
       ordenfab:{oc:{oc:''}},
       proddisp:{},
@@ -31,7 +31,7 @@ export default class Addordenfab extends Component {
       clave:'',
       valor:'',
       cliente:'',
-      lstOC:[],
+      lstLotes:[],
       piezasFabricadas:0
   }
 
@@ -49,7 +49,6 @@ export default class Addordenfab extends Component {
   async componentDidMount(){
     if(!this.props.tipo){
       this.isErrorInit=false;
-      //console.log(this.props.ordenfab);
       this.btnEnviar = 'Actualizar';
       await this.setState({
         ordenfab:this.props.ordenfab,
@@ -59,9 +58,8 @@ export default class Addordenfab extends Component {
       this.selAll = false;
       this.selectAll();
       await this.setState({          
-        piezasPendientes:this.props.ordenfab.piezas - this.props.ordenfab.piezasFabricadas,
-        piezasTotales:this.props.ordenfab.piezas,
-        piezasFabricadas:this.props.ordenfab.piezasFabricadas,
+        
+        piezasLote:this.props.ordenfab.piezasLote,
         clave:this.props.ordenfab.clave,
         cliente:this.props.ordenfab.oc.cliente.nombre,
         producto:this.props.ordenfab.oc.producto.nombre
@@ -94,53 +92,48 @@ export default class Addordenfab extends Component {
     });
   }
 
-  validarOF = () =>{
+  /*validarOF = () =>{
     if(this.btnNameValida === 'Reset'){
       this.cancelarOF(true);
     }else if(this.validator.allValid()){
-      if(this.btnNameValida === 'Validar OF'){
-        this.isErrorInit = false;
-        this.setState({
-          lstMatPrimResp:[],
-          lstErr:[]
-        });
-        Axios.get(Global.url+'prodisp/'+this.state.clave,{ headers: authHeader() })
-        .then(
-          lstMatPrim =>{
-            lstMatPrim.data.materiaPrimaUsada.forEach((matPrim,i)=>{
-              Axios.get(Global.url+'ordenfab/validar/'+
-                    matPrim.materiaprimadisponible.codigo+'/'+
-                    matPrim.porcentaje+'/'+
-                    this.state.ordenfab.piezas+'/'+this.state.ordenfab.presentacion,{ headers: authHeader() })
-                .then( res =>{
-                  var lstTmpMP = this.state.lstMatPrimResp;
-                  var lstErrTmp = this.state.lstErr
-                  if(res.data[0].estatus==='ERROR'){
-                    lstErrTmp.push(res.data[0]);
-                  }
-                  res.data.forEach((mpr,i)=>{
-                    lstTmpMP.push(mpr);
-                  });
-                  this.setState({
-                    lstMatPrimResp:lstTmpMP,
-                    lstErr:lstErrTmp
-                  });
-                })
-                .catch(err =>{
-                  AuthService.isExpired(err.message);
-                });
+      this.isErrorInit = false;
+      this.setState({
+        lstMatPrimResp:[],
+        lstErr:[]
+      });
+      this.lstMatPrimRespBase=[];
+      this.state.ordenfab.oc.producto.materiaPrimaUsada.forEach((matPrim,i)=>{
+        Axios.get(Global.url+'ordenfab/validar/'+
+              matPrim.materiaprimadisponible.codigo+'/'+
+              matPrim.porcentaje+'/'+
+              this.state.piezasLote+'/'+this.state.ordenfab.presentacion,{ headers: authHeader() })
+          .then( res =>{
+            var lstTmpMP = this.state.lstMatPrimResp;
+            var lstErrTmp = this.state.lstErr
+            if(res.data[0].estatus==='ERROR'){
+              lstErrTmp.push(res.data[0]);
+            }
+            res.data.forEach((mpr,i)=>{
+              mpr.delta = 0;
+              lstTmpMP.push(mpr);
             });
-            this.btnNameValida = 'Reset'
-          }
-        ).catch(err =>{
-          AuthService.isExpired(err.message);
-        });
-      }
+            
+            this.lstMatPrimRespBase = JSON.parse(JSON.stringify(lstTmpMP));
+            this.setState({
+              lstMatPrimResp:lstTmpMP,
+              lstErr:lstErrTmp
+            });
+          })
+          .catch(err =>{
+            AuthService.isExpired(err.message);
+          });
+      });
+      this.btnNameValida = 'Reset'
     }else{
       this.validator.showMessages();
       this.forceUpdate();
     }
-  }
+  } */
 
   guardaOf = () =>{
     var msg = '';
@@ -169,17 +162,26 @@ export default class Addordenfab extends Component {
     if(this.btnEnviar === 'Guardar'){
       ordenFabTmp.oc = {id:this.state.ordenfab.oc.id}
       ordenFabTmp.estatus=Global.TEP;
+      ordenFabTmp.piezas=this.state.piezasLote; 
+      
       Axios.post(Global.url+'ordenfab',ordenFabTmp,{ headers: authHeader() })
       .then(res=>{
-          swal('Se guardó la Orden de Fabricación con éxito',this.pad(ordenFabTmp.noConsecutivo,Global.SIZE_DOC),'success');
-          this.clean();
-          this.props.cancelar(res.data);
+          if(res.data.length > 0){
+            swal("No se puedo generar la orden de fabriacion, verifique las cantidades");
+            this.setState({
+              lstMatPrimResp:res.data
+            });
+          }else{
+            swal('Se guardó la Orden de Fabricación con éxito',this.pad(ordenFabTmp.noConsecutivo,Global.SIZE_DOC),'success');
+            this.clean();
+            this.props.cancelar(res.data);
+          }
       })
       .catch(err=>{
         AuthService.isExpired(err.message);
+        console.log(err);
       });
     }else{
-      console.log(ordenFabTmp);
       Axios.put(Global.url+'ordenfab/'+ordenFabTmp.id,ordenFabTmp,{ headers: authHeader() })
       .then(res=>{
         this.btnEnviar = 'Guardar';
@@ -204,23 +206,9 @@ export default class Addordenfab extends Component {
   enviarFormulario = (e) =>{
     e.preventDefault();
     var ordenFab = this.state.ordenfab;
-    ordenFab.oc.oc=this.ocRef.current.value;
+    ordenFab.lote=this.loteRef.current.value;
     ordenFab.noConsecutivo=this.state.counter;
     ordenFab.observaciones=this.obsRef.current.value;  
-    if(this.state.piezasTotales - this.state.piezasFabricadas - this.piezasRef.current.value < 0){
-      ordenFab.piezas = '';
-      swal('La cantidad de piezas a fabricar excede la cantidad de piezas requeridas en la OC '+this.state.ordenfab.oc.oc);
-      this.setState({
-        ordenfab:ordenFab,
-        piezasPendientes:this.state.piezasTotales -  this.state.piezasFabricadas
-      });
-    }else{
-      ordenFab.piezas=this.piezasRef.current.value;
-      this.setState({
-        ordenfab:ordenFab,
-        piezasPendientes:this.state.piezasTotales -  this.state.piezasFabricadas - this.piezasRef.current.value
-      });
-    }
     if(this.loteAguaRef.current){
       this.setState({
         loteAgua: this.loteAguaRef.current.value
@@ -237,10 +225,9 @@ export default class Addordenfab extends Component {
       },
       cliente:'',
       lstMatPrimResp:[],
-      piezasPendientes:''
     });
-    this.piezasRef.current.value = '';
-    this.ocRef.current.value = '';
+    this.lstMatPrimRespBase=[];
+    this.loteRef.current.value = '';
   }
 
   selectAll = () =>{
@@ -288,46 +275,48 @@ export default class Addordenfab extends Component {
   }
 
   //|| e._reactName === 'onBlur'
-  validaOC = (e) =>{
+  validaLote = (e) =>{
     if(e.keyCode === 13 ){
-      Axios.get(Global.url+'ordencompra/oc/'+(this.state.ordenfab.oc.oc===undefined?'vacio':this.state.ordenfab.oc.oc===''?'vacio':this.state.ordenfab.oc.oc),{ headers: authHeader() })
-      .then(res=>{        
+      Axios.get(Global.url+'lote/val/'+(this.state.ordenfab.lote===undefined?'vacio':this.state.ordenfab.lote===''?'vacio':this.state.ordenfab.lote),{ headers: authHeader() })
+      .then(res=>{     
         if(res.data.length===1){
-          if(res.data[0].piezas === res.data[0].piezasFabricadas){
-            swal('Todas las piezas de la OC:'+this.state.ordenfab.oc.oc+' cuentan con una OF','No es posible fabricar más','warning');
+          if(res.data[0].fabricado){
+            swal('Este Lote ya fue fabricado','Error','warning');
+            this.loteRef.current.value="";
             return;
           }
           let of = this.state.ordenfab;
-          of.presentacion=res.data[0].presentacion;
-          of.nombre=res.data[0].producto.nombre;
-          of.oc = res.data[0];
-          //of.id = res.data[0].id;
+          of.presentacion=res.data[0].oc.presentacion;
+          of.nombre=res.data[0].oc.producto.nombre;
+          of.oc = res.data[0].oc;
           of.lote = res.data[0].lote;
+          this.loteRef.current.value=res.data[0].lote;
+          this.lstMatPrimRespBase = JSON.parse(JSON.stringify(res.data[0].materiaprima));
           this.setState({
             ordenfab:of,
-            piezasPendientes:res.data[0].piezas - res.data[0].piezasFabricadas,
-            piezasTotales:res.data[0].piezas,
-            piezasFabricadas:res.data[0].piezasFabricadas,
-            clave:res.data[0].clave,
-            cliente:res.data[0].cliente.nombre,
-            producto:res.data[0].producto.nombre
+            piezasLote:res.data[0].piezasLote,
+            piezasFabricadas:res.data[0].oc.piezasFabricadas,
+            clave:res.data[0].oc.clave,
+            cliente:res.data[0].oc.cliente.nombre,
+            producto:res.data[0].oc.producto.nombre,
+            lstMatPrimResp:res.data[0].materiaprima
           });
         }else if(res.data.length>1){
           this.setState({
-            lstOC:res.data
+            lstLotes:res.data
           });
         }
       })
       .catch(err=>{
         AuthService.isExpired(err.message);
         if(err.message.includes("400")){
-          swal('La orden de compra '+this.state.ordenfab.oc+' no existe o aún no ha sido aprobada','No se puede iniciar la fabricación','error');
+          swal('El lote '+this.state.ordenfab.lote+' no existe o aún no ha sido aprobado','No se puede iniciar la fabricación','error');
+          this.loteRef.current.value="";
           let of = this.state.ordenfab;
-          of.oc = ''
+          of.lote = ''
           this.setState({
             ordenfab: of,
-            piezasPendientes:'',            
-            piezasTotales:'',
+            piezasLote:'',
             clave:'',
             cliente:'',
             producto:''
@@ -340,6 +329,7 @@ export default class Addordenfab extends Component {
   updtRow = (i) =>{
     let mpArray = this.state.lstMatPrimResp;
     mpArray[i].cantidad = Number(this.valorRef.current.value);
+    mpArray[i].delta = Number(this.valorRef.current.value) - Number(this.lstMatPrimRespBase[i].cantidad) ;
     mpArray[i].valor = -1;
     this.setState({
       lstMatPrimResp:mpArray,
@@ -364,21 +354,22 @@ export default class Addordenfab extends Component {
     });
   }
   
-  selOC = (index) =>{
+  selLote = (index) =>{
     let of = this.state.ordenfab;
-    of.presentacion=this.state.lstOC[index].presentacion;
-    of.nombre=this.state.lstOC[index].producto.nombre;
-    of.oc = this.state.lstOC[index];
-    //of.id = this.state.lstOC[index].id;
-    of.lote = this.state.lstOC[index].lote;
+    of.presentacion=this.state.lstLotes[index].oc.presentacion;
+    of.nombre=this.state.lstLotes[index].oc.producto.nombre;
+    of.oc = this.state.lstLotes[index].oc;
+    of.lote = this.state.lstLotes[index].lote;
+    this.loteRef.current.value=this.state.lstLotes[index].lote;
+    this.lstMatPrimRespBase = JSON.parse(JSON.stringify(this.state.lstLotes[index].materiaprima ));
     this.setState({
       ordenfab:of,
-      piezasPendientes:this.state.lstOC[index].piezas - this.state.lstOC[index].piezasFabricadas,
-      piezasTotales:this.state.lstOC[0].piezas,
-      clave:this.state.lstOC[index].clave,
-      cliente:this.state.lstOC[index].cliente.nombre,
-      producto:this.state.lstOC[index].producto.nombre,
-      lstOC:[]
+      piezasLote:this.state.lstLotes[0].piezasLote,
+      clave:this.state.lstLotes[index].oc.clave,
+      cliente:this.state.lstLotes[index].oc.cliente.nombre,
+      producto:this.state.lstLotes[index].oc.producto.nombre,
+      lstMatPrimResp:this.state.lstLotes[index].materiaprima,
+      lstLotes:[]
     });
   }
 
@@ -393,26 +384,25 @@ export default class Addordenfab extends Component {
     return (
       <React.Fragment>
         <form onSubmit={this.enviarFormulario} onChange={this.enviarFormulario}>
-          <h2 className="center"> Orden de Fabricación</h2>
+          <h2 className="center">Orden de Fabricación</h2>
           <div className="grid">
             <div className="showcase-form card">
               <div className="form-control grid">
                 <h3>OF: {this.state.counter}</h3>
                 <h3>{this.state.cliente}</h3>
-                
               </div>
               <div className="form-control grid">
                 <div>
-                  <input type="text" name="oc" placeholder="Orden de Compra" ref={this.ocRef} defaultValue={this.state.ordenfab.oc.oc} onKeyUp={this.validaOC} />
-                  {this.validator.message('oc',this.state.ordenfab.oc.oc,'required')}
-                  {this.state.lstOC.length > 1 &&
+                  <input type="text" name="lote" placeholder="Lote" ref={this.loteRef} defaultValue={this.state.ordenfab.lote} onKeyUp={this.validaLote} />
+                  {this.validator.message('lote',this.state.ordenfab.lote,'required')}
+                  {this.state.lstLotes.length > 1 &&
                   <div className="tbl-oc">
                     <table style={width}>
                       <tbody>
-                        {this.state.lstOC.map((oc,i)=>{
+                        {this.state.lstLotes.map((lote,i)=>{
                           return(
-                            <tr key={i} onClick={()=>{this.selOC(i)}}>
-                              <td className="pointer">{oc.oc}</td>
+                            <tr key={i} onClick={()=>{this.selLote(i)}}>
+                              <td className="pointer">{lote.lote}</td>
                             </tr>
                           );
                         })}
@@ -427,13 +417,11 @@ export default class Addordenfab extends Component {
               </div>
             </div>
             <div className="showcase-form card">
-              <div className="form-control grid-3-l">
-                <div>
-                  <input type="number" name="piezas" placeholder="Piezas" ref={this.piezasRef} defaultValue={this.state.ordenfab.piezas} />
-                  {this.validator.message('piezas',this.state.ordenfab.piezas,'required')}
-                </div>
-                <div>
-                  <NumberFormat value={this.state.piezasPendientes} displayType={'text'} thousandSeparator={true} />                  
+              <div className="form-control grid-1-2">
+                <div className="producto">
+                  <legend>
+                  Piezas: <NumberFormat value={this.state.piezasLote} displayType={'text'} thousandSeparator={true} />
+                  </legend> 
                 </div>
                 <div>
                 <div className="producto">{this.state.producto}</div>
@@ -467,7 +455,6 @@ export default class Addordenfab extends Component {
                 </tr>
               </thead>
             </table>
-          
             <div className="table-ovfl-of-val">
               <table className="table table-bordered table-hover header-font">
                 <colgroup>
@@ -516,10 +503,9 @@ export default class Addordenfab extends Component {
           </div>
           }
       </form>
-      <div className="container grid-3">
-            <button className="btn btn-success" onClick={this.validarOF}>{this.btnNameValida} </button>
-            <button className="btn btn-danger" onClick={() =>{this.cancelarOF(false)}}>Cancelar</button>
-            <button className="btn btn-warning" onClick={this.guardaOf} disabled={(this.isErrorInit || this.state.lstErr.length >= 1 )} >{this.btnEnviar}</button>
+      <div className="container grid">
+        <button className="btn btn-warning" onClick={this.guardaOf} disabled={this.state.lstMatPrimResp.length===0} >{this.btnEnviar}</button>
+        <button className="btn btn-danger" onClick={() =>{this.cancelarOF(false)}}>Cancelar</button>
           </div>
       </React.Fragment>
     );

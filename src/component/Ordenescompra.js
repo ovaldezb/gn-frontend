@@ -7,7 +7,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPlusSquare,
   faEdit,
-  faTrash
+  faTrash,
+  faTimesCircle
 } from "@fortawesome/free-solid-svg-icons";
 import Paginacion from './Paginacion';
 import Moment from 'react-moment';
@@ -132,34 +133,6 @@ export default class Ordenescompra extends Component {
     });
   };
 
-  changeSttus = () =>{
-    if(this.state.lstOC[this.state.idSelOc].estatus === Global.OPEN){
-      swal({
-        title: "Desea aprobar la OC "+this.state.lstOC[this.state.idSelOc].oc+" ?",
-        text: "Una vez aprobada, se podrá comenzar con la(s) orden(es) de fabricación ",
-        icon: "warning",
-        buttons: true,
-        dangerMode: true,
-      })
-      .then((willDelete) => {
-        if(willDelete){
-          let oc = this.state.lstOC[this.state.idSelOc];
-          oc.aprobado = true;
-          oc.estatus = Global.APRVD;
-          axios.put(Global.url+'ordencompra/'+oc.id,oc,{ headers: authHeader() })
-          .then(res =>{
-            this.loadOC(false);
-            swal("Se cambio el estatus de la Orde de Compra");
-          })
-          .catch();
-        }
-        })
-      .catch(err=>{
-        AuthService.isExpired(err.message);
-      });
-    }
-  }
-
   onChangePage = (pageOfItems,page) => {
     // update state with new page of items
     this.setState({ pageOfItems: pageOfItems, page:page });
@@ -181,12 +154,11 @@ export default class Ordenescompra extends Component {
         }
         
         return (
-          <tr key={i} onClick={() => {this.selectRow(i)}}   onDoubleClick={()=>{this.changeSttus(i)}} className={style}>
+          <tr key={i} onClick={() => {this.selectRow(i)}}  className={style}>
             <td>{ordcomp.oc}</td>
-            <td>{ordcomp.producto.nombre}</td>
+            <td title={'Observaciones:'+ordcomp.observaciones}>{ordcomp.producto.nombre}</td>
             <td style={this.center}>{ordcomp.clave}</td>
-            <td style={this.center}>{ordcomp.lote}</td>
-            <td style={this.center}><NumberFormat value={Number(ordcomp.piezas)}displayType={'text'} thousandSeparator={true} title={'Piezas fabricadas: '+ ordcomp.piezasFabricadas +'\nPiezas Completadas:'+ordcomp.piezasCompletadas+' \nPiezas Entregadas: '+ordcomp.piezasEntregadas}/></td>
+            <td style={this.center}><NumberFormat value={Number(ordcomp.piezas)} displayType={'text'} thousandSeparator={true} title={'Piezas fabricadas: '+ ordcomp.piezasFabricadas +'\nPiezas Completadas:'+ordcomp.piezasCompletadas+' \nPiezas Entregadas: '+ordcomp.piezasEntregadas}/></td>
             <td><Moment format="DD MMM YYYY">{momento(ordcomp.fechaFabricacion,'MM-DD-YYYY').format('YYYY-MM-DDTHH:mm:ss')}</Moment></td>
             <td><Moment format="DD MMM YYYY">{momento(ordcomp.fechaEntrega,'MM-DD-YYYY').format('YYYY-MM-DDTHH:mm:ss')}</Moment></td>
             <td>{ordcomp.cliente.nombre}</td>
@@ -218,14 +190,21 @@ export default class Ordenescompra extends Component {
                         </Link>
                       </li>
                       <li>
-                        <Link to="#" onClick={this.updateOc}>
+                        {(this.state.idSelOc === -1 || this.state.lstOC[this.state.idSelOc].estatus !== Global.OPEN) &&
+                          <Link to="#">
+                          <FontAwesomeIcon icon={faEdit} style={{color:'grey'}}/>
+                          </Link>
+                        }
+                        {(this.state.idSelOc !== -1 && this.state.lstOC[this.state.idSelOc].estatus === Global.OPEN) &&
+                        <Link to="#" onClick={this.updateOc} >
                           <FontAwesomeIcon icon={faEdit} />
                         </Link>
+                        }
                       </li>
                       <li>
                         {(this.state.idSelOc === -1 || this.state.lstOC[this.state.idSelOc].estatus !== Global.OPEN) &&
                           <Link to="#">
-                          <FontAwesomeIcon icon={faTrash} style={{color:'grey'}}/>
+                            <FontAwesomeIcon icon={faTrash} style={{color:'grey'}}/>
                           </Link>
                         }
                         {(this.state.idSelOc !== -1 && this.state.lstOC[this.state.idSelOc].estatus === Global.OPEN) &&
@@ -234,6 +213,18 @@ export default class Ordenescompra extends Component {
                         </Link>
                         }                        
                       </li>
+                      <li>
+                      {(this.state.idSelOc === -1 || this.state.lstOC[this.state.idSelOc].estatus !== Global.TEP) &&
+                        <Link to="#" title="Cancelar OC" >
+                          <FontAwesomeIcon icon={faTimesCircle} style={{color:'grey'}} />
+                        </Link>
+                      }
+                      {(this.state.idSelOc !== -1 && this.state.lstOC[this.state.idSelOc].estatus === Global.TEP) &&
+                        <Link to="#" onClick={this.cancelOC} title="Cancelar OC">
+                          <FontAwesomeIcon icon={faTimesCircle} />
+                        </Link>
+                      }
+                      </li>
                     </ul>
                   </nav>
                 </div>
@@ -241,9 +232,8 @@ export default class Ordenescompra extends Component {
               <table className="table table-bordered header-font">
                 <colgroup>
                   <col width="7%"/>
-                  <col width="30%"/>
+                  <col width="36%"/>
                   <col width="8%"/>
-                  <col width="6%"/>
                   <col width="8%"/>
                   <col width="12%"/>
                   <col width="12%"/>
@@ -255,7 +245,6 @@ export default class Ordenescompra extends Component {
                     <th scope="col">OC</th>
                     <th scope="col">Producto</th>
                     <th scope="col">Clave</th>
-                    <th scope="col">Lote</th>
                     <th scope="col">Piezas</th>
                     <th scope="col">Fabricación</th>
                     <th scope="col">Entrega</th>
@@ -268,9 +257,8 @@ export default class Ordenescompra extends Component {
                 <table className="table table-bordered table-lst" id="ordenFabricacion">
                   <colgroup>
                   <col width="7%"/>
-                  <col width="30%"/>
+                  <col width="36%"/>
                   <col width="8%"/>
-                  <col width="6%"/>
                   <col width="8%"/>
                   <col width="12%"/>
                   <col width="12%"/>
@@ -292,14 +280,11 @@ export default class Ordenescompra extends Component {
       }else {
       return (
           <React.Fragment>
-          <div className="barnav">
+            <div className="barnav">
               <div className="container flex-gn">
-              <ul>
-                    <li>Filtro:</li>
-                    <li><input className="input"  type="text"  name="filtro" ref={this.filterRef} onKeyUp={this.filtrado}/></li>
-                    <li><input type="checkbox" ref={this.selAllRef} onChange={this.selectType} /></li>
-                  </ul>
-                  <h2>Orden de Compra</h2>
+                <ul>
+                </ul>
+                <h2>Orden de Compra</h2>
                 <nav>
                   <ul>
                     <li>

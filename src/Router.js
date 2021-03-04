@@ -13,6 +13,7 @@ import Lordencompra from "./component/Lordencompra";
 import Lcliente from './component/Lcliente';
 import Lproveedor from './component/Lproveedor';
 import Lproductoentregado from './component/Lprodentregado';
+import Llotes from './component/Llote';
 
 class Router extends Component {
   
@@ -34,6 +35,7 @@ class Router extends Component {
           <Route exact path="/clientes" component={Lcliente} />
           <Route exact path="/proveedores" component={Lproveedor} />
           <Route exact path="/productoentregado" component={Lproductoentregado} />
+          <Route exact path="/lotes" component={Llotes} />
         </Switch>
         
         <div className="clearfix"></div>

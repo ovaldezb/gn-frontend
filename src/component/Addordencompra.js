@@ -18,7 +18,6 @@ export default class Addordencompra extends Component {
   piezasRef = React.createRef();
   obsRef =React.createRef();
   tipoPresRef = React.createRef();
-  loteRef = React.createRef();
   btnName = 'Guardar';
   isErrorInit = true;
   right = {textAlign:"right"}
@@ -191,8 +190,6 @@ export default class Addordencompra extends Component {
     ordenComp.presentacion=this.presRef.current.value;
     ordenComp.observaciones=this.obsRef.current.value;
     ordenComp.tipoPresentacion=this.tipoPresRef.current.value;
-    ordenComp.lote = this.loteRef.current.value;
-
     this.setState({
       ordencompra:ordenComp
     });
@@ -219,7 +216,6 @@ export default class Addordencompra extends Component {
     let oc = this.state.ordencompra;
     oc.cliente = this.state.lstCliente[index];    
     let id = this.state.lstCliente[index].id;
-    //aqui
     this.getProdByCliente(id);
     this.setState({
       ordencompra:oc,
@@ -313,11 +309,11 @@ export default class Addordencompra extends Component {
                   {this.validator.message('oc',ordencompra.oc,'required')}
                 </div>
                 <div>
-                <input type="text" name="lote" placeholder="Lote" ref={this.loteRef} value={ordencompra.lote} onChange={this.occhange} />
-                  {this.validator.message('lote',ordencompra.lote,'required')}
+                  <input type="number" name="piezas" style={this.center} placeholder="Piezas Totales" ref={this.piezasRef} value={this.state.ordencompra.piezas} onChange={this.occhange}/>
+                  {this.validator.message('piezas',ordencompra.piezas,'required')}
                 </div>
               </div>
-              <div className="form-control grid-3">
+              <div className="form-control grid">
                 <div>
                   <input type="text" name="cliente" placeholder="Cliente" ref={this.clienteRef} value={ordencompra.cliente.nombre} onKeyUp={this.buscaCliente} onChange={this.occhange}/>   
                   {this.validator.message('cliente',ordencompra.cliente.nombre,'required')}
@@ -344,10 +340,6 @@ export default class Addordencompra extends Component {
                   {(!ordencompra.cliente || ordencompra.cliente.rfc==='')   && 
                     <legend>RFC</legend>
                   }
-                </div>
-                <div>
-                  <input type="number" name="piezas" style={this.center} placeholder="Piezas Totales" ref={this.piezasRef} value={this.state.ordencompra.piezas} onChange={this.occhange}/>
-                  {this.validator.message('piezas',ordencompra.piezas,'required')}
                 </div>
               </div>
               <div className="form-control grid-1-2">

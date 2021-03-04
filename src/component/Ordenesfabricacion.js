@@ -49,6 +49,7 @@ export default class Ordenesfabricacion extends Component {
         if (res.data.length > 0) {
           this.setState({
             lstOF: res.data,
+            idSelOf:-1
           });
         }else{
           this.setState({
@@ -82,7 +83,7 @@ export default class Ordenesfabricacion extends Component {
 
   completeOF = () =>{
     swal({
-      title: "Desea completar la Orden de Fabricacón: "+this.pad(this.state.lstOF[((this.state.page-1)*10)+this.state.idSelOf].noConsecutivo,Global.SIZE_DOC)+"?",
+      title: "Desea completar la Orden de Fabricacón: "+this.pad(this.state.pageOfItems[this.state.idSelOf].noConsecutivo,Global.SIZE_DOC)+"?",
       text: "Una vez completado, pasará a Producto Terminado",
       icon: "warning",
       buttons: true,
@@ -90,7 +91,7 @@ export default class Ordenesfabricacion extends Component {
     })
     .then((willDelete) => {
       if (willDelete) {
-        axios.get(Global.url+'ordenfab/complete/'+this.state.lstOF[((this.state.page-1)*10)+this.state.idSelOf].id,{ headers: authHeader() })
+        axios.get(Global.url+'ordenfab/complete/'+this.state.pageOfItems[this.state.idSelOf].id,{ headers: authHeader() })
             .then(res=>{
               
               //var mp = this.state.lstMatPrim[this.state.idSelMp];
@@ -112,7 +113,7 @@ export default class Ordenesfabricacion extends Component {
     this.displayAdd = true;
     this.isAdd = false;
     this.setState({
-      ordenfab:this.state.lstOF[this.state.idSelOf]
+      ordenfab:this.state.pageOfItems[this.state.idSelOf]
     });
   }
 
@@ -215,7 +216,7 @@ export default class Ordenesfabricacion extends Component {
       this.isActive = true;
     }
     this.setState({
-      idSelOf: ((this.state.page-1)*10)+i
+      idSelOf: i
     });
   };
 
@@ -232,7 +233,7 @@ export default class Ordenesfabricacion extends Component {
 
   render() {
     var cantidadTotal = 0;
-    const OF = this.state.lstOF[this.state.idSelOf];
+    const OF = this.state.pageOfItems[this.state.idSelOf];
     var style = {};
     if (this.state.lstOF.length > 0) {
       var lstOrdFabPI = this.state.pageOfItems.map((ordfab, i) => {
@@ -249,7 +250,7 @@ export default class Ordenesfabricacion extends Component {
         
         return (
           <tr key={i} onClick={() => {this.selectRow(i)}}  className={style}>
-            <td style={this.center}>{this.pad(ordfab.noConsecutivo,Global.SIZE_DOC)}</td>
+            <td style={this.center} title={'Comentarios: '+ordfab.observaciones}>{this.pad(ordfab.noConsecutivo,Global.SIZE_DOC)}</td>
             <td style={this.center}>{ordfab.oc.oc}</td>
             <td style={this.center}>{ordfab.lote}</td>
             <td style={this.center}><NumberFormat value={Number(ordfab.piezas)}displayType={'text'} thousandSeparator={true}/></td>
@@ -287,9 +288,16 @@ export default class Ordenesfabricacion extends Component {
                         </Link>
                       </li>
                       <li>
+                        {(this.state.idSelOf === -1  || this.state.pageOfItems[this.state.idSelOf].estatus!==Global.TEP) &&
+                          <Link to="#" title="Actualiza la OF Seleccionada">
+                          <FontAwesomeIcon icon={faEdit} style={{color:'grey'}} />
+                          </Link>
+                        }
+                        {(this.state.idSelOf !== -1 && this.state.pageOfItems[this.state.idSelOf].estatus===Global.TEP) &&
                           <Link to="#" onClick={this.updateOf} title="Actualiza la OF Seleccionada">
-                            <FontAwesomeIcon icon={faEdit} />
-                          </Link>                        
+                          <FontAwesomeIcon icon={faEdit} />
+                          </Link>                         
+                        }
                       </li>
                       <li>
                         <Link to="#" onClick={this.printOf} title="Imprime la OF Seleccionada">
@@ -297,27 +305,17 @@ export default class Ordenesfabricacion extends Component {
                         </Link>
                       </li>
                       <li>
-                        {(OF===undefined ) &&
-                          <Link to="#"  title="Elimina la OF Seleccionada">
-                            <FontAwesomeIcon icon={faTrash} style={{color:'grey'}}/>
+                        {(this.state.idSelOf === -1  || this.state.pageOfItems[this.state.idSelOf].estatus!==Global.TEP) &&
+                          <Link to="#" title="Elimina la OF Seleccionada">
+                          <FontAwesomeIcon icon={faTrash} style={{color:'grey'}} />
                           </Link>
-                          
-                        }
-                        {(OF!==undefined ) &&
-                        <React.Fragment>
-                            {OF.estatus===Global.CMPLT && 
-                            <Link to="#" title="Elimina la OF Seleccionada">
-                            <FontAwesomeIcon icon={faTrash} style={{color:'grey'}} />
-                            </Link>
-                            }
-                            {OF.estatus===Global.TEP && 
-                            <Link to="#" onClick={this.deleteOf} title="Elimina la OF Seleccionada">
-                            <FontAwesomeIcon icon={faTrash} />
-                            </Link>
-                            }
-                          </React.Fragment>
                         }
                         
+                        {(this.state.idSelOf !== -1 && this.state.pageOfItems[this.state.idSelOf].estatus===Global.TEP) &&
+                          <Link to="#" onClick={this.deleteOf} title="Elimina la OF Seleccionada">
+                          <FontAwesomeIcon icon={faTrash} />
+                          </Link>
+                        }
                       </li>
                       <li>                        
                         <Link to="#" onClick={this.completeOF} title="Completa la OF Seleccionada">

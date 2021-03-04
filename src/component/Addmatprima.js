@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 //import "react-day-picker/lib/style.css";
-import "moment/locale/es-mx";
+//import "moment/locale/es-mx";
 import Moment from 'moment';
 import SimpleReactValidator from 'simple-react-validator'
 import Axios from "axios";
@@ -25,18 +25,21 @@ export default class Addmatprima extends Component {
   escasoRef = React.createRef();
   necesarioRef = React.createRef();
   tipoRef = React.createRef();
-
+  factconvRef = React.createRef();
+  codigoOriginal = '';
   state = {
+    showFC:false,
     selectedDayEnt: null,
     unidades:[],
     lstProv:[],
     materiaPrima:{
       unidad:{
-        unidadMedida:''
-      }
+        unidadMedida:'',
+        id:''
+      },
+      factorConversion:1,
+      descripcion:''
     },
-    date: new Date('2019-12-06 00:00:00'),
-    locale: { name: 'en-US', label: 'English' },
     existencia: {
         escaso:'',
         necesarioMin:'',
@@ -45,8 +48,12 @@ export default class Addmatprima extends Component {
     }
   };
   validator = new SimpleReactValidator({
+    className: 'text-danger',
     messages:{
-        required:'requerido'
+        required:'Requerido',
+        numeric:'No es un valor númerico',
+        min:'El :attribute debe ser mayor a 0'
+        
     }
   });
   
@@ -56,9 +63,11 @@ export default class Addmatprima extends Component {
       this.idMatPrima = this.props.matprima.id;
       this.fechaEntrada = this.props.matprima.fechaEntrada;
       this.fechaCaducidad = this.props.matprima.fechaCaducidad;
-      
+      this.codigoOriginal = this.props.matprima.codigo;
+      let matprim = this.props.matprima;
+      matprim.cantidad = matprim.cantidadOriginal;
       this.setState({
-        materiaPrima: this.props.matprima
+        materiaPrima: matprim
       });
       let tipo = document.getElementById("tipo");
       tipo.value = this.props.matprima.tipo;
@@ -117,8 +126,8 @@ export default class Addmatprima extends Component {
     };
     var materiaprima = this.state.materiaPrima;
     materiaprima.descripcion=this.descripcionRef.current.value.toUpperCase();
+    this.descripcionRef.current.value = this.descripcionRef.current.value.toUpperCase();
     materiaprima.cantidad=this.cantidadRef.current.value;
-    //materiaprima.unidad=this.state.unidades[this.unidadRef.current.value];
     materiaprima.unidad.id=this.unidadRef.current.value;
     materiaprima.codigo=this.claveRef.current.value;
     materiaprima.proveedor= this.state.lstProv[this.proveedorRef.current.selectedIndex];
@@ -127,16 +136,20 @@ export default class Addmatprima extends Component {
     materiaprima.necesario=this.necesarioRef.current.value;
     materiaprima.escaso=this.escasoRef.current.value;
     materiaprima.tipo=this.tipoRef.current.value;
+    materiaprima.factorConversion=this.factconvRef.current !== null ? Number(this.factconvRef.current.value) : 1;
     this.setState({
       existencia: existeData,
       materiaPrima:materiaprima
     });
+    this.validator.showMessageFor('fc');
   };
 
   agregarMateriaPrima = () =>{
     if(this.validator.allValid()){
+      let matprim = this.state.materiaPrima;
+      matprim.cantidadOriginal = matprim.cantidad;
+      matprim.cantidad = matprim.cantidad * matprim.factorConversion;
       if(this.props.tipo){
-        let matprim = this.state.materiaPrima
         Axios.post(Global.url+'matprima',matprim,{ headers: authHeader() })
             .then(res => {
                 if(res.data.id!==null && res.data.id!==undefined){
@@ -149,7 +162,7 @@ export default class Addmatprima extends Component {
               AuthService.isExpired(err.message);
             });
       }else{
-        Axios.put(Global.url+'matprima/'+this.idMatPrima,this.state.materiaPrima,{ headers: authHeader() })
+        Axios.put(Global.url+'matprima/'+this.idMatPrima,matprim,{ headers: authHeader() })
         .then(res=>{
           swal('La materia prima se actualizo correctamente',this.state.materiaPrima.descripcion,'success');
           this.props.cancelar(res.data);
@@ -162,6 +175,49 @@ export default class Addmatprima extends Component {
     }else{
         this.validator.showMessages();
         this.forceUpdate();
+    }
+  }
+
+  cambiaUnidad = ()=>{
+    this.factconvRef.current.value = '';
+    if(this.state.unidades[this.unidadRef.current.selectedIndex].unidadMedida === Global.LITROS || this.state.unidades[this.unidadRef.current.selectedIndex].unidadMedida === Global.MILILITROS ){
+      this.setState({
+        showFC:true
+      });
+    }else{
+      let matprim = this.state.materiaPrima;
+      if(this.state.unidades[this.unidadRef.current.selectedIndex].unidadMedida === Global.KILOS){
+        this.factconvRef.current.value = 1;
+        matprim.factorConversion = 1;
+        this.setState({
+          materiaPrima:matprim,
+          showFC:false
+        });
+      }else if(this.state.unidades[this.unidadRef.current.selectedIndex].unidadMedida === Global.GRAMOS){
+        matprim.factorConversion = .001;
+        this.factconvRef.current.value = 0.001;
+        this.setState({
+          materiaPrima:matprim,
+          showFC:false
+        });
+      }
+      
+    }
+  }
+
+  validaClaveExiste = ()=>{
+    if(this.codigoOriginal !== this.state.materiaPrima.codigo ){
+      Axios
+      .get(Global.url+'matprima/codigo/'+this.state.materiaPrima.codigo,{ headers: authHeader() })
+      .then(res=>{
+        if(res.data){
+          swal('El codigo '+this.state.materiaPrima.codigo+' ya existe!');
+          this.claveRef.current.value = this.codigoOriginal;
+        }
+      })
+      .catch(err=>{
+        AuthService.isExpired(err.message);
+      });
     }
   }
 
@@ -193,27 +249,32 @@ export default class Addmatprima extends Component {
           <div>
             <div className="showcase-form card">
               <div className="form-control">
-                <input type="text" name="descripcion" placeholder="Descripcion" ref={this.descripcionRef} value={matprima.descripcion}  onChange={this.onChage} required/>
+                <input type="text" name="descripcion" placeholder="Descripción" ref={this.descripcionRef} defaultValue={matprima.descripcion}  onChange={this.onChage} required/>
                 {this.validator.message('descripcion',matprima.descripcion,'required')}
               </div>
               <div className="form-control grid">
-                <input type="number" name="cantidad" placeholder="Cantidad"  ref={this.cantidadRef} defaultValue={matprima.cantidad} required/>
-                <select className="custom-select" ref={this.unidadRef} value={matprima.unidad!==undefined ? matprima.unidad.id : '' }>
-                  {optnLst}
-                </select>
-                {this.validator.message('cantidad',matprima.cantidad,'required')}
-              </div>
-              <div className="form-control grid">
                 <div>
-                  <input type="text" placeholder="Clave" name="clave" ref={this.claveRef} defaultValue={matprima.codigo} required/>
+                  <input type="text" placeholder="Clave" name="clave" ref={this.claveRef} defaultValue={matprima.codigo}  onBlur={this.validaClaveExiste}  required/>
                   {this.validator.message('clave',matprima.codigo,'required')}
                 </div>
                 <div>
                   <input type="text" placeholder="Lote" name="lote" ref={this.loteRef} defaultValue={matprima.lote} required/>
-                  {this.validator.message('lote',matprima.lote,'required')}
+                  {this.validator.message('lote',this.state.materiaPrima.lote,'required')}
                 </div>
               </div>
-              <div className="form-control">
+              <div className="form-control grid">
+                <div>
+                <input type="number" name="cantidad" placeholder="Cantidad"  ref={this.cantidadRef} defaultValue={matprima.cantidad} required/>
+                {this.validator.message('cantidad',matprima.cantidad,'required')}
+                </div>
+                <div>
+                <select className="custom-select" ref={this.unidadRef} value={matprima.unidad!==undefined ? matprima.unidad.id : '' } onChange={this.cambiaUnidad}>
+                  {optnLst}
+                </select>
+                </div>
+              </div>
+              <div className="form-control grid">
+                <div>
                 <select value={matprima.proveedor!==undefined ? matprima.proveedor.id : '' } ref={this.proveedorRef} onChange={this.onChange}>
                   {
                     this.state.lstProv.map((prov,i)=>{
@@ -223,8 +284,13 @@ export default class Addmatprima extends Component {
                     })
                   }
                 </select>
+                </div>
+                <div>
+                  <input type="number" className="center" name="fc" ref={this.factconvRef} placeholder="Factor de Conversión" defaultValue={matprima.factorConversion} disabled={!this.state.showFC} />
+                {this.validator.message('fc',matprima.factorConversion,'required|numeric|min:0,num')}
+                </div>
               </div>
-              <div className="form-control"></div>
+              
             </div>
           </div>
           <div>

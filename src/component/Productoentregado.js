@@ -175,11 +175,12 @@ export default class Productoentregado extends Component {
               <col width="7%"/>
               <col width="8%"/>
               <col width="10%"/>
-              <col width="33%"/>
+              <col width="32%"/>
               <col width="8%"/>
               <col width="7%"/>
               <col width="8%"/>
-              <col width="19%"/>
+              <col width="6%"/>
+              <col width="14%"/>
             </colgroup>
             <thead>
               <tr>
@@ -190,6 +191,7 @@ export default class Productoentregado extends Component {
                 <th>Cliente</th>
                 <th>Piezas</th>
                 <th>Remisión</th>
+                <th>Tipo</th>
                 <th>Entrega</th>
               </tr>
             </thead>
@@ -198,6 +200,17 @@ export default class Productoentregado extends Component {
         <React.Fragment>
           <div className="table-ovfl-prodent tbl-lesshead ">
             <table className="table table-lst table-bordered">
+              <colgroup>
+                <col width="7%"/>
+                <col width="8%"/>
+                <col width="10%"/>
+                <col width="33%"/>
+                <col width="8%"/>
+                <col width="7%"/>
+                <col width="8%"/>
+                <col width="5%"/>
+                <col width="14%"/>
+              </colgroup>
               <tbody>
                 {this.state.pageOfItems.map((pent,i)=>{
                   return(
@@ -209,7 +222,8 @@ export default class Productoentregado extends Component {
                       <td>{pent.cliente}</td>
                       <td>{pent.piezasEntregadas}</td>
                       <td>{pent.remision}</td>
-                      <td>{momento(pent.fechaEntrega,'YYYY-MM-DD HH:mm:ss.sss').format('DD MMM YYYY HH:mm:ss')}</td>
+                      <td>{pent.tipoEntrega}</td>
+                      <td>{momento(pent.fechaEntrega).format('DD MMM YYYY HH:mm')}</td>
                     </tr>
                   );
                 })}

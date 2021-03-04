@@ -26,10 +26,21 @@ var Global = {
     CMPLT:'CMPLT',
     DELVRD:'DELVRD',
     EEP:'EEP',
+    CANCEL:'CANCEL',
     SIZE_DOC:8,
     SIZE_DOC_RED:6,
     PORCENTAJE_MAX:'100.00',
-    CODIGO_AGUA:'AGUA001'
+    CODIGO_AGUA:'AGUA001',
+    LITROS:'Litros',
+    MILILITROS:'Mililitros',
+    KILOS:'Kilos',
+    GRAMOS:'Gramos',
+    MAX_DAYS:30,
+    MIN_DAYS:15,
+    ENTREGA:'Entrega',
+    MERMA:'Merma',
+    E:'E',
+    M:'M'
 };
 
 export default Global

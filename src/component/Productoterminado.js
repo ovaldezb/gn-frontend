@@ -19,6 +19,7 @@ export default class Productoterminado extends Component {
   
   filterRef = React.createRef();  
   activosRef = React.createRef();
+  
   showTruck = false;
   isPrint= false;
   center = {textAlign:"center"}
@@ -26,13 +27,17 @@ export default class Productoterminado extends Component {
   cajasInt = 0;
   residual = 0;
   isModalActive = false;
+
   state = {
       lstPdrTerm:[],
       pageOfItems: [],
       lstPTEntregado:[],
+      lstSelected:[],
+      lstDirecciones:[],
       page:1,
       filtro: "",
-      idSelPt: -1
+      idSelPt: -1,
+      lstTipoEntrega:[]
       };
     right_top = {textAlign:'right',verticalAlign: 'top'};
     center_top = {textAlign:'center',verticalAlign: 'top'};
@@ -44,8 +49,14 @@ export default class Productoterminado extends Component {
   loadProdTerm(getActivos){
     Axios.get(Global.url+'prodterm'+(getActivos?'/activo':''),{ headers: authHeader() })
       .then( res =>{
+        let selected = [];
+        res.data.forEach((pt,i)=>{
+          selected[i] = false;
+        });
         this.setState({
-          lstPdrTerm:res.data
+          lstPdrTerm:res.data,
+          lstSelected:selected,
+          
         });
       })
       .catch(err => {
@@ -54,18 +65,26 @@ export default class Productoterminado extends Component {
   }
 
   deliverPT = () =>{
+    let lstte=[];
+    let direcciones=[];
+    
     var lstPTEntregado = this.state.lstPdrTerm.map(
       (mp,i) => { 
         if(document.getElementById('check'+i).checked){
+          lstte[i]=Global.E;
           mp.index = i;
+          direcciones[i]=0;
           return mp;
         }else{
           return null;
         }
       }
     ).filter(mp => mp!==null);
+    console.log(lstte);
     this.setState({
-      lstPTEntregado:lstPTEntregado
+      lstPTEntregado:lstPTEntregado,
+      lstTipoEntrega:lstte,
+      lstDirecciones:direcciones
     });
     this.isModalActive = true;
   }
@@ -82,9 +101,14 @@ export default class Productoterminado extends Component {
 
   selectRow = (i, activar) => {
     this.showTruck = activar;
+    let selected = this.state.lstSelected;
+    selected[i] = !this.state.lstSelected[i];
     this.setState({
-      idSelPt: ((this.state.page-1)*10) + i,
+      //idSelPt: ((this.state.page-1)*10) + i,
+      idSelPt: i,
+      lstSelected:selected
     });
+    document.getElementById('check'+i).checked = selected[i];
   };
 
   onChangePage = (pageOfItems,page) => {
@@ -131,16 +155,22 @@ export default class Productoterminado extends Component {
         ptent.noRemision = document.getElementById('noremision'+ptent.noConsecutivo).value;
         ptent.piezasEntregadas = document.getElementById('pzasent'+ptent.noConsecutivo).value;
         ptent.fechaRemision = momento(new Date()).format('YYYY-MM-DD HH:mm:ss.sss') ;
+        ptent.tipoEntrega = this.state.lstTipoEntrega[i] === Global.E ? Global.ENTREGA : Global.MERMA;
+        ptent.idDireccion = this.state.lstDirecciones[i];
         return ptent;
     });
-    
+    console.log(lstPtEntDelv);
+    const arr = this.state.lstTipoEntrega.filter(te=>te===Global.E);
     Axios.put(Global.url+'prodterm/dlvr',lstPtEntDelv,{ headers: authHeader() })
     .then(res =>{
       this.isModalActive = false;
       this.setState({
         lstPTEntregado:lstPtEntDelv
       });
-      this.printPT();
+      if(arr.length){
+        this.printPT();
+      }
+      
       this.loadProdTerm(true);
       this.state.lstPdrTerm.forEach((ptent,i)=>{
         document.getElementById('check'+i).checked = false;
@@ -227,6 +257,25 @@ export default class Productoterminado extends Component {
 
     this.setState({
       idSelPt:-1
+    });
+  }
+
+  cambiaTipoEntrega = (index)=>{
+    let lstte = this.state.lstTipoEntrega;
+    console.log(document.getElementById('selTE'+index).value,index);
+    lstte[index]=document.getElementById('selTE'+index).value
+    console.log(lstte);
+    this.setState({
+      tipoEntrega:document.getElementById('selTE'+this.state.idSelPt).value,
+      lstTipoEntrega:lstte
+    });
+  }
+
+  cambiaDireccion =(index)=>{
+    let direcciones = this.state.lstDirecciones;
+    direcciones[index] = document.getElementById('dire'+index).value;
+    this.setState({
+      lstDirecciones:direcciones
     });
   }
 
@@ -320,7 +369,7 @@ export default class Productoterminado extends Component {
                   <tbody>
                     {
                       this.state.pageOfItems.map((prodterm,i)=>{
-                        style = this.state.idSelPt === i ? "selected pointer":{};
+                        style = this.state.lstSelected[i] ? "selected pointer":{};
                         return(
                           <tr key={i} onClick={() => {this.selectRow(i,(prodterm.estatus.codigo === Global.WTDEL || prodterm.estatus.codigo === Global.EEP))}}  className={style}>
                             <td>{this.pad(prodterm.noConsecutivo,Global.SIZE_DOC_RED)}</td>
@@ -343,7 +392,7 @@ export default class Productoterminado extends Component {
             </div>
             {this.isModalActive && 
               <div className="modal fade show"  tabIndex="-1" role="dialog" style={{display:'block'}}>
-              <div className="modal-dialog modal-dialog-centered" role="document">
+              <div className="modal-dialog modal-dialog-centered" style={{maxWidth:'800px'}} role="document">
                 <div className="modal-content">
                   <div className="modal-header">
                     <h5 className="modal-title" id="exampleModalLabel">Remisión</h5>
@@ -359,9 +408,10 @@ export default class Productoterminado extends Component {
                             <th style={{textAlign:'center'}}>No OF</th>
                             <th style={{textAlign:'center'}}>Piezas a entregar</th>
                             <th style={{textAlign:'center'}}>Remisión</th>
+                            <th style={{textAlign:'center'}}>Tipo</th>
+                            <th style={{textAlign:'center'}}>Dirección</th>
                           </tr>
                         </thead>
-
                         <tbody>
                         {this.state.lstPTEntregado.map((pten,i)=>{
                           return(
@@ -369,6 +419,24 @@ export default class Productoterminado extends Component {
                               <td>{this.pad(pten.noConsecutivo,Global.SIZE_DOC)}</td>
                               <td><input type="number" className="input center" size='3' defaultValue={pten.piezas - pten.piezasEntregadas} id={'pzasent'+pten.noConsecutivo}/></td>
                               <td><input type="text"   className="input center" size='5' id={'noremision'+pten.noConsecutivo}/></td>
+                              <td>
+                                <select className="custom-select" id={'selTE'+i} onChange={()=>this.cambiaTipoEntrega(i)}>
+                                  <option value={Global.E}>Entrega</option>
+                                  <option value={Global.M}>Merma</option>
+                                </select>
+                              </td>
+                              <td>
+                              {(this.state.lstTipoEntrega[i]===Global.E) &&
+                                <select className="custom-select" id={'dire'+i} onChange={()=>this.cambiaDireccion(i)}>
+                                {pten.cliente.direccion.map((dir,i)=>{
+                                  return(
+                                    <option key={i} value={i}>{dir}</option>
+                                  );
+                                })}
+                              </select>
+                              }
+                              
+                              </td>
                             </tr>
                           );
                           
@@ -388,6 +456,9 @@ export default class Productoterminado extends Component {
             {this.state.idSelPt !==-1 && 
             <div id="print" style={{display:'none'}}>
             {this.state.lstPTEntregado.map((pt,i)=>{
+            if(this.state.lstTipoEntrega[i]==='M'){
+              return ('');
+            }else  
             return(
               <table className="table-main" key={i}>
                 <tbody>
@@ -444,7 +515,7 @@ export default class Productoterminado extends Component {
                         <tr>
                           <td>&nbsp;</td>
                           <td>Direccion:</td>
-                          <td>{pt.cliente.direccion}</td>
+                          <td>{pt.cliente.direccion[this.state.lstDirecciones[i]]}</td>
                         </tr>
                         <tr>
                           <td>&nbsp;</td>
