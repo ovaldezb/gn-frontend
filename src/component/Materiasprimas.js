@@ -7,7 +7,7 @@ import "moment/locale/es-mx";
 import momento from 'moment';
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {faPlusSquare, faEdit,  faTrash,} from "@fortawesome/free-solid-svg-icons";
+import {faPlusSquare, faEdit,  faTrash,faClipboardCheck} from "@fortawesome/free-solid-svg-icons";
 import Addmatprima from "./Addmatprima";
 import swal from "sweetalert";
 import Bitacora from '../services/bitacora-service';
@@ -29,6 +29,7 @@ export default class Materiasprimas extends Component {
   right = {textAlign:"right"}
   left = {textAlign:"left",fontSize:'12px'}
   sortDir = true;
+  isModalActive = false;
   state = {
     lstMatPrim: [],
     pageOfItems: [],
@@ -47,8 +48,12 @@ export default class Materiasprimas extends Component {
     axios
       .get(this.url + "matprima", { headers: authHeader() },{ responseType: 'application/json' })
       .then((res) => {
+        console.log(res.data);
         this.setState({
-          lstMatPrim: res.data,
+          lstMatPrim: res.data.map((mp,i)=>{
+            mp.nombreproveedor = mp.proveedor.nombre;
+            return mp;
+          }),
         });
         document.getElementById('checkini').checked = false;
         document.getElementById('checkmid').checked = false;
@@ -60,11 +65,6 @@ export default class Materiasprimas extends Component {
       });
   }
 
-  /*loadMatPrim=()=> {
-    
-    
-  }*/
-
   selectRow = (i) => {
     this.setState({
       idSelMp: i,
@@ -72,17 +72,17 @@ export default class Materiasprimas extends Component {
   };
 
   filtrado = () =>{
-    var filter = this.filterRef.current.value;
+    var filter = this.filterRef.current.value.toUpperCase();
     if(filter !== ''){
-    var nvoArray = this.state.lstMatPrim.filter(element =>{
-      return Object.values(element).filter(item=>{ return String(item).includes(filter)}).length > 0 
+    var nvoArray = this.state.pageOfItems.filter(element =>{
+      return Object.values(element).filter(item=>{ return String(item).toUpperCase().includes(filter)}).length > 0 
     });
     this.setState({
       pageOfItems:nvoArray
     });
    }else{
     this.setState({
-      pageOfItems:this.state.lstMatPrim
+      pageOfItems:this.state.lstMatPrim.slice((this.state.page-1)*10,((this.state.page-1)*10)+9)
     });
    }
   }
@@ -101,6 +101,7 @@ export default class Materiasprimas extends Component {
     this.displayAdd = true;
     this.isAdd = false;
     let i = this.state.idSelMp
+    console.log(this.state.pageOfItems[i]);
     this.setState({
       matprima:this.state.pageOfItems[i],
       idSelMp: -1
@@ -138,12 +139,12 @@ export default class Materiasprimas extends Component {
 
   cancelarAdd = (matprima) => {
     this.displayAdd = false;
-    if(matprima){
-      this.isAdd = false;
-    }else{
-      this.isAdd = true;
-    }
-    this.forceUpdate();
+    this.isAdd = true;
+    
+      //this.isAdd = false;
+      this.loadMatPrim();
+    
+    
   }
 
   sortCaducidad = ()=>{
@@ -191,6 +192,42 @@ export default class Materiasprimas extends Component {
     .catch(err=>{
       AuthService.isExpired(err.message);
     });
+  }
+
+  aproveMP = () =>{
+    if(!this.state.pageOfItems[this.state.idSelMp].aprobado){
+      swal({
+        title: "Desea aprobar la materia prima ["+this.state.pageOfItems[this.state.idSelMp].descripcion+"] para su uso?",
+        text: "Una vez aprobada, se podrá utilizar para generar los Lotes de Producto",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+      })
+      .then((approved) => {
+        if(approved){
+          let matprima = this.state.pageOfItems[this.state.idSelMp];
+          matprima.aprobado = true;
+          Axios.put(Global.url+'matprima/'+this.state.pageOfItems[this.state.idSelMp].id,matprima,{ headers: authHeader() })
+          .then(res=>{
+            swal('La materia prima ['+matprima.descripcion+'] ha sido aprobada');
+            this.loadMatPrim();
+          })
+          .catch(err=>{
+            AuthService.isExpired(err.message);
+          });
+        }
+      })
+    }
+  }
+
+  closeModal = () =>{
+    this.isModalActive = false;
+    this.forceUpdate();
+  }
+
+  detalleMP = () =>{
+    this.isModalActive = true;
+    this.forceUpdate();
   }
 
   buscaFin = ()=>{
@@ -256,15 +293,20 @@ export default class Materiasprimas extends Component {
         }else{
           styleFecCad = 'suficiente';
         }
-
+        
         return (
-          <tr key={i} onClick={() => {this.selectRow(i); }} className={style} >
-            <td style={this.left}>{matprim.descripcion}</td>
+          <tr key={i} onClick={() => {this.selectRow(i); }}  onDoubleClick={()=>{this.detalleMP()}} className={style} >
+            {matprim.aprobado &&
+            <td style={this.left} title={matprim.aprobado?'Aprobado':'Pendiente de aprobación'}><b>{matprim.descripcion}</b></td>
+            }
+            {!matprim.aprobado &&
+            <td style={this.left} title={matprim.aprobado?'Aprobado':'Pendiente de aprobación'}><i>{matprim.descripcion}</i></td>
+            }
             <td className={styleCell} style={{fontSize:'12px'}}><NumberFormat value={Number(matprim.cantidad).toFixed(2)} displayType={'text'} thousandSeparator={true} /> Kg</td>
             <td className={styleDisp} style={{fontSize:'12px'}}><NumberFormat value={Number(matprim.cantidad - matprim.apartado ).toFixed(2)} displayType={'text'} thousandSeparator={true} /> Kg</td>
             <td style={{fontSize:'12px'}}>{matprim.codigo}</td>
             <td style={{fontSize:'12px'}}>{matprim.lote}</td>
-            <td style={{fontSize:'12px'}}>{matprim.proveedor.nombre}</td>
+            <td style={{fontSize:'12px'}}>{matprim.nombreproveedor}</td>
             <td style={{fontSize:'12px'}}>{momento(matprim.fechaEntrada,'MM-DD-YYYY').format('DD MMM YYYY')}</td>
             <td className={styleFecCad} style={this.col7}><Moment fromNow>{fc}</Moment></td>
           </tr>
@@ -312,34 +354,96 @@ export default class Materiasprimas extends Component {
                     <ul>
                       <li>
                         <Link to="#" onClick={this.addMp}>
-                          <FontAwesomeIcon icon={faPlusSquare} />
+                          <FontAwesomeIcon icon={faPlusSquare} title="Agregar Materia Prima"/>
                         </Link>
                       </li>
                       <li>
+                        {this.state.idSelMp === -1 &&
+                        <Link to="#" >
+                          <FontAwesomeIcon icon={faEdit} title="Actualizar Materia Prima" style={{color:'grey'}} />
+                        </Link>
+                        }
+                        {this.state.idSelMp !== -1 &&
                         <Link to="#" onClick={this.updateMp}>
-                          <FontAwesomeIcon icon={faEdit} />
+                          <FontAwesomeIcon icon={faEdit} title="Actualizar Materia Prima" />
                         </Link>
+                        }
                       </li>
                       <li>
-                        <Link to="#" onClick={this.deleteMp} >
-                          <FontAwesomeIcon icon={faTrash} />
+                        {(this.state.idSelMp === -1 || this.state.pageOfItems[this.state.idSelMp].aprobado) && 
+                        <Link to="#" >
+                          <FontAwesomeIcon icon={faTrash} title="Eliminar Materia Prima" style={{color:'grey'}}/>
                         </Link>
+                        }
+                        {(this.state.idSelMp !== -1 && !this.state.pageOfItems[this.state.idSelMp].aprobado) && 
+                        <Link to="#" onClick={this.deleteMp} >
+                          <FontAwesomeIcon icon={faTrash} title="Eliminar Materia Prima"/>
+                        </Link>
+                        }
+                      </li>
+                      <li>
+                        {(this.state.idSelMp === -1 || this.state.lstMatPrim[this.state.idSelMp].aprobado) &&
+                        <Link to="#" >
+                        <FontAwesomeIcon icon={faClipboardCheck} style={{color:'grey'}}/>
+                        </Link>
+                        }
+                        {(this.state.idSelMp !== -1 && !this.state.lstMatPrim[this.state.idSelMp].aprobado) &&
+                        <Link to="#" onClick={this.aproveMP} >
+                        <FontAwesomeIcon icon={faClipboardCheck} title="Aprobar Materia Prima"/>
+                        </Link>
+                        }
                       </li>
                     </ul>
                   </nav>
                 </div>
               </div>
-
-              <table className="table table-bordered header-font">
+              {this.isModalActive && 
+              <div className="modal fade show"  tabIndex="-1" role="dialog" style={{display:'block'}}>
+                <div className="modal-dialog modal-dialog-centered" style={{maxWidth:'600px'}} role="document">
+                  <div className="modal-content">
+                    <div className="modal-header">
+                      <h5 className="modal-title" id="exampleModalLabel">Detalle de la Materia Prima {this.state.pageOfItems[this.state.idSelMp].descripcion}</h5>
+                      <button type="button" className="close" onClick={this.closeModal} data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div className="modal-body center-100" >
+                      <div style={{border:'1px solid blue',width:'104%',marginTop:'15px'}}>
+                      <table className="table" style={{width:'100%'}}>
+                        <tbody>
+                        <tr>
+                            <td>Fecha Creación:</td>
+                            <td>{momento(this.state.pageOfItems[this.state.idSelMp].fechaCreacion,'MM-DD-YYYY hh:mm:ss').format('DD-MMM-YYYY hh:mm:ss a')}</td>
+                          </tr>
+                          <tr>
+                            <td>Estatus:</td>
+                            <td>{this.state.pageOfItems[this.state.idSelMp].aprobado ? 'Aprobado':'Pendiente de Aprobación'}</td>
+                          </tr>
+                          <tr>
+                            <td>Observaciones:</td>
+                            <td>{this.state.pageOfItems[this.state.idSelMp].observaciones}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      </div>
+                    </div>
+                    <div className="modal-footer">
+                      <button type="button" className="btn btn-secondary" onClick={this.closeModal}>Cerrar</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              }
+              <table className="table table-bordered header-font" >
                 <colgroup>
-                  <col width="19%"/>
-                  <col width="8%"/>
-                  <col width="8%"/>
+                  <col width="21%"/>
+                  <col width="9%"/>
+                  <col width="9%"/>
                   <col width="9%"/>
                   <col width="12%"/>
-                  <col width="18%"/>
+                  <col width="16%"/>
                   <col width="12%"/>
-                  <col width="13%"/>
+                  <col width="11%"/>
                 </colgroup>
                 <thead className="thead-dark">
                   <tr>
@@ -349,27 +453,27 @@ export default class Materiasprimas extends Component {
                     <th style={this.center}>Código</th>
                     <th style={this.center}>Lote</th>
                     <th style={this.center}>Proveedor</th>
-                    <th style={this.center}>F. Ent</th>
+                    <th style={this.center}>F. Entrada</th>
                     <th style={this.center}><Link to="#" onClick={this.sortCaducidad}>Caducidad</Link></th>
                   </tr>
                 </thead>
               </table>
               <div className="table-ovfl-mp tbl-lesshead">
-                <table className="table table-bordered table-hover header-font" id="materiaprima">
+                <table className="table table-bordered table-hover header-font" style={{cursor:'pointer'}} id="materiaprima">
                   <colgroup>
-                  <col width="19%"/>
-                  <col width="8%"/>
-                  <col width="8%"/>
+                  <col width="21%"/>
+                  <col width="9%"/>
+                  <col width="9%"/>
                   <col width="9%"/>
                   <col width="12%"/>
-                  <col width="18%"/>
+                  <col width="16%"/>
                   <col width="12%"/>
-                  <col width="13%"/>
+                  <col width="11%"/>
                   </colgroup>
                   <tbody>{lstMp}</tbody>
                 </table>              
               </div>
-              <div className="center">
+              <div className="center" style={{marginTop:'-10px'}}>
               <Paginacion items={this.state.lstMatPrim} onChangePage={this.onChangePage} page={this.state.page}/>
               </div>
             </React.Fragment>

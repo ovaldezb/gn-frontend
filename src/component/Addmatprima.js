@@ -26,7 +26,7 @@ export default class Addmatprima extends Component {
   necesarioRef = React.createRef();
   tipoRef = React.createRef();
   factconvRef = React.createRef();
-  codigoOriginal = '';
+  
   state = {
     showFC:false,
     selectedDayEnt: null,
@@ -63,9 +63,10 @@ export default class Addmatprima extends Component {
       this.idMatPrima = this.props.matprima.id;
       this.fechaEntrada = this.props.matprima.fechaEntrada;
       this.fechaCaducidad = this.props.matprima.fechaCaducidad;
-      this.codigoOriginal = this.props.matprima.codigo;
       let matprim = this.props.matprima;
       matprim.cantidad = matprim.cantidadOriginal;
+      console.log(matprim);
+    
       this.setState({
         materiaPrima: matprim
       });
@@ -149,6 +150,7 @@ export default class Addmatprima extends Component {
       let matprim = this.state.materiaPrima;
       matprim.cantidadOriginal = matprim.cantidad;
       matprim.cantidad = matprim.cantidad * matprim.factorConversion;
+      matprim.fechaCreacion = Moment(new Date()).format('YYYY-MM-DD HH:mm:ss.sss') ;
       if(this.props.tipo){
         Axios.post(Global.url+'matprima',matprim,{ headers: authHeader() })
             .then(res => {
@@ -205,15 +207,20 @@ export default class Addmatprima extends Component {
     }
   }
 
-  validaClaveExiste = ()=>{
-    if(this.codigoOriginal !== this.state.materiaPrima.codigo ){
+  validaClaveExiste = ()=>{  
+    if(this.state.materiaPrima.codigo !== ''){
       Axios
-      .get(Global.url+'matprima/codigo/'+this.state.materiaPrima.codigo,{ headers: authHeader() })
+      .get(Global.url+'matprimdisp/'+this.state.materiaPrima.codigo,{ headers: authHeader() })
       .then(res=>{
-        if(res.data){
-          swal('El codigo '+this.state.materiaPrima.codigo+' ya existe!');
-          this.claveRef.current.value = this.codigoOriginal;
-        }
+          if(res.data){
+            let matprim = this.state.materiaPrima;
+            matprim.descripcion = res.data.descripcion;
+            matprim.unidad = res.data.unidad;
+            this.descripcionRef.current.value = res.data.descripcion;
+            this.setState({
+              materiaPrima:matprim
+            });
+          }
       })
       .catch(err=>{
         AuthService.isExpired(err.message);
@@ -249,7 +256,7 @@ export default class Addmatprima extends Component {
           <div>
             <div className="showcase-form card">
               <div className="form-control">
-                <input type="text" name="descripcion" placeholder="Descripción" ref={this.descripcionRef} defaultValue={matprima.descripcion}  onChange={this.onChage} required/>
+                <input type="text" name="descripcion" placeholder="Descripción" ref={this.descripcionRef} defaultValue={matprima.descripcion}   />
                 {this.validator.message('descripcion',matprima.descripcion,'required')}
               </div>
               <div className="form-control grid">

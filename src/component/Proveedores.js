@@ -149,33 +149,33 @@ export default class Proveedores extends Component {
                     </div>
                     <table className="table table-dark">
                         <colgroup>
-                            <col width="25%"/>
                             <col width="20%"/>
                             <col width="15%"/>
+                            <col width="15%"/>
                             <col width="20%"/>
-                            <col width="10%"/>
-                            <col width="10%"/>
+                            <col width="15%"/>
+                            <col width="15%"/>
                         </colgroup>
                         <thead>
                             <tr>
-                                <th style={{textAlign:'center'}}>Nombre</th>
-                                <th style={{textAlign:'center'}}>RFC</th>
-                                <th style={{textAlign:'center'}}>Teléfono P.</th>
-                                <th style={{textAlign:'center'}}>Correo</th>
-                                <th style={{textAlign:'center'}}>Contacto</th>
-                                <th style={{textAlign:'center'}}>Teléfono C.</th>
+                                <th className="font12" style={{textAlign:'center'}}>Nombre</th>
+                                <th className="font12" style={{textAlign:'center'}}>RFC</th>
+                                <th className="font12" style={{textAlign:'center'}}>Teléfono Principal</th>
+                                <th className="font12" style={{textAlign:'center'}}>Correo</th>
+                                <th className="font12" style={{textAlign:'center'}}>Contacto</th>
+                                <th className="font12" style={{textAlign:'center'}}>Teléfono Contacto</th>
                             </tr>
                         </thead>
                     </table>
                     <div className="table-ovfl tbl-lesshead">
-                        <table className="table table-hover table-bordered">
+                        <table className="table table-hover table-bordered" style={{cursor:'pointer'}}>
                             <colgroup>
-                                <col width="25%"/>
                                 <col width="20%"/>
                                 <col width="15%"/>
+                                <col width="15%"/>
                                 <col width="20%"/>
-                                <col width="10%"/>
-                                <col width="10%"/>
+                                <col width="15%"/>
+                                <col width="15%"/>
                             </colgroup>
                             <tbody>
                                 {this.state.pageOfItems.map((prov,i)=>{
@@ -187,12 +187,12 @@ export default class Proveedores extends Component {
                                     }
                                     return(
                                         <tr key={i} onClick={() => {this.selectRow(i); }} className={style} >
-                                            <td>{prov.nombre}</td>
-                                            <td>{prov.rfc}</td>
-                                            <td>{prov.telefonoPrincipal}</td>
-                                            <td>{prov.contactos[0].email}</td>
-                                            <td>{prov.contactos[0].nombre}</td>
-                                            <td>{prov.contactos[0].telefono}</td>
+                                            <td className="font12">{prov.nombre}</td>
+                                            <td className="font12">{prov.rfc}</td>
+                                            <td className="font12">{prov.telefonoPrincipal}</td>
+                                            <td className="font12">{prov.contactos[0].email}</td>
+                                            <td className="font12">{prov.contactos[0].nombre}</td>
+                                            <td className="font12">{prov.contactos[0].telefono}</td>
                                         </tr>
                                     );
                                 })}

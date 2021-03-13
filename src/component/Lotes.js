@@ -17,6 +17,7 @@ import NumberFormat from 'react-number-format';
 
 export default class Lotes extends Component {
   selAllRef = React.createRef();
+  filterRef = React.createRef();
   displayAdd = false;
   isComplete = false;
   isAdd = true;
@@ -37,7 +38,12 @@ export default class Lotes extends Component {
     .get(Global.url+'lote/'+buscaTodos,{ headers: authHeader() })
     .then(res=>{
       this.setState({
-        lstLotes:res.data
+        lstLotes:res.data.map((lt,i)=>{
+          lt.producto = lt.oc.producto.nombre;
+          lt.cliente = lt.oc.cliente.nombre;
+          lt.ordencompra = lt.oc.oc;
+          return lt;
+        })
       })
     })
     .catch(err=>{
@@ -86,6 +92,44 @@ export default class Lotes extends Component {
     }
   }
 
+  deleteLote = () =>{
+    swal({
+      title: "Desea eliminar el Lote "+this.state.lstLotes[this.state.idSelLt].lote+" ?",
+      text: "Una vez eliminado, no se podrá recuperar",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    })
+    .then((willDelete) => {
+      if(willDelete){
+        Axios.delete(Global.url+'lote/'+this.state.lstLotes[this.state.idSelLt].id,{ headers: authHeader() })
+        .then(res =>{
+          swal('El lote ha sido eliminado');
+          this.loadLotes(false);
+        })
+        .catch(err=>{
+          AuthService.isExpired(err.message);
+        });
+      }
+    })
+  }
+
+  filtrado = () =>{
+    var filter = this.filterRef.current.value.toUpperCase();
+    if(filter !== ''){
+    var nvoArray = this.state.lstLotes.filter(element =>{
+      return Object.values(element).filter(item=>{ return String(item).toUpperCase().includes(filter)}).length > 0 
+    });
+    this.setState({
+      pageOfItems:nvoArray.slice()
+    });
+   }else{
+    this.setState({
+      pageOfItems:this.state.lstLotes.slice((this.state.page-1)*10,((this.state.page-1)*10)+9)
+    });
+   }
+  }
+
   selectType = ()=>{
     this.loadLotes(this.selAllRef.current.checked);
   }
@@ -112,7 +156,7 @@ export default class Lotes extends Component {
                   <li><input className="input"  type="text"  name="filtro" ref={this.filterRef} onKeyUp={this.filtrado}/></li>
                   <li><input type="checkbox" ref={this.selAllRef} onChange={this.selectType} /></li>
                 </ul>
-                <h2>Lotes</h2>
+                <h2>Lotes de Producto</h2>
                 <nav>
                 <ul>
                   <li>
@@ -121,14 +165,28 @@ export default class Lotes extends Component {
                     </Link>
                   </li>
                   <li>
+                    {(this.state.idSelLt === -1 || this.state.pageOfItems[this.state.idSelLt].estatus !== Global.OPEN) &&
+                    <Link to="#" >
+                      <FontAwesomeIcon icon={faEdit} style={{color:'grey'}} />
+                    </Link>
+                    }
+                    {(this.state.idSelLt !== -1 && this.state.pageOfItems[this.state.idSelLt].estatus === Global.OPEN) &&
                     <Link to="#" onClick={this.editLote}>
                       <FontAwesomeIcon icon={faEdit} />
                     </Link>
+                    }
                   </li>
                   <li>
-                    <Link to="#" onClick={this.deleteLote}>
-                      <FontAwesomeIcon icon={faTrash} />
+                    {(this.state.idSelLt === -1 || this.state.pageOfItems[this.state.idSelLt].estatus !== Global.OPEN) &&
+                    <Link to="#" >
+                    <FontAwesomeIcon icon={faTrash} style={{color:'grey'}}/>
                     </Link>
+                    }
+                    {(this.state.idSelLt !== -1 && this.state.pageOfItems[this.state.idSelLt].estatus === Global.OPEN) &&
+                    <Link to="#" onClick={this.deleteLote}>
+                    <FontAwesomeIcon icon={faTrash}/>
+                    </Link>
+                    }
                   </li>
                 </ul>
               </nav>
@@ -155,7 +213,7 @@ export default class Lotes extends Component {
               </thead>
             </table>
             <div className="table-ovfl tbl-lesshead">
-            <table className="table table-bordered table-lst" id="ordenFabricacion">
+            <table className="table table-bordered table-lst table-hover" style={{cursor:'pointer'}} id="ordenFabricacion">
               <colgroup>
                 <col width="10%"/>
                 <col width="10%"/>
@@ -173,10 +231,10 @@ export default class Lotes extends Component {
                   }
                   return(
                     <tr key={i} onClick={() => {this.selectRow(i)}} onDoubleClick={()=>{this.changeSttus(i)}} className={style}>
-                      <td>{lote.oc.oc}</td>
+                      <td>{lote.ordencompra}</td>
                       <td style={{textAlign:'center'}}>{lote.lote}</td>
-                      <td>{lote.oc.producto.nombre}</td>
-                      <td>{lote.oc.cliente.nombre}</td>
+                      <td>{lote.producto}</td>
+                      <td>{lote.cliente}</td>
                       <td style={{textAlign:'center'}}><NumberFormat value={Number(lote.piezasLote)}displayType={'text'} thousandSeparator={true} /></td>
                       <td style={{textAlign:'center'}}>{lote.estatus}</td>
                     </tr> 
@@ -200,12 +258,12 @@ export default class Lotes extends Component {
         <div className="barnav">
           <div className="container flex-gn">
             <div></div>
-            <h2>Lotes</h2>
+            <h2>Lotes de Producto</h2>
             <nav>
               <ul>
                 <li>
                   <Link to="#" onClick={this.addLote}>
-                    <FontAwesomeIcon icon={faPlusSquare} />
+                    <FontAwesomeIcon icon={faPlusSquare} title="Agregar un nuevo lote de producto"/>
                   </Link>
                 </li>
               </ul>

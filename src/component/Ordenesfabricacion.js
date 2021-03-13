@@ -64,12 +64,11 @@ export default class Ordenesfabricacion extends Component {
 
   selectType = () =>{
     this.loadAactiveOF(this.selAllRef.current.checked);
-    
   }
 
   addOF = () => {
-      this.displayAdd = true;
-      this.forceUpdate();
+    this.displayAdd = true;
+    this.forceUpdate();
   }
 
   cancelarAdd = (ordenfab) =>{
@@ -92,19 +91,18 @@ export default class Ordenesfabricacion extends Component {
     .then((willDelete) => {
       if (willDelete) {
         axios.get(Global.url+'ordenfab/complete/'+this.state.pageOfItems[this.state.idSelOf].id,{ headers: authHeader() })
-            .then(res=>{
-              
-              //var mp = this.state.lstMatPrim[this.state.idSelMp];
-              //Bitacora(Global.DEL_MATPRIM,JSON.stringify(mp),'');
-              swal("La Orden de Fabricación ha sido completada!", {
-                icon: "success",
-              });
-              this.loadAactiveOF();
-            }).catch(
-              err =>{
-                AuthService.isExpired(err.message);
-              }
-            );
+        .then(res=>{
+          //var mp = this.state.lstMatPrim[this.state.idSelMp];
+          //Bitacora(Global.DEL_MATPRIM,JSON.stringify(mp),'');
+          swal("La Orden de Fabricación ha sido completada!", {
+            icon: "success",
+          });
+          this.loadAactiveOF();
+        }).catch(
+          err =>{
+            AuthService.isExpired(err.message);
+          }
+        );
       } 
     });
   }
@@ -353,7 +351,7 @@ export default class Ordenesfabricacion extends Component {
                 </thead>
               </table>
               <div className="table-ovfl table-hover tbl-lesshead">
-                <table className="table table-bordered table-lst" id="ordenFabricacion">
+                <table className="table table-bordered table-lst" style={{cursor:'pointer'}} id="ordenFabricacion">
                   <colgroup>
                   <col width="18%"/>
                   <col width="18%"/>
@@ -551,15 +549,12 @@ export default class Ordenesfabricacion extends Component {
           <div className="barnav">
               <div className="container flex-gn">
                 <ul>
-                  <li>Filtro:</li>
-                  <li><input className="input"  type="text"  name="filtro" ref={this.filterRef} onKeyUp={this.filtrado}/></li>
-                  <li><input type="checkbox" ref={this.selAllRef} onChange={this.selectType} /></li>
                 </ul>
                 <h2>Orden de Fabricación</h2>
                 <nav>
                   <ul>
                     <li>
-                      <Link to="#" onClick={this.addOF}><FontAwesomeIcon icon={faPlusSquare} /></Link>
+                      <Link to="#" onClick={this.addOF}><FontAwesomeIcon icon={faPlusSquare} title="Agregar orde de fabricación" /></Link>
                     </li>
                   </ul>
                 </nav>

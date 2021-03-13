@@ -80,7 +80,7 @@ export default class Productoterminado extends Component {
         }
       }
     ).filter(mp => mp!==null);
-    console.log(lstte);
+
     this.setState({
       lstPTEntregado:lstPTEntregado,
       lstTipoEntrega:lstte,
@@ -124,7 +124,7 @@ export default class Productoterminado extends Component {
     }
   }
 
-  entregaProductos = () =>{
+  entregaProductos = async () =>{
     let isEmptyPzas = false;
     let of = '';
     let isEmptyRemi = false;
@@ -151,6 +151,36 @@ export default class Productoterminado extends Component {
       return;
     }
 
+    /* Validar repetidos en la remision al solicitarlos */
+    let arrayRemision = this.state.lstPTEntregado.map((ptent,i)=>{
+      return document.getElementById('noremision'+ptent.noConsecutivo).value;
+    })
+    let duplicados = [];
+    let sortedArray = arrayRemision.sort();
+    for(let i=0;i<sortedArray.length;i++){
+      if(sortedArray[i+1]===sortedArray[i]){
+        duplicados.push(sortedArray[i]);
+      }
+    }
+    
+    if(duplicados.length === 1){
+      swal('La remision '+duplicados[0]+' está duplicada');
+      return;
+    }else if(duplicados.length > 1){
+      swal('Las remisiones '+duplicados.toString()+' estan duplicadas');
+      return;
+    }
+
+    /* Validar las remisiones en la BD */
+    const existen = await this.validaRemision(arrayRemision);
+    if(existen.length === 1){
+      swal('La remision '+existen[0]+' está duplicada');
+      return;
+    }else if(existen.length > 1){
+      swal('Las remisiones '+existen.toString()+' estan duplicadas');
+      return;
+    }
+
     let lstPtEntDelv = this.state.lstPTEntregado.map((ptent,i) =>{
         ptent.noRemision = document.getElementById('noremision'+ptent.noConsecutivo).value;
         ptent.piezasEntregadas = document.getElementById('pzasent'+ptent.noConsecutivo).value;
@@ -159,7 +189,7 @@ export default class Productoterminado extends Component {
         ptent.idDireccion = this.state.lstDirecciones[i];
         return ptent;
     });
-    console.log(lstPtEntDelv);
+    
     const arr = this.state.lstTipoEntrega.filter(te=>te===Global.E);
     Axios.put(Global.url+'prodterm/dlvr',lstPtEntDelv,{ headers: authHeader() })
     .then(res =>{
@@ -180,60 +210,42 @@ export default class Productoterminado extends Component {
       AuthService.isExpired(err.message);
     });
   }
+
+  validaRemision = async (arrayRemision) =>{
+    let arrayRemExiste = [];
+    for(let i=0;i<arrayRemision.length;i++){
+      const result = await  Axios.get(Global.url+'prodent/rem/'+arrayRemision[i],{ headers: authHeader() });
+      if(result.data.id){
+        arrayRemExiste.push(arrayRemision[i]);
+      }
+    }
+    return arrayRemExiste;
+  }
   
   printPT = () =>{
     let printwind = window.open("");
     let estilos = '<style> '+
     '@media print{'+
-     ' .table-main{'+
-     '   border-collapse: collapse;'+
-     '   width: 100%;'+
-     '   font-size: 14px;'+
-     '   font-family: Arial, Helvetica, sans-serif;'+
-     '   padding: 0;'+
-     ' }'+
-     ' .table-0{'+
-     '   border: 2px solid black;'+
-     '   border-collapse: collapse;'+
-     '   width: 100%;'+
-     '   height: 157px;'+
-     '   margin-bottom: 0px;'+
-     '   margin-right: 0px;'+
-     ' }'+
-     ' .table-1{'+
-     '   border-collapse: collapse;'+
-     '   width: 101.5%;'+
-     '   height: 157px;'+
-     '   margin-bottom: 0px;'+
-     '   margin-left: -3px;'+
-     '  }'+
-    ' .table-1 td{'+
-    '   border: 2px solid black;'+
+    ' .left{'+
+    '   border-left: 2px solid black;'+
     ' }'+
-    ' .table-2{'+
-    '   border: 2px solid black;'+
-    '   border-collapse: collapse;'+
-    '   width: 100%;'+
-    '   margin-top: -3px;'+
-    '   height: 100px;'+
-    '  }'+  
-    ' .table-3{'+
-    '   border-collapse: collapse;'+
-    '   width: 100%;'+
-    '   height: 350px;'+
-    '   margin-top: -3px;'+
-    '  }'+
-    ' .table-3 td, th{'+
-    '   border: 2px solid black;'+
+    ' .right{'+
+    '   border-right: 2px solid black;'+
     ' }'+
-    ' .width30{'+
-    '   width:30%;'+
-    '  }'+
-    ' .width70{'+
-    '   width:70%;'+
-    '  }'+
-    ' .center{'+
-    '  text-align:center;'+
+    ' .top{'+
+    '   border-top: 2px solid black;'+
+    ' }'+
+    ' .bottom{'+
+    '   border-bottom: 2px solid black;'+
+    ' }'+
+    ' .font14{'+
+    '   font-size: 14px;'+
+    ' }'+
+    ' .font12{'+
+    '   font-size: 12px;'+
+    ' }'+
+    ' .font10{'+
+    '   font-size: 10px;'+
     ' }'+
     '}'+
     '</style>';
@@ -262,9 +274,7 @@ export default class Productoterminado extends Component {
 
   cambiaTipoEntrega = (index)=>{
     let lstte = this.state.lstTipoEntrega;
-    console.log(document.getElementById('selTE'+index).value,index);
     lstte[index]=document.getElementById('selTE'+index).value
-    console.log(lstte);
     this.setState({
       tipoEntrega:document.getElementById('selTE'+this.state.idSelPt).value,
       lstTipoEntrega:lstte
@@ -354,7 +364,7 @@ export default class Productoterminado extends Component {
                 </thead>
               </table>
               <div className="table-ovfl tbl-lesshead">
-                <table className="table table-lst table-bordered">
+                <table className="table table-lst table-bordered table-hover" style={{cursor:'pointer'}}>
                   <colgroup>
                   <col width="7%"/>
                   <col width="30%"/>
@@ -435,7 +445,6 @@ export default class Productoterminado extends Component {
                                 })}
                               </select>
                               }
-                              
                               </td>
                             </tr>
                           );
@@ -460,109 +469,68 @@ export default class Productoterminado extends Component {
               return ('');
             }else  
             return(
-              <table className="table-main" key={i}>
-                <tbody>
-                  <tr>
-                    <td className="width70">
-                      <table className="table-0" border="1">
-                        <tbody>
-                          <tr>
-                            <td className="width30" rowSpan="3">
-                              <img src={Logo} alt="" width="90%" />
-                            </td>
-                            <td className="width70 center"><b>Grupo Nordan S.A. de C.V.</b></td>
-                          </tr>
-                          <tr>
-                            <td colSpan="2"><h6>FRONTERA No 12, Col A. OBREGON TEL (722)2714460/61</h6></td>
-                          </tr>
-                          <tr>
-                            <td colSpan="2"><h6>SAN MATEO ATENCO, ESTADO DE MEXICO</h6></td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </td>
-                    <td className="width30">
-                      <table className="table-1">
-                        <tbody>
-                          <tr>
-                            <td><b>Remisión #</b></td>
-                            <td className="center">{pt.noRemision}</td>
-                          </tr>
-                          <tr>
-                            <td colSpan="2"><b>Fecha</b></td>
-                          </tr>
-                          <tr>
-                            <td colSpan="2"><Clock format={'DD-MMMM-YYYY'} ticking={false}  /></td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td colSpan="2">
-                      <table className="table-2">
-                        <colgroup>
-                          <col width="20%" />
-                          <col width="15%" />
-                          <col width="65%" />
-                        </colgroup>
-                        <tbody>
-                        <tr>
-                          <td>&nbsp;</td>
-                          <td>Cliente:</td>
-                          <td>{pt.cliente.nombre}</td>
-                        </tr>
-                        <tr>
-                          <td>&nbsp;</td>
-                          <td>Direccion:</td>
-                          <td>{pt.cliente.direccion[this.state.lstDirecciones[i]]}</td>
-                        </tr>
-                        <tr>
-                          <td>&nbsp;</td>
-                          <td>RFC:</td>
-                          <td>{pt.cliente.rfc}</td>
-                        </tr>
-                      </tbody>
-                    </table>
+              <React.Fragment>
+              <table style={{borderCollapse:'separate', borderSpacing:'0em'}} key={i} >
+                <tr>
+                  <td style={{width: '4.0cm'}} className="left top bottom" colSpan="2" rowSpan="3">
+                    <img src={Logo} alt="" width="90%"/>
                   </td>
+                  <td style={{width: '9.6cm', height: '0.5cm'}} className="top right font12" colSpan="7"><b>GRUPO NORDAN S.A. DE C.V.</b></td>
+                  <td style={{width: '1.8cm'}} className="top bottom right font12" >Remision #</td>
+                  <td style={{width: '2.0cm'}} className="top bottom right font12">{pt.noRemision}</td>
                 </tr>
                 <tr>
-                  <td colSpan="2">
-                    <div>
-                      <table className="table-3">
-                        <thead>
-                          <tr>
-                            <th>Cantidad</th>
-                            <th>Clave</th>
-                            <th>Descripcion</th>
-                            <th>OC</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr key={i}>
-                            <td style={this.center_top}>{pt.piezasEntregadas}</td>
-                            <td style={this.center_top}>{pt.clave}</td>
-                            <td style={this.left_top}>
-                              <p>{pt.producto.nombre}</p>
-                              <p>Lote:{pt.lote}</p>
-                              <p>
-                                {Math.floor(pt.piezas / pt.producto.prodxcaja)} CAJAS C/{pt.producto.prodxcaja} PZAS&nbsp;
-                                {(pt.piezas - (Math.floor(pt.piezas / pt.producto.prodxcaja))*pt.producto.prodxcaja) > 0 &&
-                                  <React.Fragment>
-                                    C/UNA MAS CON UN RESTO DE {pt.piezas - (Math.floor(pt.piezas / pt.producto.prodxcaja))*pt.producto.prodxcaja} PZAS
-                                  </React.Fragment>
-                                }
-                              </p>
-                            </td>
-                            <td style={this.center_top}>{pt.oc}</td>
-                          </tr>  
-                        </tbody>
-                      </table>
-                    </div>
-                  </td>
+                  <td className="font12 right" style={{width:'0.6cm'}} colSpan="7">FRONTERA No 12, Col A. OBREGON TEL (722)2714460/61</td>
+                  <td colspan="2" className="font12 right bottom">FECHA</td>
                 </tr>
-                </tbody>
+                <tr>
+                  <td className="font12 bottom right" style={{width:'0.5cm'}} colSpan="7">SAN MATEO ATENCO, ESTADO DE MEXICO</td>
+                  <td colspan="2" className="font12 bottom right"><Clock format={'DD-MM-YYYY'} ticking={false}  /></td>
+                </tr>
+                <tr>
+                  <td className="left" style={{width: '2.0cm', height: '0.5cm'}}>&nbsp;</td>
+                  <td className="font12" style={{width: '2.0cm'}}>CLIENTE</td>
+                  <td className="right font12" colSpan="9">{pt.cliente.nombre}</td>
+                </tr>
+                <tr>
+                  <td className="left bottom" style={{width: '2.0cm', height: '0.5cm'}}>&nbsp;</td>
+                  <td className="font12 bottom" style={{width: '2.0cm'}}>DIRECCION</td>
+                  <td className="bottom right font12" colSpan="9">{pt.cliente.direccion[this.state.lstDirecciones[i]]}</td>
+                </tr>
+                <tr>
+                  <td className="font12 left bottom right" style={{height: '0.5cm'}}>CANTIDAD</td>
+                  <td className="font12 bottom right">CLAVE</td>
+                  <td className="font12 bottom right" colSpan="8">DESCRIPCION</td>
+                  <td className="font12 bottom right" style={{textAlign: 'center'}}>OC</td>
+                </tr>
+                <tr>
+                  <td className="font12 left right" style={{height: '1.0cm',textAlign:'right'}}> {pt.piezasEntregadas} </td>
+                  <td className="font12 right" style={{textAlign:'center'}}>{pt.clave}</td>
+                  <td className="font10 right" colspan="8">{pt.producto.nombre}</td>
+                  <td className="font12 right" style={{textAlign:'center'}}>{pt.oc}</td>
+                </tr>
+                <tr>
+                  <td className="left right" style={{height: '1.0cm'}}>&nbsp;</td>
+                  <td className="right">&nbsp;</td>
+                  <td className="font10" style={{width: '2.5cm'}}># Cajas/Paquetes</td>
+                  <td className="font10"><b>{Math.floor(pt.piezas / pt.producto.prodxcaja)}</b></td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td className="font10" style={{width: '1.0cm'}}>Pzas x Caja/Paquete</td>
+                  <td className="font10" style={{textAlign: 'center'}}><b>{pt.producto.prodxcaja}</b></td>
+                  <td className="font10" style={{textAlign:'right'}}>Resto</td>
+                  <td className="font10 right"><b>{pt.piezas - (Math.floor(pt.piezas / pt.producto.prodxcaja))*pt.producto.prodxcaja}</b></td>
+                  <td className="right">&nbsp;</td>
+                </tr>
+                <tr>
+                  <td className="left right bottom" style={{height: '0.8cm'}}>&nbsp;</td>
+                  <td className="right bottom">&nbsp;</td>
+                  <td className="right bottom font10" colSpan="8" >Lote: {pt.lote}</td>
+                  <td className="right bottom">&nbsp;</td>
+                </tr>
               </table>
+              <br></br>
+              </React.Fragment>
               );
             })}
             </div>

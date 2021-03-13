@@ -13,7 +13,6 @@ import Bitacora from '../services/bitacora-service';
 export default class Addproddisp extends Component {
     style = {};
     styleBusSel={}
-    styleTblBus = {width:"100%"};
     col1B={width:"20%"};
     col2B={width:"60%"};
     col3B={width:"20%"};
@@ -381,7 +380,7 @@ export default class Addproddisp extends Component {
             </div>
             {this.state.lstBusqDesc.length > 0 &&
             <div  style={styleBusqueda}>
-                <table className="table " style={this.styleTblBus}>
+                <table className="table table-hover " style={{width:'100%',cursor:'pointer'}}>
                   <colgroup>
                     <col width="25%"/>
                     <col width="60%"/>

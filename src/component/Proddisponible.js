@@ -182,14 +182,28 @@ export default class Proddisponible extends Component {
                                   </Link>
                                 </li>
                                 <li>
+                                  {this.state.idSelPd === -1 &&
+                                  <Link to="#">
+                                    <FontAwesomeIcon icon={faEdit} style={{color:'grey'}}/>
+                                  </Link>
+                                  }
+                                  {this.state.idSelPd !== -1 &&
                                   <Link to="#" onClick={this.updatePd}>
                                     <FontAwesomeIcon icon={faEdit} />
                                   </Link>
+                                  }
                                 </li>
                                 <li>
+                                  {this.state.idSelPd === -1 &&
+                                  <Link to="#" >
+                                    <FontAwesomeIcon icon={faTrash}  style={{color:'grey'}} />
+                                  </Link>
+                                  }
+                                  {this.state.idSelPd !== -1 &&
                                   <Link to="#" onClick={this.deletePd} >
                                     <FontAwesomeIcon icon={faTrash} />
                                   </Link>
+                                  }
                                 </li>
                               </ul>
                             </nav>
@@ -206,7 +220,7 @@ export default class Proddisponible extends Component {
                           </thead>
                         </table>
                         <div className="table-ovfl tbl-lesshead">
-                          <table className="table" id="materiaprima">
+                          <table className="table table-hover" style={{cursor:'pointer'}} id="materiaprima">
                             <tbody>{lstMp}</tbody>
                           </table>              
                         </div>
@@ -232,11 +246,11 @@ export default class Proddisponible extends Component {
               <div className="container">
                 <div className="barnav">
                   <div className="container flex-gn">
-                    <div></div>
+                  <h2 className="center">Producto Disponible</h2>
                     <nav>
                       <ul>
                         <li>
-                          <Link to="#" onClick={this.addPd}><FontAwesomeIcon icon={faPlusSquare} /></Link>
+                          <Link to="#" onClick={this.addPd} title="Agregar un nuevo producto disponible"><FontAwesomeIcon icon={faPlusSquare} /></Link>
                         </li>
                       </ul>
                     </nav>

@@ -179,7 +179,7 @@ export default class Clientes extends Component {
                         </thead>
                     </table>
                     <div className="table-ovfl tbl-lesshead">
-                        <table className="table table-hover">
+                        <table className="table table-hover table-lst" style={{cursor:'pointer'}}>
                             <colgroup>
                                 <col width="20%"/>
                                 <col width="20%"/>

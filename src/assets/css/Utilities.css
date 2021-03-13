@@ -120,7 +120,7 @@
 }
 
 .table-ovfl-mp {
-  height: 463px;
+  height: 490px;
   overflow: auto;
 }
 
@@ -167,6 +167,10 @@
 
 .nav-bg{
   background-color: rgba(188, 221, 229, 0.774);
+}
+
+.font12{
+  font-size: 12px;
 }
 
 /*Switch*/

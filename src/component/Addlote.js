@@ -64,6 +64,10 @@ export default class Addlote extends Component {
             swal("Las piezas de esta OF ya se encuentran en lotes");
             this.ocRef.current.value = '';
             return;
+          }else if(res.data.estatus === Global.CANCEL){
+            swal('Esta Orden de Compra ha sido Cancelada, no se pueden generar mas Lotes');
+            this.ocRef.current.value = '';
+            return;
           }
           this.setState({
             oc:res.data
@@ -78,8 +82,6 @@ export default class Addlote extends Component {
       });
     }
   }
-
-  
 
   validarLote = ()=>{
     if(this.state.lote.piezasLote !== ''){
@@ -132,16 +134,26 @@ export default class Addlote extends Component {
         },
         materiaprima:this.state.lstMatPrimResp
       }
-      Axios.post(Global.url+'lote',lote,{ headers: authHeader() })
-      .then(res=>{
-        console.log(res.data);
-        if(res.data){
-          swal('El lote se ha creado',this.state.lote.numero,'success');
-          this.cancelarLote();
+      Axios.get(Global.url+'lote/existe'+lote.lote,{ headers: authHeader() })
+      .then(resl=>{
+        if(resl.data.length===0){
+          Axios.post(Global.url+'lote',lote,{ headers: authHeader() })
+          .then(res=>{
+            if(res.data){
+              swal('El lote se ha creado',this.state.lote.numero,'success');
+              this.cancelarLote();
+            }
+          })
+          .catch(err=>{
+            AuthService.isExpired(err.message);
+          });
+        }else{
+          swal('El lote '+lote.lote+' ya existe, no se pueden generar dos lotes con el mismo número');
+          return;
         }
       })
-      .catch(err=>{
-        AuthService.isExpired(err.message);
+      .catch(errl =>{
+        AuthService.isExpired(errl.message);
       });
     }
   }
@@ -187,7 +199,7 @@ export default class Addlote extends Component {
     return (
       <React.Fragment>
         <form onSubmit={this.enviarFormulario} onChange={this.enviarFormulario}>
-          <h3 className="center">Lote</h3>  
+          <h3 className="center">Lote de Producto</h3>  
           <div className="showcase-form card">
             <div className="form-control grid-3">
               <input type="text" name="oc" placeholder="Orden de Compra" onKeyUp={this.onbtieneOC} ref={this.ocRef} defaultValue={lote.oc.oc}/>

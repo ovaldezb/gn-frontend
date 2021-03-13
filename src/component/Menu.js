@@ -70,7 +70,7 @@ export default class Menu extends Component {
                 <li>
                   <Link to={"/lotes"}>
                     <span>
-                      <FontAwesomeIcon icon={faClipboardList} className="icon-menu" /> Lotes
+                      <FontAwesomeIcon icon={faClipboardList} className="icon-menu" /> Lotes de Producto
                     </span>
                   </Link>
                 </li>
