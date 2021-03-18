@@ -53,7 +53,7 @@ class Login extends Component {
               swal("Ocurrio un error","Verifique su usario y contraseña",'error');
             }
         }).catch((err) => {
-          console.log(err);
+          
           this.setState({
             status: "error"
           });

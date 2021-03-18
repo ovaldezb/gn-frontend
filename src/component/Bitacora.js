@@ -50,7 +50,6 @@ export default class Bitacora extends Component {
   }
 
   dblClick = (i) => {
-    //console.log('dbl click',this.state.lstBitac[(this.state.page-1)*10 + i]);
     Axios.get(Global.url+'bitacora/'+this.state.lstBitac[(this.state.page-1)*10 + i].id,{headers:authHeader()})
       .then(res =>{
         this.setState({

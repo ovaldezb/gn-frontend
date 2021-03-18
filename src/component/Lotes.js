@@ -10,7 +10,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPlusSquare,
   faEdit,
-  faTrash
+  faTrash,faCheckDouble
 } from "@fortawesome/free-solid-svg-icons";
 import Paginacion from './Paginacion';
 import NumberFormat from 'react-number-format';
@@ -188,6 +188,18 @@ export default class Lotes extends Component {
                     </Link>
                     }
                   </li>
+                  <li>
+                    {(this.state.idSelLt === -1 || this.state.pageOfItems[this.state.idSelLt].estatus !== Global.OPEN) && 
+                    <Link to="#" >
+                      <FontAwesomeIcon icon={faCheckDouble} style={{color:'grey'}} />
+                    </Link>
+                    }
+                    {(this.state.idSelLt !== -1 && this.state.pageOfItems[this.state.idSelLt].estatus === Global.OPEN) && 
+                    <Link to="#" onClick={this.changeSttus} >
+                      <FontAwesomeIcon icon={faCheckDouble} />
+                    </Link>
+                    }
+                  </li>
                 </ul>
               </nav>
               </div>
@@ -230,7 +242,7 @@ export default class Lotes extends Component {
                     style = "";
                   }
                   return(
-                    <tr key={i} onClick={() => {this.selectRow(i)}} onDoubleClick={()=>{this.changeSttus(i)}} className={style}>
+                    <tr key={i} onClick={() => {this.selectRow(i)}} className={style}>
                       <td>{lote.ordencompra}</td>
                       <td style={{textAlign:'center'}}>{lote.lote}</td>
                       <td>{lote.producto}</td>
@@ -257,7 +269,11 @@ export default class Lotes extends Component {
       <React.Fragment>
         <div className="barnav">
           <div className="container flex-gn">
-            <div></div>
+            <ul>
+              <li>Filtro:</li>
+              <li><input className="input"  type="text"  name="filtro" ref={this.filterRef} onKeyUp={this.filtrado}/></li>
+              <li><input type="checkbox" ref={this.selAllRef} onChange={this.selectType} /></li>
+            </ul>
             <h2>Lotes de Producto</h2>
             <nav>
               <ul>

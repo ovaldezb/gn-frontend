@@ -60,15 +60,30 @@ export default class Addordencompra extends Component {
   }
 
   buscaCliente = (event) =>{
-    if(event.keyCode === 13){
-      Axios.get(Global.url+'cliente/'+(this.clienteRef.current.value === '' ? 'vacio':this.clienteRef.current.value),{ headers: authHeader() })
+    if(event.keyCode === 13 && this.clienteRef.current.value ===''){
+      Axios.get(Global.url+'cliente/vacio',{ headers: authHeader() })
       .then(res =>{
-        if(res.data.length === 1){
+        this.setState({
+          lstCliente:res.data
+        });
+      })
+      .catch(err=>{  
+        console.log(err);
+        AuthService.isExpired(err.message); });
+    }else if(this.clienteRef.current.value !==''){
+      Axios.get(Global.url+'cliente/'+this.clienteRef.current.value.toUpperCase(),{ headers: authHeader() })
+      .then(res =>{
+        if(res.data.length === 0){
+          this.setState({
+            lstCliente:[]
+          });
+        }else if(res.data.length === 1){
           let oc = this.state.ordencompra;
           oc.cliente = res.data[0];
           this.setState({
             ordencompra:oc,
-            idCliente:res.data[0].id
+            idCliente:res.data[0].id,
+            lstCliente:[]
           });
           this.getProdByCliente(res.data[0].id);
         }else if(res.data.length > 1){
@@ -78,6 +93,10 @@ export default class Addordencompra extends Component {
         }
       })
       .catch(err=>{  AuthService.isExpired(err.message); });
+    }else{
+      this.setState({
+        lstCliente:[]
+      });
     }
   }
 
@@ -315,7 +334,7 @@ export default class Addordencompra extends Component {
               </div>
               <div className="form-control grid">
                 <div>
-                  <input type="text" name="cliente" placeholder="Cliente" ref={this.clienteRef} value={ordencompra.cliente.nombre} onKeyUp={this.buscaCliente} onChange={this.occhange}/>   
+                  <input type="text"  placeholder="Cliente" ref={this.clienteRef} value={ordencompra.cliente.nombre} onKeyUp={this.buscaCliente} onChange={this.occhange}/>   
                   {this.validator.message('cliente',ordencompra.cliente.nombre,'required')}
                   {this.state.lstCliente.length > 1 &&
                   <div className="cli-search">

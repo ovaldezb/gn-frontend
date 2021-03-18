@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPlusSquare,
   faEdit,
-  faTrash, faClipboardCheck,faPrint
+  faTrash, faCheckDouble,faPrint
 } from "@fortawesome/free-solid-svg-icons";
 import Paginacion from './Paginacion';
 import Addordenfab from "./Addordenfab";
@@ -82,7 +82,7 @@ export default class Ordenesfabricacion extends Component {
 
   completeOF = () =>{
     swal({
-      title: "Desea completar la Orden de Fabricacón: "+this.pad(this.state.pageOfItems[this.state.idSelOf].noConsecutivo,Global.SIZE_DOC)+"?",
+      title: "Desea completar la Orden de Fabricación: "+this.pad(this.state.pageOfItems[this.state.idSelOf].noConsecutivo,Global.SIZE_DOC)+"?",
       text: "Una vez completado, pasará a Producto Terminado",
       icon: "warning",
       buttons: true,
@@ -256,7 +256,7 @@ export default class Ordenesfabricacion extends Component {
             <td style={this.center}>
               <Link to="#" onClick={this.completeOF} >
               {this.isComplete && this.state.idSelOf === i &&
-                <FontAwesomeIcon icon={faClipboardCheck} size="2x" className="icon" />
+                <FontAwesomeIcon icon={faCheckDouble} size="2x" className="icon" />
               }
               </Link>
             </td>
@@ -318,10 +318,10 @@ export default class Ordenesfabricacion extends Component {
                       <li>                        
                         <Link to="#" onClick={this.completeOF} title="Completa la OF Seleccionada">
                         {!this.isComplete &&
-                          <FontAwesomeIcon icon={faClipboardCheck} style={{color:'grey'}}/>
+                          <FontAwesomeIcon icon={faCheckDouble} style={{color:'grey'}}/>
                         }
                         {this.isComplete &&
-                          <FontAwesomeIcon icon={faClipboardCheck} />
+                          <FontAwesomeIcon icon={faCheckDouble} />
                         }
                         </Link>                        
                       </li>
@@ -549,6 +549,9 @@ export default class Ordenesfabricacion extends Component {
           <div className="barnav">
               <div className="container flex-gn">
                 <ul>
+                  <li>Filtro:</li>
+                  <li><input className="input"  type="text"  name="filtro" ref={this.filterRef} onKeyUp={this.filtrado}/></li>
+                  <li><input type="checkbox" ref={this.selAllRef} onChange={this.selectType} /></li>
                 </ul>
                 <h2>Orden de Fabricación</h2>
                 <nav>

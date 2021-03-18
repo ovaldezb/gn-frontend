@@ -69,12 +69,13 @@ export default class Proddisponible extends Component {
   }
 
   updateLstPd(prddisp){
-    let lstTmp = this.state.lstPrdDisp; 
+    //let lstTmp = this.state.lstPrdDisp; 
     let prddispAnt = this.state.lstPrdDisp[this.state.idSelPd];
-    lstTmp[this.state.idSelPd] = prddisp;
-    this.setState({
+    //lstTmp[this.state.idSelPd] = prddisp;
+    /*this.setState({
       lstPrdDisp:lstTmp
-    });
+    });*/
+    this.loadProdDisp();
     Bitacora(Global.UPDT_PRDDISP,JSON.stringify(prddispAnt),JSON.stringify(prddisp));
     this.isAdd = true;
   }
@@ -83,15 +84,16 @@ export default class Proddisponible extends Component {
     this.displayAdd = false;
     if(prddisp){
         if(this.isAdd){
-            this.state.lstPrdDisp.push(prddisp);
-            this.setState({
-                lstPrdDisp:this.state.lstPrdDisp
-            });
+            //this.state.lstPrdDisp.push(prddisp);
+            //this.setState({
+            //    lstPrdDisp:this.state.lstPrdDisp
+            //});
+            this.loadProdDisp();
         }else{
             this.updateLstPd(prddisp);
         }
     }
-    this.forceUpdate();
+    //this.forceUpdate();
   }
 
   deletePd = () => {

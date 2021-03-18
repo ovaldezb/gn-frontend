@@ -176,7 +176,6 @@ export default class Usuarios extends Component {
           { headers: authHeader() }
         )
           .then((res) => {
-            console.log(res.status);
             if (res.status === Global.HTTP_OK) {
               Bitacora(
                 Global.ADD_USER,

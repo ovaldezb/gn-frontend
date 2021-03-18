@@ -1,9 +1,9 @@
 .container-gn {
   max-width: 1200px;
-  margin: 0 auto;
+  margin-left: -30px;
   overflow: auto;
   padding: 0 40px;
-  width: 100%;
+  width: 107%;
 }
 
 .card {
@@ -148,7 +148,7 @@
 }
 
 .table-ovfl-prodent {
-  height: 337px;
+  height: 415px;
   overflow: auto;
 }
 

@@ -29,8 +29,8 @@ export default class Header extends Component {
     const currentUser = this.state.currentUser;
     if(currentUser){
     return (
-      <header>
-          <nav className="navbar navbar-expand-lg nav-bg">
+      <header style={{height:'70px'}}>
+          <nav className="navbar navbar-expand-lg nav-bg" style={{height:'70px'}}>
             <Link to="/#" className="navbar-brand"><img src={logo} alt="Grupo Nordan" height="80" /></Link>
               <div className="collapse navbar-collapse" id="navbarSupportedContent">
                 <div className="navbar-nav mr-auto">

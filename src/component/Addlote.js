@@ -134,9 +134,9 @@ export default class Addlote extends Component {
         },
         materiaprima:this.state.lstMatPrimResp
       }
-      Axios.get(Global.url+'lote/existe'+lote.lote,{ headers: authHeader() })
+      Axios.get(Global.url+'lote/existe/'+lote.lote,{ headers: authHeader() })
       .then(resl=>{
-        if(resl.data.length===0){
+        if(!resl.data){
           Axios.post(Global.url+'lote',lote,{ headers: authHeader() })
           .then(res=>{
             if(res.data){
@@ -206,7 +206,7 @@ export default class Addlote extends Component {
               {this.validator.message('oc',lote.oc.oc,'required')}
               <input type="number" name="piezas" className="center" placeholder="Piezas a fabricar"  ref={this.noPiezasRef} defaultValue={lote.piezasLote}/>
               {this.validator.message('piezas',lote.piezasLote,'required')}
-              <input type="text" name="lote" placeholder="Lote"  ref={this.numeroRef} className="center"/>
+              <input type="text" name="lote" placeholder="Lote"  ref={this.numeroRef} className="center" required/>
               {this.validator.message('lote',lote.numero,'required')}
             </div>
             
@@ -223,7 +223,6 @@ export default class Addlote extends Component {
             
             <div className="form-control grid-3">
               <button className="btn btn-toolbar" onClick={this.validarLote}>Verificar</button>
-              
               {this.state.lstErr.length === 0 && this.isErrorInit &&
               <button className="btn btn-success" onClick={this.creaLote}>Crear Lote</button>
               }

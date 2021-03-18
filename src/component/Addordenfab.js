@@ -92,49 +92,6 @@ export default class Addordenfab extends Component {
     });
   }
 
-  /*validarOF = () =>{
-    if(this.btnNameValida === 'Reset'){
-      this.cancelarOF(true);
-    }else if(this.validator.allValid()){
-      this.isErrorInit = false;
-      this.setState({
-        lstMatPrimResp:[],
-        lstErr:[]
-      });
-      this.lstMatPrimRespBase=[];
-      this.state.ordenfab.oc.producto.materiaPrimaUsada.forEach((matPrim,i)=>{
-        Axios.get(Global.url+'ordenfab/validar/'+
-              matPrim.materiaprimadisponible.codigo+'/'+
-              matPrim.porcentaje+'/'+
-              this.state.piezasLote+'/'+this.state.ordenfab.presentacion,{ headers: authHeader() })
-          .then( res =>{
-            var lstTmpMP = this.state.lstMatPrimResp;
-            var lstErrTmp = this.state.lstErr
-            if(res.data[0].estatus==='ERROR'){
-              lstErrTmp.push(res.data[0]);
-            }
-            res.data.forEach((mpr,i)=>{
-              mpr.delta = 0;
-              lstTmpMP.push(mpr);
-            });
-            
-            this.lstMatPrimRespBase = JSON.parse(JSON.stringify(lstTmpMP));
-            this.setState({
-              lstMatPrimResp:lstTmpMP,
-              lstErr:lstErrTmp
-            });
-          })
-          .catch(err =>{
-            AuthService.isExpired(err.message);
-          });
-      });
-      this.btnNameValida = 'Reset'
-    }else{
-      this.validator.showMessages();
-      this.forceUpdate();
-    }
-  } */
-
   guardaOf = () =>{
     var msg = '';
     var loteagua = false;
@@ -179,7 +136,6 @@ export default class Addordenfab extends Component {
       })
       .catch(err=>{
         AuthService.isExpired(err.message);
-        console.log(err);
       });
     }else{
       Axios.put(Global.url+'ordenfab/'+ordenFabTmp.id,ordenFabTmp,{ headers: authHeader() })
@@ -388,7 +344,7 @@ export default class Addordenfab extends Component {
           <div className="grid">
             <div className="showcase-form card">
               <div className="form-control grid">
-                <h3>OF: {this.state.counter}</h3>
+                <h4>OF:{this.state.counter}</h4>
                 <h3>{this.state.cliente}</h3>
               </div>
               <div className="form-control grid">
@@ -411,24 +367,21 @@ export default class Addordenfab extends Component {
                     </div>
                   }
                 </div>
-                <div>
-                  <legend className="producto">{this.state.ordenfab.lote}</legend>
-                </div>
-              </div>
-            </div>
-            <div className="showcase-form card">
-              <div className="form-control grid-1-2">
                 <div className="producto">
                   <legend>
                   Piezas: <NumberFormat value={this.state.piezasLote} displayType={'text'} thousandSeparator={true} />
                   </legend> 
                 </div>
+              </div>
+            </div>
+            <div className="showcase-form card">
+              <div className="form-control">
                 <div>
                 <div className="producto">{this.state.producto}</div>
                 </div>
               </div>
               <div className="form-control">
-                <textarea placeholder="Observaciones" ref={this.obsRef} defaultValue={this.state.ordenfab.observaciones}></textarea>
+                <input type="text" className="input" placeholder="Observaciones" ref={this.obsRef} defaultValue={this.state.ordenfab.observaciones}></input>
               </div>
             </div>
           </div>
@@ -503,7 +456,7 @@ export default class Addordenfab extends Component {
           </div>
           }
       </form>
-      <div className="container grid">
+      <div className="container grid" >
         <button className="btn btn-warning" onClick={this.guardaOf} disabled={this.state.lstMatPrimResp.length===0} >{this.btnEnviar}</button>
         <button className="btn btn-danger" onClick={() =>{this.cancelarOF(false)}}>Cancelar</button>
           </div>

@@ -7,7 +7,7 @@ import "moment/locale/es-mx";
 import momento from 'moment';
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {faPlusSquare, faEdit,  faTrash,faClipboardCheck} from "@fortawesome/free-solid-svg-icons";
+import {faPlusSquare, faEdit,  faTrash,faCheckDouble} from "@fortawesome/free-solid-svg-icons";
 import Addmatprima from "./Addmatprima";
 import swal from "sweetalert";
 import Bitacora from '../services/bitacora-service';
@@ -48,7 +48,6 @@ export default class Materiasprimas extends Component {
     axios
       .get(this.url + "matprima", { headers: authHeader() },{ responseType: 'application/json' })
       .then((res) => {
-        console.log(res.data);
         this.setState({
           lstMatPrim: res.data.map((mp,i)=>{
             mp.nombreproveedor = mp.proveedor.nombre;
@@ -101,7 +100,6 @@ export default class Materiasprimas extends Component {
     this.displayAdd = true;
     this.isAdd = false;
     let i = this.state.idSelMp
-    console.log(this.state.pageOfItems[i]);
     this.setState({
       matprima:this.state.pageOfItems[i],
       idSelMp: -1
@@ -197,7 +195,7 @@ export default class Materiasprimas extends Component {
   aproveMP = () =>{
     if(!this.state.pageOfItems[this.state.idSelMp].aprobado){
       swal({
-        title: "Desea aprobar la materia prima ["+this.state.pageOfItems[this.state.idSelMp].descripcion+"] para su uso?",
+        title: "Desea aprobar la materia prima ["+this.state.pageOfItems[this.state.idSelMp].descripcion+"] del lote["+this.state.pageOfItems[this.state.idSelMp].lote+"] para su uso?",
         text: "Una vez aprobada, se podrá utilizar para generar los Lotes de Producto",
         icon: "warning",
         buttons: true,
@@ -304,7 +302,7 @@ export default class Materiasprimas extends Component {
             }
             <td className={styleCell} style={{fontSize:'12px'}}><NumberFormat value={Number(matprim.cantidad).toFixed(2)} displayType={'text'} thousandSeparator={true} /> Kg</td>
             <td className={styleDisp} style={{fontSize:'12px'}}><NumberFormat value={Number(matprim.cantidad - matprim.apartado ).toFixed(2)} displayType={'text'} thousandSeparator={true} /> Kg</td>
-            <td style={{fontSize:'12px'}}>{matprim.codigo}</td>
+            <td className="font12">{matprim.codigo}</td>
             <td style={{fontSize:'12px'}}>{matprim.lote}</td>
             <td style={{fontSize:'12px'}}>{matprim.nombreproveedor}</td>
             <td style={{fontSize:'12px'}}>{momento(matprim.fechaEntrada,'MM-DD-YYYY').format('DD MMM YYYY')}</td>
@@ -382,14 +380,14 @@ export default class Materiasprimas extends Component {
                         }
                       </li>
                       <li>
-                        {(this.state.idSelMp === -1 || this.state.lstMatPrim[this.state.idSelMp].aprobado) &&
+                        {(this.state.idSelMp === -1 || this.state.pageOfItems[this.state.idSelMp].aprobado) &&
                         <Link to="#" >
-                        <FontAwesomeIcon icon={faClipboardCheck} style={{color:'grey'}}/>
+                        <FontAwesomeIcon icon={faCheckDouble} style={{color:'grey'}}/>
                         </Link>
                         }
-                        {(this.state.idSelMp !== -1 && !this.state.lstMatPrim[this.state.idSelMp].aprobado) &&
+                        {(this.state.idSelMp !== -1 && !this.state.pageOfItems[this.state.idSelMp].aprobado) &&
                         <Link to="#" onClick={this.aproveMP} >
-                        <FontAwesomeIcon icon={faClipboardCheck} title="Aprobar Materia Prima"/>
+                        <FontAwesomeIcon icon={faCheckDouble} title="Aprobar Materia Prima"/>
                         </Link>
                         }
                       </li>
@@ -413,11 +411,15 @@ export default class Materiasprimas extends Component {
                         <tbody>
                         <tr>
                             <td>Fecha Creación:</td>
-                            <td>{momento(this.state.pageOfItems[this.state.idSelMp].fechaCreacion,'MM-DD-YYYY hh:mm:ss').format('DD-MMM-YYYY hh:mm:ss a')}</td>
+                            <td>{momento(this.state.pageOfItems[this.state.idSelMp].fechaCreacion,'MM-DD-YYYY hh:mm:ss').format('DD-MMM-YYYY hh:mm a')}</td>
                           </tr>
                           <tr>
                             <td>Estatus:</td>
                             <td>{this.state.pageOfItems[this.state.idSelMp].aprobado ? 'Aprobado':'Pendiente de Aprobación'}</td>
+                          </tr>
+                          <tr>
+                            <td>Lote:</td>
+                            <td>{this.state.pageOfItems[this.state.idSelMp].lote}</td>
                           </tr>
                           <tr>
                             <td>Observaciones:</td>

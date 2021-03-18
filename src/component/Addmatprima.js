@@ -65,7 +65,6 @@ export default class Addmatprima extends Component {
       this.fechaCaducidad = this.props.matprima.fechaCaducidad;
       let matprim = this.props.matprima;
       matprim.cantidad = matprim.cantidadOriginal;
-      console.log(matprim);
     
       this.setState({
         materiaPrima: matprim
@@ -130,10 +129,12 @@ export default class Addmatprima extends Component {
     this.descripcionRef.current.value = this.descripcionRef.current.value.toUpperCase();
     materiaprima.cantidad=this.cantidadRef.current.value;
     materiaprima.unidad.id=this.unidadRef.current.value;
-    materiaprima.codigo=this.claveRef.current.value;
+    materiaprima.codigo=this.claveRef.current.value.toUpperCase();
+    this.claveRef.current.value = this.claveRef.current.value.toUpperCase();
     materiaprima.proveedor= this.state.lstProv[this.proveedorRef.current.selectedIndex];
     materiaprima.observaciones=this.observacionesRef.current.value;
-    materiaprima.lote=this.loteRef.current.value;
+    materiaprima.lote=this.loteRef.current.value.toUpperCase();
+    this.loteRef.current.value = this.loteRef.current.value.toUpperCase();
     materiaprima.necesario=this.necesarioRef.current.value;
     materiaprima.escaso=this.escasoRef.current.value;
     materiaprima.tipo=this.tipoRef.current.value;
@@ -180,6 +181,19 @@ export default class Addmatprima extends Component {
     }
   }
 
+  validaLote = () =>{
+    Axios.get(Global.url+'matprima/lote/'+this.loteRef.current.value,{ headers: authHeader() })
+    .then(res =>{
+      if(res.data){
+        swal('El número de lote ya existe');
+        this.loteRef.current.value = '';
+      }
+    })
+    .catch(err=>{
+      AuthService.isExpired(err.message);
+    });
+  }
+
   cambiaUnidad = ()=>{
     this.factconvRef.current.value = '';
     if(this.state.unidades[this.unidadRef.current.selectedIndex].unidadMedida === Global.LITROS || this.state.unidades[this.unidadRef.current.selectedIndex].unidadMedida === Global.MILILITROS ){
@@ -207,7 +221,8 @@ export default class Addmatprima extends Component {
     }
   }
 
-  validaClaveExiste = ()=>{  
+  validaClaveExiste = ()=>{
+
     if(this.state.materiaPrima.codigo !== ''){
       Axios
       .get(Global.url+'matprimdisp/'+this.state.materiaPrima.codigo,{ headers: authHeader() })
@@ -261,11 +276,11 @@ export default class Addmatprima extends Component {
               </div>
               <div className="form-control grid">
                 <div>
-                  <input type="text" placeholder="Clave" name="clave" ref={this.claveRef} defaultValue={matprima.codigo}  onBlur={this.validaClaveExiste}  required/>
+                  <input type="text" placeholder="Clave" name="clave" ref={this.claveRef} defaultValue={matprima.codigo}  onKeyUp={this.validaClaveExiste}  required/>
                   {this.validator.message('clave',matprima.codigo,'required')}
                 </div>
                 <div>
-                  <input type="text" placeholder="Lote" name="lote" ref={this.loteRef} defaultValue={matprima.lote} required/>
+                  <input type="text" placeholder="Lote" name="lote" ref={this.loteRef} defaultValue={matprima.lote} onBlur={this.validaLote} required/>
                   {this.validator.message('lote',this.state.materiaPrima.lote,'required')}
                 </div>
               </div>

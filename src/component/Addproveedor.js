@@ -52,6 +52,8 @@ export default class Addproveedor extends Component {
           telefonoPrincipal:this.telfPralRef.current.value,
           activo:true
       }
+      this.nombreRef.current.value = this.nombreRef.current.value.toUpperCase();
+      this.rfcRef.current.value = this.rfcRef.current.value.toUpperCase();
       this.setState({
           proveedor:prov,
           contacto:{
@@ -125,7 +127,6 @@ export default class Addproveedor extends Component {
     }
   
     eliminaContacto = ()=>{
-      console.log(this.state.idSelCntcr);
       if(this.state.idSelCntcr===-1){
         swal('Seleccione un contacto');
         return;

@@ -19,7 +19,6 @@ export default class Productoterminado extends Component {
   
   filterRef = React.createRef();  
   activosRef = React.createRef();
-  
   showTruck = false;
   isPrint= false;
   center = {textAlign:"center"}
@@ -382,15 +381,15 @@ export default class Productoterminado extends Component {
                         style = this.state.lstSelected[i] ? "selected pointer":{};
                         return(
                           <tr key={i} onClick={() => {this.selectRow(i,(prodterm.estatus.codigo === Global.WTDEL || prodterm.estatus.codigo === Global.EEP))}}  className={style}>
-                            <td>{this.pad(prodterm.noConsecutivo,Global.SIZE_DOC_RED)}</td>
-                            <td>{prodterm.producto.nombre}</td>
-                            <td>{prodterm.oc}</td>
-                            <td>{prodterm.lote}</td>
-                            <td style={this.center}><NumberFormat value={Number(prodterm.piezas)}displayType={'text'} thousandSeparator={true} title={'Piezas Entregadas:'+prodterm.piezasEntregadas}/></td>
-                            <td style={this.center}><Moment format="DD/MM/YYYY">{momento(prodterm.fechaFabricacion,'YYYY-MM-DD').format('YYYY-MM-DD')}</Moment></td>
-                            <td style={this.center}><Moment format="DD/MM/YYYY">{momento(prodterm.fechaEntrega,'YYYY-MM-DD').format('YYYY-MM-DD')}</Moment></td>
-                            <td style={this.center} title={prodterm.cliente.nombre}>{prodterm.estatus.label}</td>
-                            <td style={this.center}><input type="checkbox" id={'check'+i}/></td>
+                            <td className="font12">{this.pad(prodterm.noConsecutivo,Global.SIZE_DOC_RED)}</td>
+                            <td className="font12">{prodterm.producto.nombre}</td>
+                            <td className="font12">{prodterm.oc}</td>
+                            <td className="font12">{prodterm.lote}</td>
+                            <td className="font12" style={this.center}><NumberFormat value={Number(prodterm.piezas)}displayType={'text'} thousandSeparator={true} title={'Piezas Entregadas:'+prodterm.piezasEntregadas}/></td>
+                            <td className="font12" style={this.center}><Moment format="DD-MMM-YYYY">{momento(prodterm.fechaFabricacion,'YYYY-MM-DD').format('YYYY-MM-DD')}</Moment></td>
+                            <td className="font12" style={this.center}><Moment format="DD-MMM-YYYY">{momento(prodterm.fechaEntrega,'YYYY-MM-DD').format('YYYY-MM-DD')}</Moment></td>
+                            <td className="font12" style={this.center} title={prodterm.cliente.nombre}>{prodterm.estatus.label}</td>
+                            <td className="font12" style={this.center}><input type="checkbox" id={'check'+i}/></td>
                           </tr>
                         );
                       })
@@ -415,29 +414,29 @@ export default class Productoterminado extends Component {
                     <table className="table" style={{width:'100%'}}>
                         <thead className="thead-dark">                      
                           <tr>
-                            <th style={{textAlign:'center'}}>No OF</th>
-                            <th style={{textAlign:'center'}}>Piezas a entregar</th>
-                            <th style={{textAlign:'center'}}>Remisión</th>
-                            <th style={{textAlign:'center'}}>Tipo</th>
-                            <th style={{textAlign:'center'}}>Dirección</th>
+                            <th className="font12" style={{textAlign:'center'}}>No OF</th>
+                            <th className="font12" style={{textAlign:'center'}}>Piezas a entregar</th>
+                            <th className="font12" style={{textAlign:'center'}}>Remisión</th>
+                            <th className="font12" style={{textAlign:'center'}}>Tipo</th>
+                            <th className="font12" style={{textAlign:'center'}}>Dirección</th>
                           </tr>
                         </thead>
                         <tbody>
                         {this.state.lstPTEntregado.map((pten,i)=>{
                           return(
                             <tr key={i}>
-                              <td>{this.pad(pten.noConsecutivo,Global.SIZE_DOC)}</td>
-                              <td><input type="number" className="input center" size='3' defaultValue={pten.piezas - pten.piezasEntregadas} id={'pzasent'+pten.noConsecutivo}/></td>
-                              <td><input type="text"   className="input center" size='5' id={'noremision'+pten.noConsecutivo}/></td>
+                              <td>{this.pad(pten.noConsecutivo,Global.SIZE_DOC-2)}</td>
+                              <td className="font12"><input type="number" className="input center" size='3' defaultValue={pten.piezas - pten.piezasEntregadas} id={'pzasent'+pten.noConsecutivo}/></td>
+                              <td className="font12"><input type="text"   className="input center" size='5' id={'noremision'+pten.noConsecutivo}/></td>
                               <td>
-                                <select className="custom-select" id={'selTE'+i} onChange={()=>this.cambiaTipoEntrega(i)}>
+                                <select className="custom-select font12" id={'selTE'+i} onChange={()=>this.cambiaTipoEntrega(i)}>
                                   <option value={Global.E}>Entrega</option>
                                   <option value={Global.M}>Merma</option>
                                 </select>
                               </td>
-                              <td>
+                              <td className="font12">
                               {(this.state.lstTipoEntrega[i]===Global.E) &&
-                                <select className="custom-select" id={'dire'+i} onChange={()=>this.cambiaDireccion(i)}>
+                                <select className="custom-select font12" id={'dire'+i} onChange={()=>this.cambiaDireccion(i)}>
                                 {pten.cliente.direccion.map((dir,i)=>{
                                   return(
                                     <option key={i} value={i}>{dir}</option>
@@ -448,7 +447,6 @@ export default class Productoterminado extends Component {
                               </td>
                             </tr>
                           );
-                          
                         })}
                       </tbody>
                     </table>
@@ -504,7 +502,7 @@ export default class Productoterminado extends Component {
                   <td className="font12 bottom right" style={{textAlign: 'center'}}>OC</td>
                 </tr>
                 <tr>
-                  <td className="font12 left right" style={{height: '1.0cm',textAlign:'right'}}> {pt.piezasEntregadas} </td>
+                  <td className="font12 left right" style={{height: '1.0cm',textAlign:'right'}}><NumberFormat value={Number(pt.piezasEntregadas)} displayType={'text'} thousandSeparator={true} /></td>
                   <td className="font12 right" style={{textAlign:'center'}}>{pt.clave}</td>
                   <td className="font10 right" colspan="8">{pt.producto.nombre}</td>
                   <td className="font12 right" style={{textAlign:'center'}}>{pt.oc}</td>

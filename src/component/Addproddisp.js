@@ -151,9 +151,9 @@ export default class Addproddisp extends Component {
   }
 
   delMatPrim = () =>{
-      var code = this.state.lstMatPrim[this.state.idSelPd].codigo;
+      var code = this.state.lstMatPrim[this.state.idSelPd].materiaprimadisponible.codigo;
       var lstTmp = this.state.lstMatPrim.filter((md) =>{
-          return  (code !== md.codigo)
+          return  (code !== md.materiaprimadisponible.codigo)
         });
       
       this.setState({
@@ -168,9 +168,10 @@ export default class Addproddisp extends Component {
         codigo:this.codigoRef.current.value,
         porcentaje:this.porcentajeRef.current.value,
         nombre:this.nombreRef.current.value.toUpperCase(),
-        clave:this.claveRef.current.value,
+        clave:this.claveRef.current.value.toUpperCase(),
         prodxcaja:this.prodxcajaRef.current.value
     }); 
+    this.claveRef.current.value = this.claveRef.current.value.toUpperCase();
   }
 
   saveProdDisp = () =>{
@@ -346,7 +347,7 @@ export default class Addproddisp extends Component {
             <p></p>
             <div className="row">
               <div className="col-2">
-                <input type="text" placeholder="Codigo"  onKeyUp={this.busquedaCodigo} ref={this.codigoRef} defaultValue={this.state.codigo}/>
+                <input type="text" placeholder="Codigo"  onKeyUp={this.busquedaCodigo} ref={this.codigoRef} value={this.state.codigo} onChange={this.descChange} />
               </div>
               <div className="col-4">
                 <input type="text" placeholder="Descripcion" onKeyUp={this.busquedaDesc} ref={this.descRef} value={this.state.desc} onChange={this.descChange}/>
