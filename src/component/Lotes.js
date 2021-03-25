@@ -37,14 +37,21 @@ export default class Lotes extends Component {
     Axios
     .get(Global.url+'lote/'+buscaTodos,{ headers: authHeader() })
     .then(res=>{
-      this.setState({
-        lstLotes:res.data.map((lt,i)=>{
-          lt.producto = lt.oc.producto.nombre;
-          lt.cliente = lt.oc.cliente.nombre;
-          lt.ordencompra = lt.oc.oc;
-          return lt;
+      if(res.data.length > 0){
+        this.setState({
+          lstLotes:res.data.map((lt,i)=>{
+            lt.producto = lt.oc.producto.nombre;
+            lt.cliente = lt.oc.cliente.nombre;
+            lt.ordencompra = lt.oc.oc;
+            return lt;
+          }),
+          idSelLt:-1
         })
-      })
+      }else{
+        this.setState({
+          lstLotes:[]
+        });
+      }
     })
     .catch(err=>{
       AuthService.isExpired(err.message);
@@ -131,6 +138,7 @@ export default class Lotes extends Component {
   }
 
   selectType = ()=>{
+    console.log(this.selAllRef.current.checked);
     this.loadLotes(this.selAllRef.current.checked);
   }
 

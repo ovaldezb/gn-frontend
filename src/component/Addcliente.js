@@ -100,6 +100,18 @@ export default class Addcliente extends Component {
   }
   
   addContacto = () =>{
+    if(this.state.contacto.nombre === ''){
+      swal('Debe ingresar el nombre del contacto');
+      return;
+    }
+    if(this.state.contacto.telefono === ''){
+      swal('Debe ingresar el teléfono del contacto');
+      return;
+    }
+    if(this.state.contacto.email === ''){
+      swal('Debe ingresar el correo electrónico del contacto');
+      return;
+    }
     var lstcntc = this.state.lstContactos;
     if(this.state.idSelCntc===-1){
       lstcntc.push(this.state.contacto);
@@ -112,7 +124,8 @@ export default class Addcliente extends Component {
         nombre:'',
         telefono:'',
         email:''   
-      }
+      },
+      idSelCntc:-1
     });
   }
 
@@ -138,7 +151,11 @@ export default class Addcliente extends Component {
     var lstcontacos = this.state.lstContactos;
     lstcontacos.splice(this.state.idSelCntc,1);
     this.setState(
-      {lstContactos:lstcontacos}
+      {
+        lstContactos:lstcontacos,
+        idSelDir:-1
+      
+      }
     );
   }
 
@@ -212,9 +229,9 @@ export default class Addcliente extends Component {
                       {this.validator.message('rfc',cliente.rfc,'required')}
                     </div>
                     <div className="form-control" >
-                      <textarea type="text" name="dir" placeholder="Dirección" ref={this.direccionRef} />
+                      <textarea type="text" name="dir" placeholder="Dirección" ref={this.direccionRef} rows={1} />
                     </div>
-                    <div className="barnav-cli" style={{marginTop:'10px',marginLeft:'10px',marginRight:'-5px'}}>
+                    <div className="barnav-cli btns_addr">
                       <nav>
                         <ul>
                           <li>
@@ -223,14 +240,28 @@ export default class Addcliente extends Component {
                             </Link>
                           </li>
                           <li>
+                          {this.state.idSelDir === -1 && 
+                            <Link to="#" >
+                              <FontAwesomeIcon icon={faEdit} style={{color:'grey'}} />
+                            </Link>
+                          }
+                          {this.state.idSelDir !== -1 && 
                             <Link to="#" onClick={this.editDireccion}>
                               <FontAwesomeIcon icon={faEdit} />
                             </Link>
+                          }
                           </li>
                           <li>
+                          {this.state.idSelDir === -1 && 
+                            <Link to="#" >
+                              <FontAwesomeIcon icon={faTrash} style={{color:'grey'}} />
+                            </Link>
+                            }
+                            {this.state.idSelDir !== -1 && 
                             <Link to="#" onClick={this.eliminaDireccion} >
                               <FontAwesomeIcon icon={faTrash} />
                             </Link>
+                            }
                           </li>
                         </ul>
                       </nav>    
@@ -246,14 +277,28 @@ export default class Addcliente extends Component {
                             </Link>
                           </li>
                           <li>
-                            <Link to="#" onClick={this.editContacto}>
-                              <FontAwesomeIcon icon={faEdit} />
+                            {this.state.idSelCntc === -1 && 
+                            <Link to="#" >
+                              <FontAwesomeIcon icon={faEdit} style={{color:'grey'}} />
                             </Link>
+                            }
+                            {this.state.idSelCntc !== -1 && 
+                            <Link to="#" onClick={this.editContacto}>
+                              <FontAwesomeIcon icon={faEdit}  />
+                            </Link>
+                            }
                           </li>
                           <li>
+                          {this.state.idSelCntc === -1 && 
+                            <Link to="#"  >
+                              <FontAwesomeIcon icon={faTrash} style={{color:'grey'}}/>
+                            </Link>
+                          }
+                          {this.state.idSelCntc !== -1 && 
                             <Link to="#" onClick={this.eliminaContacto} >
                               <FontAwesomeIcon icon={faTrash} />
                             </Link>
+                          }
                           </li>
                         </ul>
                       </nav>    
@@ -270,45 +315,63 @@ export default class Addcliente extends Component {
                   </div>
                 </div>
                 <div className="container grid">
-                  <div style={{border:'2px solid black',height:'200px'}}>
+                  <div style={{border:'2px solid black',height:'250px'}}>
                     <table  className="table table-hover table-bordered" style={{width:'100%'}}>
                       <thead className="thead-dark">
                         <tr>
                           <th>Dirección</th>
                         </tr>
                       </thead>
-                      <tbody>
-                      {this.state.lstDireccion.map((dir,i)=>{
-                        return(
-                          <tr key={i} onClick={()=>{this.selectRowDir(i)}} onDoubleClick={()=>{this.editDireccion()}} className={this.state.idSelDir===i?'selected pointer':''}>
-                            <td>{dir}</td>
-                          </tr>
-                        );
-                      })}
-                      </tbody>
-                    </table>
+                      </table>
+                      <div className="table-ovfl-cliente tbl-lesshead">
+                        <table className="table table-bordered" style={{cursor:'pointer'}}>
+                          <tbody>
+                          {this.state.lstDireccion.map((dir,i)=>{
+                            return(
+                            <tr key={i} onClick={()=>{this.selectRowDir(i)}} onDoubleClick={()=>{this.editDireccion()}} className={this.state.idSelDir===i?'selected pointer':''}>
+                              <td className="font14">{dir}</td>
+                            </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
-                  <div style={{border:'2px solid black',height:'200px'}}>
-                    <table className="table table-bordered table-hover" style={{width:'100%'}}>
+                  <div style={{border:'2px solid black',height:'250px'}}>
+                    <table className="table" style={{width:'100%'}}>
+                      <colgroup>
+                          <col width="37%" />
+                          <col width="26%" />
+                          <col width="37%" />
+                      </colgroup>
                       <thead className="thead-dark">
                         <tr>
-                          <th>Contacto</th>
-                          <th>Teléfono</th>
-                          <th>Correo</th>
+                          <th style={{textAlign:'center'}}>Contacto</th>
+                          <th style={{textAlign:'center'}}>Teléfono</th>
+                          <th style={{textAlign:'center'}}>Correo</th>
                         </tr>
                       </thead>
-                      <tbody>
-                      {this.state.lstContactos.map((ctc,i)=>{
-                        return(
-                        <tr key={i} onClick={()=>this.selectRowContacto(i)}  onDoubleClick={()=>{this.editContacto()}} className={this.state.idSelCntc===i?'selected pointer':''}>
-                          <td>{ctc.nombre}</td>
-                          <td>{ctc.telefono}</td>
-                          <td>{ctc.email}</td>
-                        </tr>
-                        );
-                      })}
-                      </tbody>
-                    </table>
+                     </table>
+                     <div className="table-ovfl-cliente tbl-lesshead">
+                      <table className="table table-bordered table-hover" style={{cursor:'pointer'}}> 
+                        <colgroup>
+                            <col width="37%" />
+                            <col width="26%" />
+                            <col width="37%" />
+                        </colgroup>
+                        <tbody>
+                        {this.state.lstContactos.map((ctc,i)=>{
+                          return(
+                          <tr key={i} onClick={()=>this.selectRowContacto(i)}  onDoubleClick={()=>{this.editContacto()}} className={this.state.idSelCntc===i?'selected pointer':''}>
+                            <td className="font14">{ctc.nombre}</td>
+                            <td className="font14">{ctc.telefono}</td>
+                            <td className="font14">{ctc.email}</td>
+                          </tr>
+                          );
+                        })}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </div>
                 <div className="container grid">

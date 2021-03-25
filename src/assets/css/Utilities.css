@@ -152,6 +152,16 @@
   overflow: auto;
 }
 
+.table-ovfl-cliente {
+  height: 200px;
+  overflow: auto;
+}
+
+.table-ovfl-proveedor {
+  height: 200px;
+  overflow: auto;
+}
+
 .pointer {
   cursor: pointer;
 } 
@@ -234,6 +244,12 @@ input:checked + .slider:before {
   border-radius: 50%;
 }
 
+/* DIreccion */
+.btns_addr{
+  margin-top:5px;
+  margin-left:10px;
+  margin-right:-5px;
+}
 
 /* Caja del valor*/
 .valor{

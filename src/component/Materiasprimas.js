@@ -54,6 +54,7 @@ export default class Materiasprimas extends Component {
             return mp;
           }),
         });
+        
         document.getElementById('checkini').checked = false;
         document.getElementById('checkmid').checked = false;
         document.getElementById('checkfin').checked = false;
@@ -81,7 +82,7 @@ export default class Materiasprimas extends Component {
     });
    }else{
     this.setState({
-      pageOfItems:this.state.lstMatPrim.slice((this.state.page-1)*10,((this.state.page-1)*10)+9)
+      pageOfItems:this.state.lstMatPrim.slice((this.state.page-1)*10,((this.state.page-1)*10)+10)
     });
    }
   }
@@ -124,8 +125,6 @@ export default class Materiasprimas extends Component {
             icon: "success",
           });
           this.loadMatPrim();
-          
-          this.forceUpdate();
         }).catch(
           err =>{
             AuthService.isExpired(err.message);
@@ -135,14 +134,10 @@ export default class Materiasprimas extends Component {
     });
   }
 
-  cancelarAdd = (matprima) => {
+  cancelarAdd = () => {
     this.displayAdd = false;
     this.isAdd = true;
-    
-      //this.isAdd = false;
-      this.loadMatPrim();
-    
-    
+    this.loadMatPrim();
   }
 
   sortCaducidad = ()=>{
@@ -166,7 +161,10 @@ export default class Materiasprimas extends Component {
     .get(Global.url+'matprima/ini/'+momento(f1).format('MM-DD-YYYY H:mm:ss'),{ headers: authHeader() })
     .then(res=>{
       this.setState({
-        lstMatPrim:res.data,
+        lstMatPrim: res.data.map((mp,i)=>{
+          mp.nombreproveedor = mp.proveedor.nombre;
+          return mp;
+        })
       });
     })
     .catch(err=>{
@@ -184,7 +182,10 @@ export default class Materiasprimas extends Component {
     .get(Global.url+'matprima/btw/'+momento(f1).format('MM-DD-YYYY H:mm:ss')+'/'+momento(f2).format('MM-DD-YYYY H:mm:ss'),{ headers: authHeader() })
     .then(res=>{
       this.setState({
-        lstMatPrim:res.data,
+        lstMatPrim: res.data.map((mp,i)=>{
+          mp.nombreproveedor = mp.proveedor.nombre;
+          return mp;
+        })
       });
     })
     .catch(err=>{
@@ -205,6 +206,7 @@ export default class Materiasprimas extends Component {
         if(approved){
           let matprima = this.state.pageOfItems[this.state.idSelMp];
           matprima.aprobado = true;
+          matprima.fechaAprobacion = momento(new Date()).format('YYYY-MM-DD HH:mm:ss.sss') ;
           Axios.put(Global.url+'matprima/'+this.state.pageOfItems[this.state.idSelMp].id,matprima,{ headers: authHeader() })
           .then(res=>{
             swal('La materia prima ['+matprima.descripcion+'] ha sido aprobada');
@@ -236,7 +238,10 @@ export default class Materiasprimas extends Component {
     .get(Global.url+'matprima/fin/'+momento(f1).format('MM-DD-YYYY H:mm:ss'),{ headers: authHeader() })
     .then(res=>{
       this.setState({
-        lstMatPrim:res.data,
+        lstMatPrim: res.data.map((mp,i)=>{
+          mp.nombreproveedor = mp.proveedor.nombre;
+          return mp;
+        })
       });
     })
     .catch(err=>{
@@ -411,7 +416,7 @@ export default class Materiasprimas extends Component {
                         <tbody>
                         <tr>
                             <td>Fecha Creación:</td>
-                            <td>{momento(this.state.pageOfItems[this.state.idSelMp].fechaCreacion,'MM-DD-YYYY hh:mm:ss').format('DD-MMM-YYYY hh:mm a')}</td>
+                            <td>{momento(this.state.pageOfItems[this.state.idSelMp].fechaCreacion,'YYYY-MM-DD hh:mm:ss').format('DD-MMM-YYYY hh:mm a')}</td>
                           </tr>
                           <tr>
                             <td>Estatus:</td>

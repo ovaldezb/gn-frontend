@@ -147,14 +147,28 @@ export default class Clientes extends Component {
                                         </Link>
                                     </li>
                                     <li>
+                                      {this.state.idSelCli === -1 && 
+                                        <Link to="#" >
+                                            <FontAwesomeIcon icon={faEdit} style={{color:'grey'}} />
+                                        </Link>
+                                        }
+                                        {this.state.idSelCli !== -1 && 
                                         <Link to="#" onClick={this.updateCl}>
                                             <FontAwesomeIcon icon={faEdit} />
                                         </Link>
+                                        }
                                     </li>
                                     <li>
-                                        <Link to="#" onClick={this.deleteCl} >
-                                            <FontAwesomeIcon icon={faTrash} />
+                                    {this.state.idSelCli === -1 && 
+                                        <Link to="#"  >
+                                            <FontAwesomeIcon icon={faTrash} style={{color:'grey'}} />
                                         </Link>
+                                    }
+                                    {this.state.idSelCli !== -1 && 
+                                        <Link to="#" onClick={this.deleteCl} >
+                                            <FontAwesomeIcon icon={faTrash}  />
+                                        </Link>
+                                    }
                                     </li>
                                 </ul>
                             </nav>

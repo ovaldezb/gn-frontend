@@ -147,6 +147,10 @@ export default class Addmatprima extends Component {
   };
 
   agregarMateriaPrima = () =>{
+    if(this.state.lstProv.length === 0){
+      swal('Se requiere al menos un proveedor');
+      return;
+    }
     if(this.validator.allValid()){
       let matprim = this.state.materiaPrima;
       matprim.cantidadOriginal = matprim.cantidad;
@@ -309,7 +313,6 @@ export default class Addmatprima extends Component {
                 </div>
                 <div>
                   <input type="number" className="center" name="fc" ref={this.factconvRef} placeholder="Factor de Conversión" defaultValue={matprima.factorConversion} disabled={!this.state.showFC} />
-                {this.validator.message('fc',matprima.factorConversion,'required|numeric|min:0,num')}
                 </div>
               </div>
               

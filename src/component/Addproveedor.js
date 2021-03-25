@@ -23,7 +23,11 @@ export default class Addproveedor extends Component {
         proveedor:{},
         lstContactos:[],
         idSelCntc:-1,
-        contacto:{}
+        contacto:{
+          nombre:'',
+          telefono:'',
+          email:''
+        }
     }
     validator = new SimpleReactValidator({
       className: 'text-danger',
@@ -99,6 +103,18 @@ export default class Addproveedor extends Component {
   }
 
     addContacto = () =>{
+      if(this.state.contacto.nombre === ''){
+        swal('Debe ingresar el nombre');
+        return;
+      }
+      if(this.state.contacto.telefono === ''){
+        swal('Debe ingresar el teléfono');
+        return;
+      }
+      if(this.state.contacto.email === ''){
+        swal('Debe ingresar el correo electrónico');
+        return;
+      }
       var lstcntc = this.state.lstContactos;
       if(this.state.idSelCntc===-1){
         lstcntc.push(this.state.contacto);
@@ -127,7 +143,7 @@ export default class Addproveedor extends Component {
     }
   
     eliminaContacto = ()=>{
-      if(this.state.idSelCntcr===-1){
+      if(this.state.idSelCntc===-1){
         swal('Seleccione un contacto');
         return;
       }
@@ -155,6 +171,8 @@ export default class Addproveedor extends Component {
     this.props.cancelar();
   }
 
+  OnChange = ()=>{}
+
     render() {
         const proveedor = this.state.proveedor;
         const contacto = this.state.contacto;
@@ -177,7 +195,7 @@ export default class Addproveedor extends Component {
                           {this.validator.message('rfc',proveedor.rfc,'required')}
                         </div>
                         <div className="form-control">
-                            <textarea type="text" name="dir" placeholder="Dirección" ref={this.direccionRef} defaultValue={proveedor.direccion} />
+                            <textarea type="text" name="dir" placeholder="Dirección" ref={this.direccionRef} defaultValue={proveedor.direccion} rows={1} />
                             {this.validator.message('dir',this.state.proveedor.direccion,'required')}
                         </div>
                     </div>
@@ -191,34 +209,52 @@ export default class Addproveedor extends Component {
                             </Link>
                           </li>
                           <li>
+                            {this.state.idSelCntc === -1 && 
+                            <Link to="#" >
+                              <FontAwesomeIcon icon={faEdit} style={{color:'grey'}} />
+                            </Link>
+                            }
+                            {this.state.idSelCntc !== -1 && 
                             <Link to="#" onClick={this.editContacto}>
                               <FontAwesomeIcon icon={faEdit} />
                             </Link>
+                            }
                           </li>
                           <li>
-                            <Link to="#" onClick={this.eliminaContacto} >
-                              <FontAwesomeIcon icon={faTrash} />
+                            {this.state.idSelCntc === -1 && 
+                            <Link to="#" >
+                              <FontAwesomeIcon icon={faTrash} style={{color:'grey'}} />
                             </Link>
+                            }
+                            {this.state.idSelCntc !== -1 && 
+                            <Link to="#" onClick={this.eliminaContacto} >
+                              <FontAwesomeIcon icon={faTrash}  />
+                            </Link>
+                            }
                           </li>
                         </ul>
                       </nav>    
                     </div>
                       <div className="form-control">
-                        <input type="text" placeholder="Contacto" ref={this.contactoRef} defaultValue={contacto.nombre} />
+                        <input type="text" placeholder="Contacto" ref={this.contactoRef} value={contacto.nombre} onChange={this.OnChange} />
                       </div>
                       <div className="form-control">
-                        <input type="text" placeholder="Correo Electrónico" ref={this.emailRef} defaultValue={contacto.email}/>
+                        <input type="text" placeholder="Teléfono Contacto" ref={this.telRef} value={contacto.telefono} onChange={this.OnChange}/>
                       </div>
                       <div className="form-control">
-                        <input type="text" placeholder="Teléfono Contacto" ref={this.telRef} defaultValue={contacto.telefono}/>
+                        <input type="text" placeholder="Correo Electrónico" ref={this.emailRef} value={contacto.email} onChange={this.OnChange}/>
                       </div>
-                      
                     </div>
                 </div>
                 <div className="container grid">
                   <div></div>
-                  <div style={{border:'2px solid black',height:'200px'}}>
+                  <div style={{border:'2px solid black',height:'250px'}}>
                     <table className="table table-bordered center" style={{width:'100%'}}>
+                      <colgroup>
+                        <col width="35%" />
+                        <col width="30%" />
+                        <col width="35%" />
+                      </colgroup>
                       <thead className="thead-dark">
                         <tr>
                           <th>Contacto</th>
@@ -226,18 +262,27 @@ export default class Addproveedor extends Component {
                           <th>Correo</th>
                         </tr>
                       </thead>
-                      <tbody>
-                      {this.state.lstContactos.map((cntc,i)=>{
-                        return(
-                          <tr key={i} onClick={()=>this.selectRowContacto(i)}  onDoubleClick={()=>{this.editContacto()}} className={this.state.idSelCntc===i?'selected pointer':''}>
-                          <td>{cntc.nombre}</td>
-                          <td>{cntc.telefono}</td>
-                          <td>{cntc.email}</td>
-                        </tr>
-                        );
-                        })} 
-                      </tbody>
-                    </table>
+                      </table>
+                      <div className="table-ovfl-proveedor tbl-lesshead">
+                        <table className="table table-bordered" style={{cursor:'pointer'}}>
+                          <colgroup>
+                            <col width="35%" />
+                            <col width="30%" />
+                            <col width="35%" />
+                          </colgroup>
+                          <tbody>
+                        {this.state.lstContactos.map((cntc,i)=>{
+                          return(
+                            <tr key={i} onClick={()=>this.selectRowContacto(i)}  onDoubleClick={()=>{this.editContacto()}} className={this.state.idSelCntc===i?'selected pointer':''}>
+                            <td className="font14">{cntc.nombre}</td>
+                            <td className="font14">{cntc.telefono}</td>
+                            <td className="font14">{cntc.email}</td>
+                          </tr>
+                          );
+                          })} 
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </div>
                 <div className="container grid">

@@ -258,12 +258,10 @@ export default class Usuarios extends Component {
       }
       return (
         <tr key={i} onClick={() => {this.selectRow(i); }} onDoubleClick={() => {this.updatePopulateUser();}} className={style}>
-          <td>
-            {user.nombre} {user.apellido}
-          </td>
-          <td>{user.username}</td>
-          <td>{user.area.name}</td>
-          <td>{user.activo ? "Activo" : "Inactivo"}</td>
+          <td className="font14">{user.nombre} {user.apellido}</td>
+          <td className="font14">{user.username}</td>
+          <td className="font14">{user.area.name}</td>
+          <td className="font14">{user.activo ? "Activo" : "Inactivo"}</td>
         </tr>
       );
     });
@@ -350,14 +348,28 @@ export default class Usuarios extends Component {
                   <nav>
                     <ul>
                       <li>
+                        {this.state.idSelMp === -1 && 
+                        <Link to="#" onClick={this.updatePopulateUser}>
+                          <FontAwesomeIcon icon={faEdit} style={{color:'grey'}} />
+                        </Link>
+                        }
+                        {this.state.idSelMp !== -1 && 
                         <Link to="#" onClick={this.updatePopulateUser}>
                           <FontAwesomeIcon icon={faEdit} />
                         </Link>
+                        }
                       </li>
                       <li>
+                      {this.state.idSelMp === -1 && 
+                        <Link to="#" >
+                          <FontAwesomeIcon icon={faTrash} style={{color:'grey'}} />
+                        </Link>
+                      }
+                      {this.state.idSelMp !== -1 && 
                         <Link to="#" onClick={this.deleteUser}>
                           <FontAwesomeIcon icon={faTrash} />
                         </Link>
+                      }
                       </li>
                     </ul>
                   </nav>
@@ -379,7 +391,7 @@ export default class Usuarios extends Component {
                   </tr>
                 </thead>
               </table>
-              <div className="table-ovfl-user">
+              <div className="table-ovfl-user tbl-lesshead">
                 <table className="table table-hover" id="usuarios">
                   <colgroup>
                   <col width="26%" />

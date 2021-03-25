@@ -134,14 +134,28 @@ export default class Proveedores extends Component {
                                         </Link>
                                     </li>
                                     <li>
-                                        <Link to="#" onClick={this.updateProv}>
-                                            <FontAwesomeIcon icon={faEdit} />
+                                      {this.state.idSelProv === -1 && 
+                                        <Link to="#" >
+                                            <FontAwesomeIcon icon={faEdit} style={{color:'grey'}} />
                                         </Link>
+                                      }
+                                      {this.state.idSelProv !== -1 && 
+                                        <Link to="#" onClick={this.updateProv}>
+                                            <FontAwesomeIcon icon={faEdit}  />
+                                        </Link>
+                                      }
                                     </li>
                                     <li>
-                                        <Link to="#" onClick={this.deleteProv} >
-                                            <FontAwesomeIcon icon={faTrash} />
+                                    {this.state.idSelProv === -1 &&
+                                        <Link to="#"  >
+                                            <FontAwesomeIcon icon={faTrash} style={{color:'grey'}} />
                                         </Link>
+                                      }
+                                      {this.state.idSelProv !== -1 &&
+                                        <Link to="#" onClick={this.deleteProv} >
+                                            <FontAwesomeIcon icon={faTrash}  />
+                                        </Link>
+                                      }
                                     </li>
                                 </ul>
                             </nav>

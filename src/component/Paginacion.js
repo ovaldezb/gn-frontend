@@ -31,10 +31,11 @@ class Paginacion extends React.Component {
 
     componentDidUpdate(prevProps, prevState) {
         // reset page if items array has changed
+        //console.log('Component Did Update '+prevProps.items);
         if (this.props.items !== prevProps.items) {
             this.setPage(this.props.initialPage);
         }
-    }
+    } 
 
     setPage(page) {
       var { items, pageSize } = this.props;

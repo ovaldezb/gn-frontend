@@ -103,7 +103,6 @@ export default class Productoterminado extends Component {
     let selected = this.state.lstSelected;
     selected[i] = !this.state.lstSelected[i];
     this.setState({
-      //idSelPt: ((this.state.page-1)*10) + i,
       idSelPt: i,
       lstSelected:selected
     });

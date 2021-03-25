@@ -92,6 +92,9 @@ export default class Addproddisp extends Component {
 
   busquedaCodigo = (e) =>{
       if(e.keyCode === 13){
+        this.setState({
+          lstBusqDesc:[]
+        });
         Axios.get(Global.url+'matprimdisp/'+this.state.codigo,{ headers: authHeader() })
         .then( res =>{
             this.setState({
@@ -165,7 +168,7 @@ export default class Addproddisp extends Component {
     e.preventDefault();
     this.setState({
         desc:this.descRef.current.value,
-        codigo:this.codigoRef.current.value,
+        codigo:this.codigoRef.current.value.toUpperCase(),
         porcentaje:this.porcentajeRef.current.value,
         nombre:this.nombreRef.current.value.toUpperCase(),
         clave:this.claveRef.current.value.toUpperCase(),
