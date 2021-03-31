@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import Paginacion from './Paginacion';
 import authHeader from "../services/auth-header";
 import axios from "axios";
 import Global from "../Global";
@@ -32,8 +31,6 @@ export default class Materiasprimas extends Component {
   isModalActive = false;
   state = {
     lstMatPrim: [],
-    pageOfItems: [],
-    page:1,
     filtro: "",
     status: "",
     idSelMp: -1,
@@ -71,21 +68,7 @@ export default class Materiasprimas extends Component {
     });
   };
 
-  filtrado = () =>{
-    var filter = this.filterRef.current.value.toUpperCase();
-    if(filter !== ''){
-    var nvoArray = this.state.pageOfItems.filter(element =>{
-      return Object.values(element).filter(item=>{ return String(item).toUpperCase().includes(filter)}).length > 0 
-    });
-    this.setState({
-      pageOfItems:nvoArray
-    });
-   }else{
-    this.setState({
-      pageOfItems:this.state.lstMatPrim.slice((this.state.page-1)*10,((this.state.page-1)*10)+10)
-    });
-   }
-  }
+ 
 
   addMp = () => {
     this.displayAdd = true;
@@ -102,14 +85,14 @@ export default class Materiasprimas extends Component {
     this.isAdd = false;
     let i = this.state.idSelMp
     this.setState({
-      matprima:this.state.pageOfItems[i],
+      matprima:this.state.lstMatPrim[i],
       idSelMp: -1
     });  
   }
 
   deleteMp = () =>{
     swal({
-      title: "Estas seguro que desea eliminar la MP["+this.state.pageOfItems[this.state.idSelMp].descripcion+"]?",
+      title: "Estas seguro que desea eliminar la MP["+this.state.lstMatPrim[this.state.idSelMp].descripcion+"]?",
       text: "Una vez eliminado, no se podrá recuperar la Materia Prima",
       icon: "warning",
       buttons: true,
@@ -117,9 +100,9 @@ export default class Materiasprimas extends Component {
     })
     .then((willDelete) => {
       if (willDelete) {
-        axios.delete(this.url+'matprima/'+this.state.pageOfItems[this.state.idSelMp].id,{ headers: authHeader() })
+        axios.delete(this.url+'matprima/'+this.state.lstMatPrim[this.state.idSelMp].id,{ headers: authHeader() })
         .then(res=>{
-          var mp = this.state.pageOfItems[this.state.idSelMp];
+          var mp = this.state.lstMatPrim[this.state.idSelMp];
           Bitacora(Global.DEL_MATPRIM,JSON.stringify(mp),'');
           swal("La materia prima ha sido eliminada!", {
             icon: "success",
@@ -141,7 +124,7 @@ export default class Materiasprimas extends Component {
   }
 
   sortCaducidad = ()=>{
-    let poi = this.state.pageOfItems;
+    let poi = this.state.lstMatPrim;
     this.sortDir = !this.sortDir;
      poi.sort((o1,o2)=>{
       let dateO1 =  new Date(momento(o1.fechaCaducidad,'MM-DD-YYYY H:mm:ss')) 
@@ -194,9 +177,9 @@ export default class Materiasprimas extends Component {
   }
 
   aproveMP = () =>{
-    if(!this.state.pageOfItems[this.state.idSelMp].aprobado){
+    if(!this.state.lstMatPrim[this.state.idSelMp].aprobado){
       swal({
-        title: "Desea aprobar la materia prima ["+this.state.pageOfItems[this.state.idSelMp].descripcion+"] del lote["+this.state.pageOfItems[this.state.idSelMp].lote+"] para su uso?",
+        title: "Desea aprobar la materia prima ["+this.state.lstMatPrim[this.state.idSelMp].descripcion+"] del lote["+this.state.lstMatPrim[this.state.idSelMp].lote+"] para su uso?",
         text: "Una vez aprobada, se podrá utilizar para generar los Lotes de Producto",
         icon: "warning",
         buttons: true,
@@ -204,10 +187,10 @@ export default class Materiasprimas extends Component {
       })
       .then((approved) => {
         if(approved){
-          let matprima = this.state.pageOfItems[this.state.idSelMp];
+          let matprima = this.state.lstMatPrim[this.state.idSelMp];
           matprima.aprobado = true;
           matprima.fechaAprobacion = momento(new Date()).format('YYYY-MM-DD HH:mm:ss.sss') ;
-          Axios.put(Global.url+'matprima/'+this.state.pageOfItems[this.state.idSelMp].id,matprima,{ headers: authHeader() })
+          Axios.put(Global.url+'matprima/'+this.state.lstMatPrim[this.state.idSelMp].id,matprima,{ headers: authHeader() })
           .then(res=>{
             swal('La materia prima ['+matprima.descripcion+'] ha sido aprobada');
             this.loadMatPrim();
@@ -249,12 +232,25 @@ export default class Materiasprimas extends Component {
     });
   }
 
-  onChangePage = (pageOfItems,page) => {
-    this.setState({ 
-      pageOfItems: pageOfItems, 
-      page:page,
-      idSelMp:-1 });
-  }
+  filtrado=()=>{
+    var filter = this.filterRef.current.value;
+    var td, found, i, j;
+    var tabla = document.getElementById('materiaprima');
+    for (i = 0; i <tabla.rows.length; i++){
+        td = tabla.rows[i].cells;
+        for (j = 0; j < td.length; j++) {
+            if (td[j].innerHTML.toUpperCase().indexOf(filter.toUpperCase()) > -1) {
+                found = true;
+            }
+        }
+        if (found) {
+            tabla.rows[i].style.display = "";
+            found = false;
+        } else {
+            tabla.rows[i].style.display = "none";
+        }
+    }
+}
 
   render() {
     var style = {};
@@ -263,7 +259,7 @@ export default class Materiasprimas extends Component {
     var styleFecCad = {};
     var today = new Date();
     if ((this.state.lstMatPrim.length > 0 || this.isFiltro)) {
-      var lstMp = this.state.pageOfItems.map((matprim, i) => {
+      var lstMp = this.state.lstMatPrim.map((matprim, i) => {
         if (this.state.idSelMp === i) {
           style = "selected pointer";
         } else{
@@ -373,24 +369,24 @@ export default class Materiasprimas extends Component {
                         }
                       </li>
                       <li>
-                        {(this.state.idSelMp === -1 || this.state.pageOfItems[this.state.idSelMp].aprobado) && 
+                        {(this.state.idSelMp === -1 || this.state.lstMatPrim[this.state.idSelMp].aprobado) && 
                         <Link to="#" >
                           <FontAwesomeIcon icon={faTrash} title="Eliminar Materia Prima" style={{color:'grey'}}/>
                         </Link>
                         }
-                        {(this.state.idSelMp !== -1 && !this.state.pageOfItems[this.state.idSelMp].aprobado) && 
+                        {(this.state.idSelMp !== -1 && !this.state.lstMatPrim[this.state.idSelMp].aprobado) && 
                         <Link to="#" onClick={this.deleteMp} >
                           <FontAwesomeIcon icon={faTrash} title="Eliminar Materia Prima"/>
                         </Link>
                         }
                       </li>
                       <li>
-                        {(this.state.idSelMp === -1 || this.state.pageOfItems[this.state.idSelMp].aprobado) &&
+                        {(this.state.idSelMp === -1 || this.state.lstMatPrim[this.state.idSelMp].aprobado) &&
                         <Link to="#" >
                         <FontAwesomeIcon icon={faCheckDouble} style={{color:'grey'}}/>
                         </Link>
                         }
-                        {(this.state.idSelMp !== -1 && !this.state.pageOfItems[this.state.idSelMp].aprobado) &&
+                        {(this.state.idSelMp !== -1 && !this.state.lstMatPrim[this.state.idSelMp].aprobado) &&
                         <Link to="#" onClick={this.aproveMP} >
                         <FontAwesomeIcon icon={faCheckDouble} title="Aprobar Materia Prima"/>
                         </Link>
@@ -405,7 +401,7 @@ export default class Materiasprimas extends Component {
                 <div className="modal-dialog modal-dialog-centered" style={{maxWidth:'600px'}} role="document">
                   <div className="modal-content">
                     <div className="modal-header">
-                      <h5 className="modal-title" id="exampleModalLabel">Detalle de la Materia Prima {this.state.pageOfItems[this.state.idSelMp].descripcion}</h5>
+                      <h5 className="modal-title" id="exampleModalLabel">Detalle de la Materia Prima {this.state.lstMatPrim[this.state.idSelMp].descripcion}</h5>
                       <button type="button" className="close" onClick={this.closeModal} data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                       </button>
@@ -416,19 +412,19 @@ export default class Materiasprimas extends Component {
                         <tbody>
                         <tr>
                             <td>Fecha Creación:</td>
-                            <td>{momento(this.state.pageOfItems[this.state.idSelMp].fechaCreacion,'YYYY-MM-DD hh:mm:ss').format('DD-MMM-YYYY hh:mm a')}</td>
+                            <td>{momento(this.state.lstMatPrim[this.state.idSelMp].fechaCreacion,'YYYY-MM-DD hh:mm:ss').format('DD-MMM-YYYY hh:mm a')}</td>
                           </tr>
                           <tr>
                             <td>Estatus:</td>
-                            <td>{this.state.pageOfItems[this.state.idSelMp].aprobado ? 'Aprobado':'Pendiente de Aprobación'}</td>
+                            <td>{this.state.lstMatPrim[this.state.idSelMp].aprobado ? 'Aprobado':'Pendiente de Aprobación'}</td>
                           </tr>
                           <tr>
                             <td>Lote:</td>
-                            <td>{this.state.pageOfItems[this.state.idSelMp].lote}</td>
+                            <td>{this.state.lstMatPrim[this.state.idSelMp].lote}</td>
                           </tr>
                           <tr>
                             <td>Observaciones:</td>
-                            <td>{this.state.pageOfItems[this.state.idSelMp].observaciones}</td>
+                            <td>{this.state.lstMatPrim[this.state.idSelMp].observaciones}</td>
                           </tr>
                         </tbody>
                       </table>
@@ -481,7 +477,7 @@ export default class Materiasprimas extends Component {
                 </table>              
               </div>
               <div className="center" style={{marginTop:'-10px'}}>
-              <Paginacion items={this.state.lstMatPrim} onChangePage={this.onChangePage} page={this.state.page}/>
+             
               </div>
             </React.Fragment>
           )}
@@ -507,7 +503,6 @@ export default class Materiasprimas extends Component {
                 </div>
               </div>
           <h1 className="center">No hay materias primas por mostrar</h1>
-          <Paginacion items={this.state.lstMatPrim} onChangePage={this.onChangePage} page={this.state.page}/>
         </div>
       );
     }

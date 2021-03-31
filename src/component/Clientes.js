@@ -65,7 +65,7 @@ export default class Clientes extends Component {
                   .then(res=>{
                     //var mp = this.state.lstMatPrim[this.state.idSelMp];
                     //Bitacora(Global.DEL_MATPRIM,JSON.stringify(mp),'');
-                    swal("La materia prima ha sido eliminada!", {
+                    swal("El Cliente ha sido eliminado!", {
                       icon: "success",
                     });
                     this.getClientes();
@@ -193,7 +193,7 @@ export default class Clientes extends Component {
                         </thead>
                     </table>
                     <div className="table-ovfl tbl-lesshead">
-                        <table className="table table-hover table-lst" style={{cursor:'pointer'}}>
+                        <table className="table table-hover table-bordered table-lst" style={{cursor:'pointer'}}>
                             <colgroup>
                                 <col width="20%"/>
                                 <col width="20%"/>

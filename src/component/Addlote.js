@@ -56,6 +56,7 @@ export default class Addlote extends Component {
   }
 
   onbtieneOC = (event)=>{
+    event.preventDefault();
     if(event.keyCode === 13 && this.state.lote.oc.oc !== ''){
       Axios.get(Global.url+'ordencompra/clave/'+this.state.lote.oc.oc,{ headers: authHeader() })
       .then(res =>{
@@ -118,6 +119,8 @@ export default class Addlote extends Component {
         this.validator.showMessages();
         this.forceUpdate();
       }
+    }else{
+      swal('Ingrese la cantidad de piezas para este lote');
     }
   }
 
@@ -206,7 +209,7 @@ export default class Addlote extends Component {
               {this.validator.message('oc',lote.oc.oc,'required')}
               <input type="number" name="piezas" className="center" placeholder="Piezas a fabricar"  ref={this.noPiezasRef} defaultValue={lote.piezasLote}/>
               {this.validator.message('piezas',lote.piezasLote,'required')}
-              <input type="text" name="lote" placeholder="Lote"  ref={this.numeroRef} className="center" required/>
+              <input type="text" name="lote" placeholder="Lote"  ref={this.numeroRef} className="center"/>
               {this.validator.message('lote',lote.numero,'required')}
             </div>
             
@@ -220,16 +223,17 @@ export default class Addlote extends Component {
               </React.Fragment>
             }
             </div>
-            
-            <div className="form-control grid-3">
+          </div>
+        </form>
+
+        <div className="container grid-3">
               <button className="btn btn-toolbar" onClick={this.validarLote}>Verificar</button>
               {this.state.lstErr.length === 0 && this.isErrorInit &&
               <button className="btn btn-success" onClick={this.creaLote}>Crear Lote</button>
               }
               <button className="btn btn-danger" onClick={this.cancelarLote} >Cancelar</button>
-            </div>
-          </div>
-        </form>
+        </div>
+        <br></br>
         {this.state.lstMatPrimResp.length > 0 &&
         <div className="container">
           <table className="table table-dark table-bordered tbl-lesshead-1 header-font">

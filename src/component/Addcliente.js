@@ -67,6 +67,7 @@ export default class Addcliente extends Component {
 
   enviarCliente = () =>{
     if(this.validator.allValid()){
+      
       var cliente = this.state.cliente;
       cliente.contactos = this.state.lstContactos;
       cliente.direccion = this.state.lstDireccion;
@@ -329,7 +330,7 @@ export default class Addcliente extends Component {
                           {this.state.lstDireccion.map((dir,i)=>{
                             return(
                             <tr key={i} onClick={()=>{this.selectRowDir(i)}} onDoubleClick={()=>{this.editDireccion()}} className={this.state.idSelDir===i?'selected pointer':''}>
-                              <td className="font14">{dir}</td>
+                              <td className="font12">{dir}</td>
                             </tr>
                             );
                           })}
@@ -363,9 +364,9 @@ export default class Addcliente extends Component {
                         {this.state.lstContactos.map((ctc,i)=>{
                           return(
                           <tr key={i} onClick={()=>this.selectRowContacto(i)}  onDoubleClick={()=>{this.editContacto()}} className={this.state.idSelCntc===i?'selected pointer':''}>
-                            <td className="font14">{ctc.nombre}</td>
-                            <td className="font14">{ctc.telefono}</td>
-                            <td className="font14">{ctc.email}</td>
+                            <td className="font12">{ctc.nombre}</td>
+                            <td className="font12">{ctc.telefono}</td>
+                            <td className="font12">{ctc.email}</td>
                           </tr>
                           );
                         })}

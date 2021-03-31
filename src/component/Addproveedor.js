@@ -248,7 +248,7 @@ export default class Addproveedor extends Component {
                 </div>
                 <div className="container grid">
                   <div></div>
-                  <div style={{border:'2px solid black',height:'250px'}}>
+                  <div style={{border:'2px solid black',height:'250px',marginTop:'-15px'}}>
                     <table className="table table-bordered center" style={{width:'100%'}}>
                       <colgroup>
                         <col width="35%" />
@@ -263,7 +263,7 @@ export default class Addproveedor extends Component {
                         </tr>
                       </thead>
                       </table>
-                      <div className="table-ovfl-proveedor tbl-lesshead">
+                      <div className="table-ovfl-proveedor">
                         <table className="table table-bordered" style={{cursor:'pointer'}}>
                           <colgroup>
                             <col width="35%" />
@@ -274,9 +274,9 @@ export default class Addproveedor extends Component {
                         {this.state.lstContactos.map((cntc,i)=>{
                           return(
                             <tr key={i} onClick={()=>this.selectRowContacto(i)}  onDoubleClick={()=>{this.editContacto()}} className={this.state.idSelCntc===i?'selected pointer':''}>
-                            <td className="font14">{cntc.nombre}</td>
-                            <td className="font14">{cntc.telefono}</td>
-                            <td className="font14">{cntc.email}</td>
+                            <td className="font12">{cntc.nombre}</td>
+                            <td className="font12" style={{textAlign:'center'}}>{cntc.telefono}</td>
+                            <td className="font12">{cntc.email}</td>
                           </tr>
                           );
                           })} 
@@ -286,7 +286,7 @@ export default class Addproveedor extends Component {
                   </div>
                 </div>
                 <div className="container grid">
-                    <button className="btn btn-success" onClick={this.enviarProveedor} >{this.btnMsg}</button>
+                    <button className="btn btn-success" onClick={this.enviarProveedor} disabled={this.state.lstContactos.length===0} >{this.btnMsg}</button>
                     <button className="btn btn-danger" onClick={this.cancelarProv}>Cancelar</button>
                 </div>
               </form>

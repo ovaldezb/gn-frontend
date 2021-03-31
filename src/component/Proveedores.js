@@ -29,12 +29,25 @@ export default class Proveedores extends Component {
     }
 
     getProveedores(){
+      let lstProvTmp = [];
         Axios.get(Global.url+'proveedor',{ headers: authHeader() })
         .then(res =>{
-            this.setState({
-                lstProv:res.data
-            });
-        } )
+          res.data.forEach(elem =>{
+            let prov = {};
+            prov.nombre = elem.nombre; 
+            prov.rfc = elem.rfc;
+            prov.telefonoPrincipal = elem.telefonoPrincipal;
+            prov.contacto = elem.contactos[0] !== undefined ? elem.contactos[0].nombre : '';
+            prov.email = elem.contactos[0] !== undefined ? elem.contactos[0].email : '';
+            prov.telefono = elem.contactos[0] !== undefined ? elem.contactos[0].telefono : '';
+            prov.id = elem.id;
+            prov.contactos = elem.contactos;
+            lstProvTmp.push(prov);
+          });
+          this.setState({
+              lstProv:lstProvTmp
+          });
+        })
         .catch(err=>{
             AuthService.isExpired(err.message);
         });
@@ -55,7 +68,7 @@ export default class Proveedores extends Component {
           })
           .then((willDelete) => {
             if (willDelete) {
-              axios.delete(Global.url+'proveedor/'+this.state.lstProv[this.state.idSelProv].id,{ headers: authHeader() })
+              axios.delete(Global.url+'proveedor/'+this.state.pageOfItems[this.state.idSelProv].id,{ headers: authHeader() })
                   .then(res=>{
                     //var mp = this.state.lstMatPrim[this.state.idSelMp];
                     //Bitacora(Global.DEL_MATPRIM,JSON.stringify(mp),'');
@@ -81,7 +94,7 @@ export default class Proveedores extends Component {
 
     selectRow = (i) => {
         this.setState({
-          idSelProv: ((this.state.page-1)*10) + i,
+          idSelProv:  i,
         });
       };
 
@@ -89,7 +102,7 @@ export default class Proveedores extends Component {
         this.displayAdd = true;
         this.isUpdt = true;
         this.setState({
-            proveedor:this.state.lstProv[((this.state.page-1)*10)+this.state.idSelProv]
+            proveedor:this.state.pageOfItems[this.state.idSelProv]
         });
     }
 
@@ -204,9 +217,9 @@ export default class Proveedores extends Component {
                                             <td className="font12">{prov.nombre}</td>
                                             <td className="font12">{prov.rfc}</td>
                                             <td className="font12">{prov.telefonoPrincipal}</td>
-                                            <td className="font12">{prov.contactos[0].email}</td>
-                                            <td className="font12">{prov.contactos[0].nombre}</td>
-                                            <td className="font12">{prov.contactos[0].telefono}</td>
+                                            <td className="font12">{prov.email}</td>
+                                            <td className="font12">{prov.contacto}</td>
+                                            <td className="font12">{prov.telefono}</td>
                                         </tr>
                                     );
                                 })}

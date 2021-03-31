@@ -249,7 +249,7 @@ export default class Ordenesfabricacion extends Component {
         return (
           <tr key={i} onClick={() => {this.selectRow(i)}}  className={style}>
             <td style={this.center} title={'Comentarios: '+ordfab.observaciones}>{this.pad(ordfab.noConsecutivo,Global.SIZE_DOC)}</td>
-            <td style={this.center}>{ordfab.oc.oc}</td>
+            <td style={this.center}>{ordfab.oc.producto.clave}</td>
             <td style={this.center}>{ordfab.lote}</td>
             <td style={this.center}><NumberFormat value={Number(ordfab.piezas)}displayType={'text'} thousandSeparator={true}/></td>
             <td style={this.center}>{ordfab.estatus}</td>
@@ -342,7 +342,7 @@ export default class Ordenesfabricacion extends Component {
                 <thead className="thead-dark">                   
                   <tr>
                     <th scope="col">No de Orden</th>
-                    <th scope="col">OC</th>
+                    <th scope="col">Clave Producto</th>
                     <th scope="col">Lote</th>
                     <th scope="col">Piezas</th>
                     <th scope="col">Estatus</th>
