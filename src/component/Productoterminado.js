@@ -38,9 +38,10 @@ export default class Productoterminado extends Component {
       idSelPt: -1,
       lstTipoEntrega:[]
       };
-    right_top = {textAlign:'right',verticalAlign: 'top'};
-    center_top = {textAlign:'center',verticalAlign: 'top'};
-    left_top = {textAlign:'left',verticalAlign: 'top'};
+  right_top = {textAlign:'right',verticalAlign: 'top'};
+  center_top = {textAlign:'center',verticalAlign: 'top'};
+  left_top = {textAlign:'left',verticalAlign: 'top'};
+
   componentDidMount(props) {
     this.loadProdTerm(true);
   }
@@ -526,7 +527,129 @@ export default class Productoterminado extends Component {
                   <td className="right bottom">&nbsp;</td>
                 </tr>
               </table>
+              <p className="font10">Original</p>
               <br></br>
+              <table style={{borderCollapse:'separate', borderSpacing:'0em'}} key={i} >
+                <tr>
+                  <td style={{width: '4.0cm'}} className="left top bottom" colSpan="2" rowSpan="3">
+                    <img src={Logo} alt="" width="90%"/>
+                  </td>
+                  <td style={{width: '9.6cm', height: '0.5cm'}} className="top right font12" colSpan="7"><b>GRUPO NORDAN S.A. DE C.V.</b></td>
+                  <td style={{width: '1.8cm'}} className="top bottom right font12" >Remision #</td>
+                  <td style={{width: '2.0cm'}} className="top bottom right font12">{pt.noRemision}</td>
+                </tr>
+                <tr>
+                  <td className="font12 right" style={{width:'0.6cm'}} colSpan="7">FRONTERA No 12, Col A. OBREGON TEL (722)2714460/61</td>
+                  <td colspan="2" className="font12 right bottom">FECHA</td>
+                </tr>
+                <tr>
+                  <td className="font12 bottom right" style={{width:'0.5cm'}} colSpan="7">SAN MATEO ATENCO, ESTADO DE MEXICO</td>
+                  <td colspan="2" className="font12 bottom right"><Clock format={'DD-MM-YYYY'} ticking={false}  /></td>
+                </tr>
+                <tr>
+                  <td className="left" style={{width: '2.0cm', height: '0.5cm'}}>&nbsp;</td>
+                  <td className="font12" style={{width: '2.0cm'}}>CLIENTE</td>
+                  <td className="right font12" colSpan="9">{pt.cliente.nombre}</td>
+                </tr>
+                <tr>
+                  <td className="left bottom" style={{width: '2.0cm', height: '0.5cm'}}>&nbsp;</td>
+                  <td className="font12 bottom" style={{width: '2.0cm'}}>DIRECCION</td>
+                  <td className="bottom right font12" colSpan="9">{pt.cliente.direccion[this.state.lstDirecciones[i]]}</td>
+                </tr>
+                <tr>
+                  <td className="font12 left bottom right" style={{height: '0.5cm'}}>CANTIDAD</td>
+                  <td className="font12 bottom right">CLAVE</td>
+                  <td className="font12 bottom right" colSpan="8">DESCRIPCION</td>
+                  <td className="font12 bottom right" style={{textAlign: 'center'}}>OC</td>
+                </tr>
+                <tr>
+                  <td className="font12 left right" style={{height: '1.0cm',textAlign:'right'}}><NumberFormat value={Number(pt.piezasEntregadas)} displayType={'text'} thousandSeparator={true} /></td>
+                  <td className="font12 right" style={{textAlign:'center'}}>{pt.clave}</td>
+                  <td className="font10 right" colspan="8">{pt.producto.nombre}</td>
+                  <td className="font12 right" style={{textAlign:'center'}}>{pt.oc}</td>
+                </tr>
+                <tr>
+                  <td className="left right" style={{height: '1.0cm'}}>&nbsp;</td>
+                  <td className="right">&nbsp;</td>
+                  <td className="font10" style={{width: '2.5cm'}}># Cajas/Paquetes</td>
+                  <td className="font10"><b>{Math.floor(pt.piezas / pt.producto.prodxcaja)}</b></td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td className="font10" style={{width: '1.0cm'}}>Pzas x Caja/Paquete</td>
+                  <td className="font10" style={{textAlign: 'center'}}><b>{pt.producto.prodxcaja}</b></td>
+                  <td className="font10" style={{textAlign:'right'}}>Resto</td>
+                  <td className="font10 right"><b>{pt.piezas - (Math.floor(pt.piezas / pt.producto.prodxcaja))*pt.producto.prodxcaja}</b></td>
+                  <td className="right">&nbsp;</td>
+                </tr>
+                <tr>
+                  <td className="left right bottom" style={{height: '0.8cm'}}>&nbsp;</td>
+                  <td className="right bottom">&nbsp;</td>
+                  <td className="right bottom font10" colSpan="8" >Lote: {pt.lote}</td>
+                  <td className="right bottom">&nbsp;</td>
+                </tr>
+              </table>
+              <p className="font10">Laboratorio</p>
+              <br></br>
+              <table style={{borderCollapse:'separate', borderSpacing:'0em'}} key={i} >
+                <tr>
+                  <td style={{width: '4.0cm'}} className="left top bottom" colSpan="2" rowSpan="3">
+                    <img src={Logo} alt="" width="90%"/>
+                  </td>
+                  <td style={{width: '9.6cm', height: '0.5cm'}} className="top right font12" colSpan="7"><b>GRUPO NORDAN S.A. DE C.V.</b></td>
+                  <td style={{width: '1.8cm'}} className="top bottom right font12" >Remision #</td>
+                  <td style={{width: '2.0cm'}} className="top bottom right font12">{pt.noRemision}</td>
+                </tr>
+                <tr>
+                  <td className="font12 right" style={{width:'0.6cm'}} colSpan="7">FRONTERA No 12, Col A. OBREGON TEL (722)2714460/61</td>
+                  <td colspan="2" className="font12 right bottom">FECHA</td>
+                </tr>
+                <tr>
+                  <td className="font12 bottom right" style={{width:'0.5cm'}} colSpan="7">SAN MATEO ATENCO, ESTADO DE MEXICO</td>
+                  <td colspan="2" className="font12 bottom right"><Clock format={'DD-MM-YYYY'} ticking={false}  /></td>
+                </tr>
+                <tr>
+                  <td className="left" style={{width: '2.0cm', height: '0.5cm'}}>&nbsp;</td>
+                  <td className="font12" style={{width: '2.0cm'}}>CLIENTE</td>
+                  <td className="right font12" colSpan="9">{pt.cliente.nombre}</td>
+                </tr>
+                <tr>
+                  <td className="left bottom" style={{width: '2.0cm', height: '0.5cm'}}>&nbsp;</td>
+                  <td className="font12 bottom" style={{width: '2.0cm'}}>DIRECCION</td>
+                  <td className="bottom right font12" colSpan="9">{pt.cliente.direccion[this.state.lstDirecciones[i]]}</td>
+                </tr>
+                <tr>
+                  <td className="font12 left bottom right" style={{height: '0.5cm'}}>CANTIDAD</td>
+                  <td className="font12 bottom right">CLAVE</td>
+                  <td className="font12 bottom right" colSpan="8">DESCRIPCION</td>
+                  <td className="font12 bottom right" style={{textAlign: 'center'}}>OC</td>
+                </tr>
+                <tr>
+                  <td className="font12 left right" style={{height: '1.0cm',textAlign:'right'}}><NumberFormat value={Number(pt.piezasEntregadas)} displayType={'text'} thousandSeparator={true} /></td>
+                  <td className="font12 right" style={{textAlign:'center'}}>{pt.clave}</td>
+                  <td className="font10 right" colspan="8">{pt.producto.nombre}</td>
+                  <td className="font12 right" style={{textAlign:'center'}}>{pt.oc}</td>
+                </tr>
+                <tr>
+                  <td className="left right" style={{height: '1.0cm'}}>&nbsp;</td>
+                  <td className="right">&nbsp;</td>
+                  <td className="font10" style={{width: '2.5cm'}}># Cajas/Paquetes</td>
+                  <td className="font10"><b>{Math.floor(pt.piezas / pt.producto.prodxcaja)}</b></td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td className="font10" style={{width: '1.0cm'}}>Pzas x Caja/Paquete</td>
+                  <td className="font10" style={{textAlign: 'center'}}><b>{pt.producto.prodxcaja}</b></td>
+                  <td className="font10" style={{textAlign:'right'}}>Resto</td>
+                  <td className="font10 right"><b>{pt.piezas - (Math.floor(pt.piezas / pt.producto.prodxcaja))*pt.producto.prodxcaja}</b></td>
+                  <td className="right">&nbsp;</td>
+                </tr>
+                <tr>
+                  <td className="left right bottom" style={{height: '0.8cm'}}>&nbsp;</td>
+                  <td className="right bottom">&nbsp;</td>
+                  <td className="right bottom font10" colSpan="8" >Lote: {pt.lote}</td>
+                  <td className="right bottom">&nbsp;</td>
+                </tr>
+              </table>
+              <p className="font10">Vigilancia</p>
               </React.Fragment>
               );
             })}
