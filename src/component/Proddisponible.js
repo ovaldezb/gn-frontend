@@ -8,7 +8,6 @@ import Bitacora from '../services/bitacora-service';
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faPlusSquare, faEdit,  faTrash,} from "@fortawesome/free-solid-svg-icons";
-import Paginacion from './Paginacion';
 import Addproddisp from './Addproddisp'
 
 export default class Proddisponible extends Component {
@@ -21,8 +20,6 @@ export default class Proddisponible extends Component {
   filterRef = React.createRef();
   state ={
     lstPrdDisp:[],
-    pageOfItems: [],
-    page:1,
     filtro: "",
     status: "",
     idSelPd: -1,
@@ -62,7 +59,7 @@ export default class Proddisponible extends Component {
 
   updatePd = () =>{
     this.setState({
-      proddisp:this.state.pageOfItems[this.state.idSelPd]
+      proddisp:this.state.lstPrdDisp[this.state.idSelPd]
     });
     this.displayAdd = true;
     this.isAdd = false;
@@ -84,14 +81,12 @@ export default class Proddisponible extends Component {
     this.displayAdd = false;
     if(prddisp){
         if(this.isAdd){
-            //this.state.lstPrdDisp.push(prddisp);
-            //this.setState({
-            //    lstPrdDisp:this.state.lstPrdDisp
-            //});
             this.loadProdDisp();
         }else{
             this.updateLstPd(prddisp);
         }
+    }else{
+      this.loadProdDisp();
     }
     //this.forceUpdate();
   }
@@ -124,30 +119,36 @@ export default class Proddisponible extends Component {
       });
   }
 
-  filtrado = () =>{
+  
+  filtrado=()=>{
     var filter = this.filterRef.current.value;
-    var nvoArray = this.state.lstPrdDisp.filter(element =>{
-      return Object.values(element).filter(item=>{ return String(item).includes(filter)}).length > 0 
-    });
-    this.setState({
-      pageOfItems:nvoArray
-    });
+    var td, found, i, j;
+    var tabla = document.getElementById('proddisponible');
+    for (i = 0; i <tabla.rows.length; i++){
+        td = tabla.rows[i].cells;
+        for (j = 0; j < td.length; j++) {
+            if (td[j].innerHTML.toUpperCase().indexOf(filter.toUpperCase()) > -1) {
+                found = true;
+            }
+        }
+        if (found) {
+            tabla.rows[i].style.display = "";
+            found = false;
+        } else {
+            tabla.rows[i].style.display = "none";
+        }
+    }
   }
 
   selectRow = (i) => {
     this.setState({
-      idSelPd:((this.state.page-1)*10) + i,
+      idSelPd: i,
     });
   };
 
-  onChangePage = (pageOfItems,page) => {
-    // update state with new page of items
-    this.setState({ pageOfItems: pageOfItems, page:page });
-  }
-
   render() {
     if (this.state.lstPrdDisp.length > 0) {
-        var lstMp = this.state.pageOfItems.map((proddisp, i) => {
+        var lstMp = this.state.lstPrdDisp.map((proddisp, i) => {
             if(this.state.idSelPd === i){
                 this.style = "selected pointer";
             }else{
@@ -221,15 +222,11 @@ export default class Proddisponible extends Component {
                             </tr>
                           </thead>
                         </table>
-                        <div className="table-ovfl tbl-lesshead">
-                          <table className="table table-hover" style={{cursor:'pointer'}} id="materiaprima">
+                        <div className="table-ovfl-mp tbl-lesshead">
+                          <table className="table table-hover" style={{cursor:'pointer'}} id="proddisponible">
                             <tbody>{lstMp}</tbody>
                           </table>              
                         </div>
-                        <div className="center">
-                          <Paginacion items={this.state.lstPrdDisp} onChangePage={this.onChangePage} page={this.state.page}/>
-                        </div>
-                      
                 </React.Fragment>
                 }
             </React.Fragment>

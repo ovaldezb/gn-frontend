@@ -250,7 +250,7 @@ export default class Materiasprimas extends Component {
             tabla.rows[i].style.display = "none";
         }
     }
-}
+  }
 
   render() {
     var style = {};
@@ -476,9 +476,7 @@ export default class Materiasprimas extends Component {
                   <tbody>{lstMp}</tbody>
                 </table>              
               </div>
-              <div className="center" style={{marginTop:'-10px'}}>
-             
-              </div>
+              
             </React.Fragment>
           )}
         </React.Fragment>

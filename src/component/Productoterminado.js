@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import Paginacion from './Paginacion';
 import authHeader from "../services/auth-header";
 import Axios from 'axios';
 import Global from '../Global';
@@ -29,11 +28,9 @@ export default class Productoterminado extends Component {
 
   state = {
       lstPdrTerm:[],
-      pageOfItems: [],
       lstPTEntregado:[],
       lstSelected:[],
       lstDirecciones:[],
-      page:1,
       filtro: "",
       idSelPt: -1,
       lstTipoEntrega:[]
@@ -89,14 +86,24 @@ export default class Productoterminado extends Component {
     this.isModalActive = true;
   }
 
-  filtrado = () =>{
+  filtrado=()=>{
     var filter = this.filterRef.current.value;
-    var nvoArray = this.state.lstPdrTerm.filter(element =>{
-      return Object.values(element).filter(item=>{ return String(item).includes(filter)}).length > 0 
-    });
-    this.setState({
-      pageOfItems:nvoArray
-    });
+    var td, found, i, j;
+    var tabla = document.getElementById('productoterminado');
+    for (i = 0; i <tabla.rows.length; i++){
+        td = tabla.rows[i].cells;
+        for (j = 0; j < td.length; j++) {
+            if (td[j].innerHTML.toUpperCase().indexOf(filter.toUpperCase()) > -1) {
+                found = true;
+            }
+        }
+        if (found) {
+            tabla.rows[i].style.display = "";
+            found = false;
+        } else {
+            tabla.rows[i].style.display = "none";
+        }
+    }
   }
 
   selectRow = (i, activar) => {
@@ -109,11 +116,6 @@ export default class Productoterminado extends Component {
     });
     document.getElementById('check'+i).checked = selected[i];
   };
-
-  onChangePage = (pageOfItems,page) => {
-    // update state with new page of items
-    this.setState({ pageOfItems: pageOfItems, page:page });
-  }
 
   selectType = () =>{
     if(this.activosRef.current.checked){
@@ -362,8 +364,8 @@ export default class Productoterminado extends Component {
                   </tr>
                 </thead>
               </table>
-              <div className="table-ovfl tbl-lesshead">
-                <table className="table table-lst table-bordered table-hover" style={{cursor:'pointer'}}>
+              <div className="table-ovfl-mp tbl-lesshead">
+                <table className="table table-lst table-bordered table-hover" style={{cursor:'pointer'}} id="productoterminado">
                   <colgroup>
                   <col width="7%"/>
                   <col width="30%"/>
@@ -377,7 +379,7 @@ export default class Productoterminado extends Component {
                   </colgroup>
                   <tbody>
                     {
-                      this.state.pageOfItems.map((prodterm,i)=>{
+                      this.state.lstPdrTerm.map((prodterm,i)=>{
                         style = this.state.lstSelected[i] ? "selected pointer":{};
                         return(
                           <tr key={i} onClick={() => {this.selectRow(i,(prodterm.estatus.codigo === Global.WTDEL || prodterm.estatus.codigo === Global.EEP))}}  className={style}>
@@ -397,7 +399,6 @@ export default class Productoterminado extends Component {
                   </tbody>
                 </table>
               </div>
-              <Paginacion items={this.state.lstPdrTerm} onChangePage={this.onChangePage} page={this.state.page}/>
             </div>
             {this.isModalActive && 
               <div className="modal fade show"  tabIndex="-1" role="dialog" style={{display:'block'}}>

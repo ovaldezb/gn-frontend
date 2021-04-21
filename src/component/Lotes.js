@@ -12,7 +12,7 @@ import {
   faEdit,
   faTrash,faCheckDouble
 } from "@fortawesome/free-solid-svg-icons";
-import Paginacion from './Paginacion';
+
 import NumberFormat from 'react-number-format';
 
 export default class Lotes extends Component {
@@ -23,8 +23,6 @@ export default class Lotes extends Component {
   isAdd = true;
   state={
     lstLotes:[],
-    pageOfItems: [],
-    page:1,
     lote:{},
     idSelLt:-1
   }
@@ -121,30 +119,28 @@ export default class Lotes extends Component {
     })
   }
 
-  filtrado = () =>{
-    var filter = this.filterRef.current.value.toUpperCase();
-    if(filter !== ''){
-    var nvoArray = this.state.lstLotes.filter(element =>{
-      return Object.values(element).filter(item=>{ return String(item).toUpperCase().includes(filter)}).length > 0 
-    });
-    this.setState({
-      pageOfItems:nvoArray.slice()
-    });
-   }else{
-    this.setState({
-      pageOfItems:this.state.lstLotes.slice((this.state.page-1)*10,((this.state.page-1)*10)+9)
-    });
-   }
+  filtrado=()=>{
+    var filter = this.filterRef.current.value;
+    var td, found, i, j;
+    var tabla = document.getElementById('lotes');
+    for (i = 0; i <tabla.rows.length; i++){
+        td = tabla.rows[i].cells;
+        for (j = 0; j < td.length; j++) {
+            if (td[j].innerHTML.toUpperCase().indexOf(filter.toUpperCase()) > -1) {
+                found = true;
+            }
+        }
+        if (found) {
+            tabla.rows[i].style.display = "";
+            found = false;
+        } else {
+            tabla.rows[i].style.display = "none";
+        }
+    }
   }
 
   selectType = ()=>{
-    console.log(this.selAllRef.current.checked);
     this.loadLotes(this.selAllRef.current.checked);
-  }
-
-  onChangePage = (pageOfItems,page) => {
-    // update state with new page of items
-    this.setState({ pageOfItems: pageOfItems, page:page });
   }
 
   render() {
@@ -173,36 +169,36 @@ export default class Lotes extends Component {
                     </Link>
                   </li>
                   <li>
-                    {(this.state.idSelLt === -1 || this.state.pageOfItems[this.state.idSelLt].estatus !== Global.OPEN) &&
+                    {(this.state.idSelLt === -1 || this.state.lstLotes[this.state.idSelLt].estatus !== Global.OPEN) &&
                     <Link to="#" >
                       <FontAwesomeIcon icon={faEdit} style={{color:'grey'}} />
                     </Link>
                     }
-                    {(this.state.idSelLt !== -1 && this.state.pageOfItems[this.state.idSelLt].estatus === Global.OPEN) &&
+                    {(this.state.idSelLt !== -1 && this.state.lstLotes[this.state.idSelLt].estatus === Global.OPEN) &&
                     <Link to="#" onClick={this.editLote}>
                       <FontAwesomeIcon icon={faEdit} />
                     </Link>
                     }
                   </li>
                   <li>
-                    {(this.state.idSelLt === -1 || this.state.pageOfItems[this.state.idSelLt].estatus !== Global.OPEN) &&
+                    {(this.state.idSelLt === -1 || this.state.lstLotes[this.state.idSelLt].estatus !== Global.OPEN) &&
                     <Link to="#" >
                     <FontAwesomeIcon icon={faTrash} style={{color:'grey'}}/>
                     </Link>
                     }
-                    {(this.state.idSelLt !== -1 && this.state.pageOfItems[this.state.idSelLt].estatus === Global.OPEN) &&
+                    {(this.state.idSelLt !== -1 && this.state.lstLotes[this.state.idSelLt].estatus === Global.OPEN) &&
                     <Link to="#" onClick={this.deleteLote}>
                     <FontAwesomeIcon icon={faTrash}/>
                     </Link>
                     }
                   </li>
                   <li>
-                    {(this.state.idSelLt === -1 || this.state.pageOfItems[this.state.idSelLt].estatus !== Global.OPEN) && 
+                    {(this.state.idSelLt === -1 || this.state.lstLotes[this.state.idSelLt].estatus !== Global.OPEN) && 
                     <Link to="#" >
                       <FontAwesomeIcon icon={faCheckDouble} style={{color:'grey'}} />
                     </Link>
                     }
-                    {(this.state.idSelLt !== -1 && this.state.pageOfItems[this.state.idSelLt].estatus === Global.OPEN) && 
+                    {(this.state.idSelLt !== -1 && this.state.lstLotes[this.state.idSelLt].estatus === Global.OPEN) && 
                     <Link to="#" onClick={this.changeSttus} >
                       <FontAwesomeIcon icon={faCheckDouble} />
                     </Link>
@@ -215,9 +211,9 @@ export default class Lotes extends Component {
             <table className="table table-bordered">
               <colgroup>
                 <col width="10%"/>
-                <col width="10%"/>
-                <col width="35%"/>
-                <col width="25%"/>
+                <col width="15%"/>
+                <col width="40%"/>
+                <col width="15%"/>
                 <col width="10%"/>
                 <col width="10%"/>
               </colgroup>
@@ -226,24 +222,24 @@ export default class Lotes extends Component {
                   <th style={{textAlign:'center'}}>OC</th>
                   <th style={{textAlign:'center'}}>Lote</th>
                   <th style={{textAlign:'center'}}>Producto</th>
-                  <th style={{textAlign:'center'}}>Cliente</th>
+                  <th style={{textAlign:'center'}}>Clave</th>
                   <th style={{textAlign:'center'}}>Pieza Lote</th>
                   <th style={{textAlign:'center'}}>Estatus</th>
                 </tr>
               </thead>
             </table>
-            <div className="table-ovfl tbl-lesshead">
-            <table className="table table-bordered table-lst table-hover" style={{cursor:'pointer'}} id="ordenFabricacion">
+            <div className="table-ovfl-mp tbl-lesshead">
+            <table className="table table-bordered table-lst table-hover" style={{cursor:'pointer'}} id="lotes">
               <colgroup>
                 <col width="10%"/>
-                <col width="10%"/>
-                <col width="35%"/>
-                <col width="25%"/>
+                <col width="15%"/>
+                <col width="40%"/>
+                <col width="15%"/>
                 <col width="10%"/>
                 <col width="10%"/>
               </colgroup>
               <tbody>
-                {this.state.pageOfItems.map((lote,i)=>{
+                {this.state.lstLotes.map((lote,i)=>{
                   if(this.state.idSelLt === i){
                     style = "selected pointer";
                   }else{
@@ -254,7 +250,7 @@ export default class Lotes extends Component {
                       <td>{lote.ordencompra}</td>
                       <td style={{textAlign:'center'}}>{lote.lote}</td>
                       <td>{lote.producto}</td>
-                      <td>{lote.cliente}</td>
+                      <td style={{textAlign:'center'}}>{lote.oc.clave}</td>
                       <td style={{textAlign:'center'}}><NumberFormat value={Number(lote.piezasLote)}displayType={'text'} thousandSeparator={true} /></td>
                       <td style={{textAlign:'center'}}>{lote.estatus}</td>
                     </tr> 
@@ -262,9 +258,6 @@ export default class Lotes extends Component {
                 })}
               </tbody>
             </table>
-            </div>
-            <div className="center">
-              <Paginacion items={this.state.lstLotes} onChangePage={this.onChangePage} page={this.state.page} />
             </div>
           </React.Fragment>
           }

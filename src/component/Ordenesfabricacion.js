@@ -9,7 +9,7 @@ import {
   faEdit,
   faTrash, faCheckDouble,faPrint
 } from "@fortawesome/free-solid-svg-icons";
-import Paginacion from './Paginacion';
+
 import Addordenfab from "./Addordenfab";
 import NumberFormat from 'react-number-format';
 import swal from "sweetalert";
@@ -29,8 +29,6 @@ export default class Ordenesfabricacion extends Component {
   isComplete = false;
   state = {
     lstOF: [],
-    pageOfItems: [],
-    page:1,
     filtro: "",
     status: "",
     idSelOf: -1,
@@ -82,7 +80,7 @@ export default class Ordenesfabricacion extends Component {
 
   completeOF = () =>{
     swal({
-      title: "Desea completar la Orden de Fabricación: "+this.pad(this.state.pageOfItems[this.state.idSelOf].noConsecutivo,Global.SIZE_DOC)+"?",
+      title: "Desea completar la Orden de Fabricación: "+this.pad(this.state.lstOF[this.state.idSelOf].noConsecutivo,Global.SIZE_DOC)+"?",
       text: "Una vez completado, pasará a Producto Terminado",
       icon: "warning",
       buttons: true,
@@ -90,7 +88,7 @@ export default class Ordenesfabricacion extends Component {
     })
     .then((willDelete) => {
       if (willDelete) {
-        axios.get(Global.url+'ordenfab/complete/'+this.state.pageOfItems[this.state.idSelOf].id,{ headers: authHeader() })
+        axios.get(Global.url+'ordenfab/complete/'+this.state.lstOF[this.state.idSelOf].id,{ headers: authHeader() })
         .then(res=>{
           //var mp = this.state.lstMatPrim[this.state.idSelMp];
           //Bitacora(Global.DEL_MATPRIM,JSON.stringify(mp),'');
@@ -111,7 +109,7 @@ export default class Ordenesfabricacion extends Component {
     this.displayAdd = true;
     this.isAdd = false;
     this.setState({
-      ordenfab:this.state.pageOfItems[this.state.idSelOf]
+      ordenfab:this.state.lstOF[this.state.idSelOf]
     });
   }
 
@@ -177,6 +175,9 @@ export default class Ordenesfabricacion extends Component {
     '  .font14{'+
     '      font-size: 14px;'+
     '  }'+
+    '  .font12{'+
+    '      font-size: 12px;'+
+    '  }'+
     '} '  + 
     '</style>';
     var is_chrome = Boolean(window.chrome);
@@ -197,14 +198,24 @@ export default class Ordenesfabricacion extends Component {
     }
   }
 
-  filtrado = () =>{
+  filtrado=()=>{
     var filter = this.filterRef.current.value;
-    var nvoArray = this.state.lstOF.filter(element =>{
-      return Object.values(element).filter(item=>{ return String(item).includes(filter)}).length > 0 
-    });
-    this.setState({
-      pageOfItems:nvoArray
-    });
+    var td, found, i, j;
+    var tabla = document.getElementById('ordenFabricacion');
+    for (i = 0; i <tabla.rows.length; i++){
+        td = tabla.rows[i].cells;
+        for (j = 0; j < td.length; j++) {
+            if (td[j].innerHTML.toUpperCase().indexOf(filter.toUpperCase()) > -1) {
+                found = true;
+            }
+        }
+        if (found) {
+            tabla.rows[i].style.display = "";
+            found = false;
+        } else {
+            tabla.rows[i].style.display = "none";
+        }
+    }
   }
 
   selectRow = (i) => {
@@ -218,10 +229,6 @@ export default class Ordenesfabricacion extends Component {
     });
   };
 
-  onChangePage = (pageOfItems,page) => {
-    // update state with new page of items
-    this.setState({ pageOfItems: pageOfItems, page:page });
-  }
 
   pad(num, size) {
     num = num.toString();
@@ -231,10 +238,10 @@ export default class Ordenesfabricacion extends Component {
 
   render() {
     var cantidadTotal = 0;
-    const OF = this.state.pageOfItems[this.state.idSelOf];
+    const OF = this.state.lstOF[this.state.idSelOf];
     var style = {};
     if (this.state.lstOF.length > 0) {
-      var lstOrdFabPI = this.state.pageOfItems.map((ordfab, i) => {
+      var lstOrdFabPI = this.state.lstOF.map((ordfab, i) => {
         if (this.state.idSelOf === i) {
           style = "selected pointer";
           if(ordfab.estatus===Global.TEP){
@@ -286,30 +293,37 @@ export default class Ordenesfabricacion extends Component {
                         </Link>
                       </li>
                       <li>
-                        {(this.state.idSelOf === -1  || this.state.pageOfItems[this.state.idSelOf].estatus!==Global.TEP) &&
+                        {(this.state.idSelOf === -1  || this.state.lstOF[this.state.idSelOf].estatus!==Global.TEP) &&
                           <Link to="#" title="Actualiza la OF Seleccionada">
                           <FontAwesomeIcon icon={faEdit} style={{color:'grey'}} />
                           </Link>
                         }
-                        {(this.state.idSelOf !== -1 && this.state.pageOfItems[this.state.idSelOf].estatus===Global.TEP) &&
+                        {(this.state.idSelOf !== -1 && this.state.lstOF[this.state.idSelOf].estatus===Global.TEP) &&
                           <Link to="#" onClick={this.updateOf} title="Actualiza la OF Seleccionada">
                           <FontAwesomeIcon icon={faEdit} />
                           </Link>                         
                         }
                       </li>
                       <li>
+                        {this.state.idSelOf === -1 && 
+                        <Link to="#"  title="Imprime la OF Seleccionada">
+                          <FontAwesomeIcon icon={faPrint} style={{color:'grey'}}/>
+                        </Link>
+                        }
+                        {this.state.idSelOf !== -1 && 
                         <Link to="#" onClick={this.printOf} title="Imprime la OF Seleccionada">
                           <FontAwesomeIcon icon={faPrint} />
                         </Link>
+                        }
                       </li>
                       <li>
-                        {(this.state.idSelOf === -1  || this.state.pageOfItems[this.state.idSelOf].estatus!==Global.TEP) &&
+                        {(this.state.idSelOf === -1  || this.state.lstOF[this.state.idSelOf].estatus!==Global.TEP) &&
                           <Link to="#" title="Elimina la OF Seleccionada">
                           <FontAwesomeIcon icon={faTrash} style={{color:'grey'}} />
                           </Link>
                         }
                         
-                        {(this.state.idSelOf !== -1 && this.state.pageOfItems[this.state.idSelOf].estatus===Global.TEP) &&
+                        {(this.state.idSelOf !== -1 && this.state.lstOF[this.state.idSelOf].estatus===Global.TEP) &&
                           <Link to="#" onClick={this.deleteOf} title="Elimina la OF Seleccionada">
                           <FontAwesomeIcon icon={faTrash} />
                           </Link>
@@ -350,7 +364,7 @@ export default class Ordenesfabricacion extends Component {
                   </tr>
                 </thead>
               </table>
-              <div className="table-ovfl table-hover tbl-lesshead">
+              <div className="table-ovfl-mp table-hover tbl-lesshead">
                 <table className="table table-bordered table-lst" style={{cursor:'pointer'}} id="ordenFabricacion">
                   <colgroup>
                   <col width="18%"/>
@@ -363,9 +377,7 @@ export default class Ordenesfabricacion extends Component {
                   <tbody>{lstOrdFabPI}</tbody>
                 </table>              
               </div>
-              <div className="center">
-                <Paginacion items={this.state.lstOF} onChangePage={this.onChangePage} page={this.state.page} />
-              </div>
+
               {this.state.idSelOf !== -1 &&
               <div id="print" style={{display:'none'}}>
                 <table>
@@ -437,7 +449,7 @@ export default class Ordenesfabricacion extends Component {
                               <td className="top bottom right center">&nbsp;</td>
                               <td className="top bottom right center">%</td>
                               <td className="top bottom right center">KGS</td>
-                              <td className="top bottom right center">&nbsp;</td>
+                              <td className="top bottom right center">CLAVE</td>
                               <td className="top bottom right center">LOTE</td>
                               <td className="top bottom right center">&nbsp;</td>
                           </tr>
@@ -447,19 +459,17 @@ export default class Ordenesfabricacion extends Component {
                               cantidadTotal += mp.cantidad;
                               return(
                                 <tr key={i}>
-                                  <td className="left right">{mp.nombre}</td>
-                                  <td className="right center"><NumberFormat value={Number(mpObjetoFormula[0].porcentaje/100)} format="#####" displayType={'text'}/></td>
-                                  <td className="right center">{Number(mpObjetoFormula[0].porcentaje).toFixed(2)}</td>
-                                  <td className="right center">{Number(mp.cantidad).toFixed(2)}</td>
-                                  <td className="right">{mp.nombre}</td>
-                                  <td className="right center">{mp.lote}</td>
-                                  <td className="right">
-                                    <table style={{width: '100%'}}>
-                                      <tbody>
-                                        <tr>
-                                          <td className="left right top bottom">&nbsp;</td>
-                                        </tr>
-                                      </tbody>
+                                  <td className="left right bottom font12">{mp.nombre}</td>
+                                  <td className="right center bottom font12"><NumberFormat value={Number(mpObjetoFormula[0].porcentaje/100)} format="#####" displayType={'text'}/></td>
+                                  <td className="right center bottom font12">{Number(mpObjetoFormula[0].porcentaje).toFixed(2)}</td>
+                                  <td className="right center bottom font12">{Number(mp.cantidad).toFixed(2)}</td>
+                                  <td className="right bottom center font12">{mp.codigo}</td>
+                                  <td className="right center bottom font12">{mp.lote}</td>
+                                  <td className="right bottom">
+                                    <table style={{border:'2px solid black',width:'100%'}}>
+                                      <tr>
+                                        <td>&nbsp;</td>
+                                      </tr>
                                     </table>
                                   </td>
                                 </tr>
@@ -467,12 +477,12 @@ export default class Ordenesfabricacion extends Component {
                             })
                           }  
                           <tr>
-                              <td className="left top right bottom">Total</td>
-                              <td className="right top bottom center">1</td>
-                              <td className="right top bottom center">100%</td>
-                              <td className="right top bottom center">{Number(cantidadTotal).toFixed(2)}</td>
-                              <td className="right top bottom">&nbsp;</td>                              
-                              <td className="right top bottom" colSpan="2">Tamaños del Lote</td>
+                              <td className="left right bottom">Total</td>
+                              <td className="right  bottom center">1</td>
+                              <td className="right  bottom center">100%</td>
+                              <td className="right  bottom center">{Number(cantidadTotal).toFixed(2)}</td>
+                              <td className="right  bottom">&nbsp;</td>                              
+                              <td className="right  bottom font12" colSpan="2">Tamaños del Lote</td>
                           </tr> 
                           </tbody>               
                       </table>

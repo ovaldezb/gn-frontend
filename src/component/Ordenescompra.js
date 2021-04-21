@@ -10,7 +10,7 @@ import {
   faTrash,
   faTimesCircle
 } from "@fortawesome/free-solid-svg-icons";
-import Paginacion from './Paginacion';
+//import Paginacion from './Paginacion';
 import Moment from 'react-moment';
 import momento from 'moment';
 import NumberFormat from 'react-number-format';
@@ -29,8 +29,6 @@ export default class Ordenescompra extends Component {
   isModalActive = false;
   state = {
     lstOC: [],
-    pageOfItems: [],
-    page:1,
     filtro: "",
     status: "",
     idSelOc: -1,
@@ -72,7 +70,7 @@ export default class Ordenescompra extends Component {
     }
     let i =  this.state.idSelOc
       this.setState({
-        ordencompra:this.state.pageOfItems[i]
+        ordencompra:this.state.lstOC[i]
       });
       this.displayAdd = true;
       this.isAdd = false;
@@ -100,14 +98,14 @@ export default class Ordenescompra extends Component {
   deleteOc = () =>{
     swal({
       title: "Estas seguro?",
-      text: "Una vez eliminado, no se podrá recuperar la Orden de Compra "+this.state.pageOfItems[this.state.idSelOc].oc,
+      text: "Una vez eliminado, no se podrá recuperar la Orden de Compra "+this.state.lstOC[this.state.idSelOc].oc,
       icon: "warning",
       buttons: true,
       dangerMode: true,
     })
     .then((willDelete) => {
       if (willDelete) {
-        axios.delete(Global.url+'ordencompra/'+this.state.pageOfItems[this.state.idSelOc].id,{ headers: authHeader() })
+        axios.delete(Global.url+'ordencompra/'+this.state.lstOC[this.state.idSelOc].id,{ headers: authHeader() })
             .then(res=>{
               //var oc = this.state.lstOC[this.state.idSelOc];
               //Bitacora(Global.DEL_MATPRIM,JSON.stringify(mp),'');
@@ -125,30 +123,37 @@ export default class Ordenescompra extends Component {
     });
   }
 
-  filtrado = () =>{
+  filtrado=()=>{
     var filter = this.filterRef.current.value;
-    var nvoArray = this.state.lstOC.filter(element =>{
-      return Object.values(element).filter(item=>{ return String(item).includes(filter)}).length > 0 
-    });
-    this.setState({
-      pageOfItems:nvoArray
-    });
+    var td, found, i, j;
+    var tabla = document.getElementById('ordenCompra');
+    for (i = 0; i <tabla.rows.length; i++){
+        td = tabla.rows[i].cells;
+        for (j = 0; j < td.length; j++) {
+            if (td[j].innerHTML.toUpperCase().indexOf(filter.toUpperCase()) > -1) {
+                found = true;
+            }
+        }
+        if (found) {
+            tabla.rows[i].style.display = "";
+            found = false;
+        } else {
+            tabla.rows[i].style.display = "none";
+        }
+    }
   }
 
   selectRow = (i) => {
     this.setState({
-      idSelOc: i//((this.state.page - 1) * 10) + i,
+      idSelOc: i
     });
   };
 
-  onChangePage = (pageOfItems,page) => {
-    // update state with new page of items
-    this.setState({ pageOfItems: pageOfItems, page:page });
-  }
+
 
   cancelOC = () =>{
     swal({
-      title: "Desea cancelar la orden de compra ["+this.state.pageOfItems[this.state.idSelOc].oc+"] ?",
+      title: "Desea cancelar la orden de compra ["+this.state.lstOC[this.state.idSelOc].oc+"] ?",
       text: "Una vez cancelada, no se podrán generar mas Lotes de Producto, los que ya fueron generados no se veran afectados",
       icon: "warning",
       buttons: true,
@@ -156,7 +161,7 @@ export default class Ordenescompra extends Component {
     })
     .then((approved) => {
       if(approved){
-        let ordcom = this.state.pageOfItems[this.state.idSelOc];
+        let ordcom = this.state.lstOC[this.state.idSelOc];
         ordcom.estatus = Global.CANCEL;
         axios.put(Global.url+'ordencompra/'+ordcom.id,ordcom,{ headers: authHeader() })
         .then(res =>{
@@ -178,7 +183,7 @@ export default class Ordenescompra extends Component {
   render() {
     var style = {};
     if (this.state.lstOC.length > 0) {
-      var lstOrdComPI = this.state.pageOfItems.map((ordcomp, i) => {
+      var lstOrdComPI = this.state.lstOC.map((ordcomp, i) => {
         if (this.state.idSelOc === i) {
           style = "selected pointer";
           if(ordcomp.estatus===Global.TEP){
@@ -227,36 +232,36 @@ export default class Ordenescompra extends Component {
                         </Link>
                       </li>
                       <li>
-                        {(this.state.idSelOc === -1 || this.state.pageOfItems[this.state.idSelOc].estatus !== Global.OPEN) &&
+                        {(this.state.idSelOc === -1 || this.state.lstOC[this.state.idSelOc].estatus !== Global.OPEN) &&
                           <Link to="#">
                           <FontAwesomeIcon icon={faEdit} style={{color:'grey'}}/>
                           </Link>
                         }
-                        {(this.state.idSelOc !== -1 && this.state.pageOfItems[this.state.idSelOc].estatus === Global.OPEN) &&
+                        {(this.state.idSelOc !== -1 && this.state.lstOC[this.state.idSelOc].estatus === Global.OPEN) &&
                         <Link to="#" onClick={this.updateOc} >
                           <FontAwesomeIcon icon={faEdit} />
                         </Link>
                         }
                       </li>
                       <li>
-                        {(this.state.idSelOc === -1 || this.state.pageOfItems[this.state.idSelOc].estatus !== Global.OPEN) &&
+                        {(this.state.idSelOc === -1 || this.state.lstOC[this.state.idSelOc].estatus !== Global.OPEN) &&
                           <Link to="#">
                             <FontAwesomeIcon icon={faTrash} style={{color:'grey'}}/>
                           </Link>
                         }
-                        {(this.state.idSelOc !== -1 && this.state.pageOfItems[this.state.idSelOc].estatus === Global.OPEN) &&
+                        {(this.state.idSelOc !== -1 && this.state.lstOC[this.state.idSelOc].estatus === Global.OPEN) &&
                         <Link to="#" onClick={this.deleteOc} >
                           <FontAwesomeIcon icon={faTrash} />
                         </Link>
                         }                        
                       </li>
                       <li>
-                      {(this.state.idSelOc === -1 || this.state.pageOfItems[this.state.idSelOc].estatus !== Global.TEP) &&
+                      {(this.state.idSelOc === -1 || this.state.lstOC[this.state.idSelOc].estatus !== Global.TEP) &&
                         <Link to="#" title="Cancelar OC" >
                           <FontAwesomeIcon icon={faTimesCircle} style={{color:'grey'}} />
                         </Link>
                       }
-                      {(this.state.idSelOc !== -1 && this.state.pageOfItems[this.state.idSelOc].estatus === Global.TEP) &&
+                      {(this.state.idSelOc !== -1 && this.state.lstOC[this.state.idSelOc].estatus === Global.TEP) &&
                         <Link to="#" onClick={this.cancelOC} title="Cancelar OC">
                           <FontAwesomeIcon icon={faTimesCircle} />
                         </Link>
@@ -290,8 +295,8 @@ export default class Ordenescompra extends Component {
                   </tr>
                 </thead>
               </table>
-              <div className="table-ovfl tbl-lesshead">
-                <table className="table table-bordered table-lst table-hover" style={{cursor:'pointer'}} id="ordenFabricacion">
+              <div className="table-ovfl-mp tbl-lesshead">
+                <table className="table table-bordered table-lst table-hover" style={{cursor:'pointer'}} id="ordenCompra">
                   <colgroup>
                   <col width="7%"/>
                   <col width="36%"/>
@@ -305,9 +310,6 @@ export default class Ordenescompra extends Component {
                   <tbody>{lstOrdComPI}</tbody>
                 </table>              
               </div>
-              <div className="center">
-                <Paginacion items={this.state.lstOC} onChangePage={this.onChangePage} page={this.state.page} />
-              </div>
             </React.Fragment>
           )}
           {this.isModalActive && 
@@ -315,7 +317,7 @@ export default class Ordenescompra extends Component {
               <div className="modal-dialog modal-dialog-centered"  role="document">
                 <div className="modal-content">
                   <div className="modal-header">
-                    <h5 className="modal-title" id="exampleModalLabel">Detalle de la Orden de Compra {this.state.pageOfItems[this.state.idSelOc].oc}</h5>
+                    <h5 className="modal-title" id="exampleModalLabel">Detalle de la Orden de Compra {this.state.lstOC[this.state.idSelOc].oc}</h5>
                     <button type="button" className="close" onClick={this.closeModal} data-dismiss="modal" aria-label="Close">
                       <span aria-hidden="true">&times;</span>
                     </button>
@@ -330,23 +332,23 @@ export default class Ordenescompra extends Component {
                       <tbody>
                         <tr>
                           <td style={{textAlign:'right'}} className="producto">Piezas Faltantes de Lote:</td>
-                          <td className="producto"><NumberFormat value={this.state.pageOfItems[this.state.idSelOc].piezas - this.state.pageOfItems[this.state.idSelOc].piezasLote} thousandSeparator={true} displayType={'text'} /></td>
+                          <td className="producto"><NumberFormat value={this.state.lstOC[this.state.idSelOc].piezas - this.state.lstOC[this.state.idSelOc].piezasLote} thousandSeparator={true} displayType={'text'} /></td>
                         </tr>
                         <tr>
                           <td style={{textAlign:'right'}} className="producto">Piezas Faltantes de Fabricar:</td>
-                          <td className="producto"><NumberFormat value={this.state.pageOfItems[this.state.idSelOc].piezas - this.state.pageOfItems[this.state.idSelOc].piezasFabricadas} thousandSeparator={true} displayType={'text'} /> </td>
+                          <td className="producto"><NumberFormat value={this.state.lstOC[this.state.idSelOc].piezas - this.state.lstOC[this.state.idSelOc].piezasFabricadas} thousandSeparator={true} displayType={'text'} /> </td>
                         </tr>
                         <tr>
                           <td style={{textAlign:'right'}} className="producto">Piezas Faltantes de Terminar:</td>
-                          <td className="producto"><NumberFormat value={this.state.pageOfItems[this.state.idSelOc].piezas - this.state.pageOfItems[this.state.idSelOc].piezasCompletadas}thousandSeparator={true} displayType={'text'} /></td>
+                          <td className="producto"><NumberFormat value={this.state.lstOC[this.state.idSelOc].piezas - this.state.lstOC[this.state.idSelOc].piezasCompletadas}thousandSeparator={true} displayType={'text'} /></td>
                         </tr>
                         <tr>
                           <td style={{textAlign:'right'}} className="producto">Piezas Faltantes de Entregar:</td>
-                          <td className="producto"><NumberFormat value={this.state.pageOfItems[this.state.idSelOc].piezas - this.state.pageOfItems[this.state.idSelOc].piezasEntregadas} thousandSeparator={true} displayType={'text'} /> </td>
+                          <td className="producto"><NumberFormat value={this.state.lstOC[this.state.idSelOc].piezas - this.state.lstOC[this.state.idSelOc].piezasEntregadas} thousandSeparator={true} displayType={'text'} /> </td>
                         </tr>
                         <tr>
                           <td style={{textAlign:'right'}} className="producto">Comentarios:</td>
-                          <td className="producto">{this.state.pageOfItems[this.state.idSelOc].observaciones}</td>
+                          <td className="producto">{this.state.lstOC[this.state.idSelOc].observaciones}</td>
                         </tr>
                       </tbody>
                     </table>

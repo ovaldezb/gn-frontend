@@ -1,6 +1,5 @@
 var Global = {
     //url:'https://localhost:8443/api/',
-    //url:'http://localhost:8085/api/',
     url:'http://nordan.store:8085/api/',
     JWT_NAME:'USER',
     ADD_USER:'ADD_USER',
