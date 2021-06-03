@@ -192,7 +192,7 @@ export default class Addordencompra extends Component {
     e.preventDefault();
 
     var ordenComp = this.state.ordencompra;
-    ordenComp.oc=this.ocRef.current.value;
+    ordenComp.oc=this.ocRef.current.value.trim();
     ordenComp.clave=this.claveRef.current.value;    
     if(ordenComp.cliente !== undefined){
       if(this.clienteRef.current.value===''){
@@ -406,7 +406,7 @@ export default class Addordencompra extends Component {
                 {this.validator.message('presentacion',ordencompra.presentacion,'required')}
                 <div>
                     <select ref={this.tipoPresRef}>
-                      <option value="milimililitros">mililitros</option>
+                      <option value="mililitros">mililitros</option>
                       <option value="gramos">gramos</option>
                     </select>
                 </div>

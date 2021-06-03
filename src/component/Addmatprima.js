@@ -129,12 +129,12 @@ export default class Addmatprima extends Component {
     this.descripcionRef.current.value = this.descripcionRef.current.value.toUpperCase();
     materiaprima.cantidad=this.cantidadRef.current.value;
     materiaprima.unidad.id=this.unidadRef.current.value;
-    materiaprima.codigo=this.claveRef.current.value.toUpperCase();
-    this.claveRef.current.value = this.claveRef.current.value.toUpperCase();
+    materiaprima.codigo=this.claveRef.current.value.toUpperCase().trim();
+    this.claveRef.current.value = this.claveRef.current.value.toUpperCase().trim();
     materiaprima.proveedor= this.state.lstProv[this.proveedorRef.current.selectedIndex];
     materiaprima.observaciones=this.observacionesRef.current.value;
-    materiaprima.lote=this.loteRef.current.value.toUpperCase();
-    this.loteRef.current.value = this.loteRef.current.value.toUpperCase();
+    materiaprima.lote=this.loteRef.current.value.toUpperCase().trim();
+    this.loteRef.current.value = this.loteRef.current.value.toUpperCase().trim();
     materiaprima.necesario=this.necesarioRef.current.value;
     materiaprima.escaso=this.escasoRef.current.value;
     materiaprima.tipo=this.tipoRef.current.value;

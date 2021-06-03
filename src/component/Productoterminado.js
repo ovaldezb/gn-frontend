@@ -431,16 +431,16 @@ export default class Productoterminado extends Component {
                               <td className="font12"><input type="text"   className="input center" size='5' id={'noremision'+pten.noConsecutivo}/></td>
                               <td>
                                 <select className="custom-select font12" id={'selTE'+i} onChange={()=>this.cambiaTipoEntrega(i)}>
-                                  <option value={Global.E}>Entrega</option>
-                                  <option value={Global.M}>Merma</option>
+                                  <option key={1} value={Global.E}>Entrega</option>
+                                  <option key={2} value={Global.M}>Merma</option>
                                 </select>
                               </td>
                               <td className="font12">
                               {(this.state.lstTipoEntrega[i]===Global.E) &&
                                 <select className="custom-select font12" id={'dire'+i} onChange={()=>this.cambiaDireccion(i)}>
-                                {pten.cliente.direccion.map((dir,i)=>{
+                                {pten.cliente.direccion.map((dir,x)=>{
                                   return(
-                                    <option key={i} value={i}>{dir}</option>
+                                    <option key={x} value={x}>{dir}</option>
                                   );
                                 })}
                               </select>
@@ -464,12 +464,12 @@ export default class Productoterminado extends Component {
             {this.state.idSelPt !==-1 && 
             <div id="print" style={{display:'none'}}>
             {this.state.lstPTEntregado.map((pt,i)=>{
-            if(this.state.lstTipoEntrega[i]==='M'){
-              return ('');
+              if(this.state.lstTipoEntrega[i]==='M'){
+                return ('');
             }else  
-            return(
+              return(
               <React.Fragment>
-              <table style={{borderCollapse:'separate', borderSpacing:'0em'}} key={i} >
+              <table style={{borderCollapse:'separate', borderSpacing:'0em'}}>
                 <tr>
                   <td style={{width: '4.0cm'}} className="left top bottom" colSpan="2" rowSpan="3">
                     <img src={Logo} alt="" width="90%"/>
@@ -530,7 +530,7 @@ export default class Productoterminado extends Component {
               </table>
               <p className="font10">Original</p>
               <br></br>
-              <table style={{borderCollapse:'separate', borderSpacing:'0em'}} key={i} >
+              <table style={{borderCollapse:'separate', borderSpacing:'0em'}} >
                 <tr>
                   <td style={{width: '4.0cm'}} className="left top bottom" colSpan="2" rowSpan="3">
                     <img src={Logo} alt="" width="90%"/>
@@ -591,7 +591,7 @@ export default class Productoterminado extends Component {
               </table>
               <p className="font10">Laboratorio</p>
               <br></br>
-              <table style={{borderCollapse:'separate', borderSpacing:'0em'}} key={i} >
+              <table style={{borderCollapse:'separate', borderSpacing:'0em'}} >
                 <tr>
                   <td style={{width: '4.0cm'}} className="left top bottom" colSpan="2" rowSpan="3">
                     <img src={Logo} alt="" width="90%"/>
