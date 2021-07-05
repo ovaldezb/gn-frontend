@@ -35,16 +35,20 @@ export default class Lotes extends Component {
     Axios
     .get(Global.url+'lote/'+buscaTodos,{ headers: authHeader() })
     .then(res=>{
+      //console.log(res.data);
+      
       if(res.data.length > 0){
+        let lstLtTmp = res.data.map(lt=>{
+          lt.producto = lt.oc.producto.nombre;
+          lt.cliente = lt.oc.cliente.nombre;
+          lt.ordencompra = lt.oc.oc;
+          return lt;
+        });
+        console.log(lstLtTmp);
         this.setState({
-          lstLotes:res.data.map((lt,i)=>{
-            lt.producto = lt.oc.producto.nombre;
-            lt.cliente = lt.oc.cliente.nombre;
-            lt.ordencompra = lt.oc.oc;
-            return lt;
-          }),
+          lstLotes:lstLtTmp,
           idSelLt:-1
-        })
+        });
       }else{
         this.setState({
           lstLotes:[]

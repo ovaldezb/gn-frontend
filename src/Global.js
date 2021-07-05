@@ -1,5 +1,5 @@
 var Global = {
-    url:'https://localhost:8443/api/',
+    url:'http://localhost:8085/api/',
     //url:'http://nordan.store:8085/api/',
     JWT_NAME:'USER',
     ADD_USER:'ADD_USER',
@@ -26,6 +26,7 @@ var Global = {
     DELVRD:'DELVRD',
     EEP:'EEP',
     CANCEL:'CANCEL',
+    DISP:'DISP',
     SIZE_DOC:8,
     SIZE_DOC_RED:6,
     PORCENTAJE_MAX:'100.00',
@@ -39,7 +40,11 @@ var Global = {
     ENTREGA:'Entrega',
     MERMA:'Merma',
     E:'E',
-    M:'M'
+    M:'M',
+    GUARDAR:'Guardar',
+    ACTUALIZAR:'Actualizar',
+    CANCELAR:'Cancelar',
+    COMPLETAR:'Completar'
 };
 
 export default Global

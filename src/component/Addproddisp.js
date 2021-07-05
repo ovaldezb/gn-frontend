@@ -26,6 +26,7 @@ export default class Addproddisp extends Component {
     nombreRef = React.createRef();
     claveRef = React.createRef();
     prodxcajaRef = React.createRef();
+    tipoProdRef = React.createRef();
     isBusqueda = false;
     isReset = false;
     idPrdDisp = '';
@@ -33,6 +34,7 @@ export default class Addproddisp extends Component {
     state = {
         codigo:'',
         desc:'',
+        tipo:'',
         lstMatPrim:[],
         porcentaje:'',
         idSelPd:-1,
@@ -40,7 +42,9 @@ export default class Addproddisp extends Component {
         lstBusqDesc:[],
         nombre:'',
         clave:'',
-        sumaPorcentaje:0
+        sumaPorcentaje:0,
+        tipoProducto:'P',
+        prodxcaja:'',
   };
 
   constructor(){
@@ -70,6 +74,15 @@ export default class Addproddisp extends Component {
           sumaPorcentaje:Number(sumPor).toFixed(2)
       });
     }
+    /*Axios.get(Global.url+'utils/unidad/Kilos',{ headers: authHeader() })
+    .then(res=>{
+      console.log(res.data);
+      this.setState({
+        umKg:res.data
+      });
+    }).catch(err=>{
+      AuthService.isExpired(err.message);
+    });*/
   }
   
   busquedaDesc = (e)=>{
@@ -118,6 +131,8 @@ export default class Addproddisp extends Component {
         materiaprimadisponible:{
             codigo:this.codigoRef.current.value,    
             descripcion:this.descRef.current.value,
+            tipo:this.state.tipo,
+
         }
     }
     if(res.length > 0){
@@ -172,7 +187,8 @@ export default class Addproddisp extends Component {
         porcentaje:this.porcentajeRef.current.value,
         nombre:this.nombreRef.current.value.toUpperCase(),
         clave:this.claveRef.current.value.toUpperCase(),
-        prodxcaja:this.prodxcajaRef.current.value
+        prodxcaja:this.prodxcajaRef.current.value,
+        tipoProducto:this.tipoProdRef.current.value
     }); 
     this.claveRef.current.value = this.claveRef.current.value.toUpperCase();
   }
@@ -183,7 +199,8 @@ export default class Addproddisp extends Component {
           clave:this.state.clave,
           tipo:'vacio',
           materiaPrimaUsada: this.state.lstMatPrim,
-          prodxcaja:this.state.prodxcaja
+          prodxcaja:this.state.prodxcaja,
+          tipoProducto:this.state.tipoProducto
       };
       if(this.validator.allValid()){
         if(this.props.tipo){
@@ -243,9 +260,25 @@ export default class Addproddisp extends Component {
     this.setState({
         codigo: this.state.lstBusqDesc[i].codigo,
         desc:this.state.lstBusqDesc[i].descripcion,
+        tipo:this.state.lstBusqDesc[i].tipo,
         lstBusqDesc:[],
         idSelPdBus:-1
     });
+  }
+
+  cambiaTipoProd = () =>{
+    if(this.tipoProdRef.current.value ==='B'){
+      this.prodxcajaRef.current.value = '';
+      this.setState({
+        tipoProducto:this.tipoProdRef.current.value,
+        prodxcaja:''
+      });
+    }else{
+      this.setState({
+        tipoProducto:this.tipoProdRef.current.value
+      });
+    }
+    console.log(this.state);
   }
 
   selUpdtMatPrim = (i) =>{
@@ -326,14 +359,19 @@ export default class Addproddisp extends Component {
                 {this.validator.message('nombre',this.state.nombre,'required')}
               </div>
               <div className="form-control">
-                <input type="text" name="clave"  className="center" placeholder="Clave" ref={this.claveRef} defaultValue={this.state.clave} onBlur={this.validaClave}/>
+                <input type="text" name="clave"  className="center" placeholder="Clave" ref={this.claveRef} defaultValue={this.state.clave} onBlur={this.validaClave} onChange={this.descChange}/>
                 {this.validator.message('clave',this.state.clave,'required')}
               </div>
             </div>
-            <div className="grid-1-2">
+            <div className="grid-3">
+              <div>
+                <select className="custom-select" ref={this.tipoProdRef} onChange={this.cambiaTipoProd}>
+                  <option value="P">Producto</option>
+                  <option value="B">Base</option>
+                </select>
+              </div>
               <div className="form-control">
-                <input type="number" name="empxcaja" placeholder="Productos por caja" ref={this.prodxcajaRef} defaultValue={this.state.prodxcaja} />
-                {this.validator.message('empxcaja',this.state.prodxcaja,'required')}
+                <input type="number" name="empxcaja" placeholder="Productos por caja" ref={this.prodxcajaRef} value={this.state.prodxcaja}  disabled={this.state.tipoProducto==='B'} onChange={this.descChange}/>
               </div>
               <div>
                 {this.state.sumaPorcentaje===Global.PORCENTAJE_MAX &&

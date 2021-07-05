@@ -96,7 +96,7 @@ export default class Addlote extends Component {
           Axios.get(Global.url+'ordenfab/validar/'+
               matPrim.materiaprimadisponible.codigo+'/'+
               matPrim.porcentaje+'/'+
-              this.state.lote.piezasLote+'/'+this.state.oc.presentacion,{ headers: authHeader() })
+              this.state.lote.piezasLote+'/'+this.state.oc.presentacion+'/'+matPrim.materiaprimadisponible.tipo,{ headers: authHeader() })
           .then( res =>{
              var lstTmpMP = this.state.lstMatPrimResp;
              var lstErrTmp = this.state.lstErr
@@ -246,8 +246,8 @@ export default class Addlote extends Component {
             </colgroup>
             <thead>
               <tr>
-                <th style={this.center}>Codigo</th>
-                <th style={this.center}>Materia prima</th>
+                <th style={this.center}>Código</th>
+                <th style={this.center}>Materia Prima</th>
                 <th style={this.center}>Cantidad</th>
                 <th style={this.center}>Lote</th>
                 <th style={this.center}>Estatus</th>

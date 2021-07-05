@@ -115,7 +115,7 @@ export default class Ordenesfabricacion extends Component {
 
   deleteOf = () =>{
     swal({
-      title: "Esta seguro que desea eliminar la OF "+this.pad(this.state.lstOF[((this.state.page-1)*10)+this.state.idSelOf].noConsecutivo,Global.SIZE_DOC)+"?",
+      title: "Esta seguro que desea eliminar la OF "+this.pad(this.state.lstOF[this.state.idSelOf].noConsecutivo,Global.SIZE_DOC)+"?",
       text: "Una vez eliminada, no se podra recuperar",
       icon: "warning",
       buttons: true,
@@ -123,7 +123,7 @@ export default class Ordenesfabricacion extends Component {
     })
     .then((willDelete) => {
       if (willDelete) {
-        axios.delete(Global.url+'ordenfab/'+this.state.lstOF[((this.state.page-1)*10)+this.state.idSelOf].id,{ headers: authHeader() })
+        axios.delete(Global.url+'ordenfab/'+this.state.lstOF[this.state.idSelOf].id,{ headers: authHeader() })
             .then(res=>{
               swal("La Orden de Fabricación ha sido eliminada!", {
                 icon: "success",

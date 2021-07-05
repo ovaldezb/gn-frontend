@@ -47,6 +47,7 @@ export default class Productoterminado extends Component {
     Axios.get(Global.url+'prodterm'+(getActivos?'/activo':''),{ headers: authHeader() })
       .then( res =>{
         let selected = [];
+        this.showTruck = false;
         res.data.forEach((pt,i)=>{
           selected[i] = false;
         });
@@ -62,13 +63,14 @@ export default class Productoterminado extends Component {
   }
 
   deliverPT = () =>{
-    let lstte=[];
+    let lstte=new Array(this.state.lstPdrTerm.length);
     let direcciones=[];
-    
+    let x =0;
     var lstPTEntregado = this.state.lstPdrTerm.map(
       (mp,i) => { 
         if(document.getElementById('check'+i).checked){
-          lstte[i]=Global.E;
+          lstte[x]=Global.E;
+          x++;
           mp.index = i;
           direcciones[i]=0;
           return mp;
@@ -131,7 +133,6 @@ export default class Productoterminado extends Component {
     let isEmptyRemi = false;
     
     this.state.lstPTEntregado.forEach((ptent,i)=>{
-      
       if(document.getElementById('pzasent'+ptent.noConsecutivo).value === ''){
         isEmptyPzas = true;
         of = this.pad(ptent.noConsecutivo,Global.SIZE_DOC);
@@ -198,6 +199,7 @@ export default class Productoterminado extends Component {
       this.setState({
         lstPTEntregado:lstPtEntDelv
       });
+      this.loadProdTerm(true);
       if(arr.length){
         this.printPT();
       }
@@ -277,7 +279,7 @@ export default class Productoterminado extends Component {
     let lstte = this.state.lstTipoEntrega;
     lstte[index]=document.getElementById('selTE'+index).value
     this.setState({
-      tipoEntrega:document.getElementById('selTE'+this.state.idSelPt).value,
+      //tipoEntrega:document.getElementById('selTE'+this.state.idSelPt).value,
       lstTipoEntrega:lstte
     });
   }

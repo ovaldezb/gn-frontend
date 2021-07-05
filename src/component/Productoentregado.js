@@ -262,7 +262,7 @@ export default class Productoentregado extends Component {
               </table>
             <br/>      
           </div>
-          <table className="table table-dark header-font table-bordered" style={{marginTop:'-15px',width:'99%'}}>
+          <table className="table table-dark header-font table-bordered" style={{marginTop:'-15px',width:'100%'}}>
             <colgroup>
               <col width="7%"/>
               <col width="8%"/>

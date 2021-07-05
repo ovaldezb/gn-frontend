@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faPlusSquare, faEdit,  faTrash,} from "@fortawesome/free-solid-svg-icons";
 import Addproddisp from './Addproddisp'
+import SimpleReactValidator from 'simple-react-validator'
 
 export default class Proddisponible extends Component {
   displayAdd = false;
@@ -25,6 +26,14 @@ export default class Proddisponible extends Component {
     idSelPd: -1,
     proddisp:{}
   };
+  constructor(){
+    super();
+    this.validator = new SimpleReactValidator({
+      messages:{
+          required:'requeridos'
+      }
+  });
+  }
   componentDidMount(){
     this.loadProdDisp();
   }
@@ -54,7 +63,7 @@ export default class Proddisponible extends Component {
     this.setState({
       proddisp:{}
     });
-    this.forceUpdate();
+    //this.forceUpdate();
   };
 
   updatePd = () =>{
@@ -156,10 +165,11 @@ export default class Proddisponible extends Component {
             }
             return(
                 <tr key={i} onClick={() => {this.selectRow(i); }} className={this.style}>
-                    <td style={this.col1}>{i+1}</td>
-                    <td style={this.col2}>{proddisp.nombre}</td>
-                    <td style={this.col3}>{proddisp.clave}</td>
-                    <td style={this.col4}>{proddisp.prodxcaja}</td>
+                    <td style={{textAlign:'center'}}>{i+1}</td>
+                    <td style={{textAlign:'left'}}>{proddisp.nombre}</td>
+                    <td style={{textAlign:'center'}}>{proddisp.clave}</td>
+                    <td style={{textAlign:'center'}}>{proddisp.prodxcaja}</td>
+                    <td style={{textAlign:'center'}}>{proddisp.tipoProducto === 'P'? 'Producto' :'Base'}</td>
                 </tr>
             );
         });
@@ -212,18 +222,33 @@ export default class Proddisponible extends Component {
                             </nav>
                           </div>
                         </div>
-                          <table className="table table-bordered">
+                        <table className="table table-bordered">
+                          <colgroup>
+                              <col width="10%"/>
+                              <col width="40%"/>
+                              <col width="20%"/>
+                              <col width="15%"/>
+                              <col width="15%"/>
+                            </colgroup>
                           <thead className="thead-dark">
                             <tr>
-                                <th scope="col" style={this.col1}>#</th>
-                                <th scope="col" style={this.col2}>Nombre</th>
-                                <th scope="col" style={this.col3}>Clave</th>
-                                <th scope="col" style={this.col4}>Piezas x Caja</th>
+                                <th scope="col" style={{textAlign:'center'}}>#</th>
+                                <th scope="col" style={{textAlign:'center'}}>Nombre</th>
+                                <th scope="col" style={{textAlign:'center'}}>Clave</th>
+                                <th scope="col" style={{textAlign:'center'}}>Piezas x Caja</th>
+                                <th scope="col" style={{textAlign:'center'}}>Tipo</th>
                             </tr>
                           </thead>
                         </table>
                         <div className="table-ovfl-mp tbl-lesshead">
                           <table className="table table-hover" style={{cursor:'pointer'}} id="proddisponible">
+                            <colgroup>
+                              <col width="10%"/>
+                              <col width="40%"/>
+                              <col width="20%"/>
+                              <col width="15%"/>
+                              <col width="15%"/>
+                            </colgroup>
                             <tbody>{lstMp}</tbody>
                           </table>              
                         </div>

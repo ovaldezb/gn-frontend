@@ -4,6 +4,7 @@ import {faPumpSoap, faBong,
   faArchive, faUserTie, 
   faUsers, faHandshake, 
   faShoppingCart,faTruckLoading,
+  faFillDrip,
   faClipboardList} from "@fortawesome/free-solid-svg-icons";
 import React, { Component } from 'react'
 import { Link } from "react-router-dom";
@@ -80,6 +81,12 @@ export default class Menu extends Component {
                    Orden de Fabricación
                    </Link> 
                 </li>
+                <li>
+                  <Link to={"/bases"}>
+                  <span><FontAwesomeIcon icon={faFillDrip} size="1x" className="icon-menu"/></span>Bases
+                  </Link>
+                </li>
+
                 <li>
                   <Link to={"/prodterminado"} >
                     <span>

@@ -221,7 +221,7 @@ export default class Ordenescompra extends Component {
                   <ul>
                     <li>Filtro:</li>
                     <li><input className="input"  type="text"  name="filtro" ref={this.filterRef} onKeyUp={this.filtrado}/></li>
-                    <li><input type="checkbox" ref={this.selAllRef} onChange={this.selectType} /></li>
+                    <li>Historial:<input type="checkbox" ref={this.selAllRef} onChange={this.selectType} /></li>
                   </ul>
                   <h2>Orden de Compra</h2>
                   <nav>
