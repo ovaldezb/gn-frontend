@@ -242,6 +242,7 @@ export default class Ordenesfabricacion extends Component {
     var style = {};
     if (this.state.lstOF.length > 0) {
       var lstOrdFabPI = this.state.lstOF.map((ordfab, i) => {
+        const fechaCreacion = momento(ordfab.fechaCreacion,'YYYY-MM-DD HH:mm:ss.SSS').format('DD MMM YYYY HH:mm');
         if (this.state.idSelOf === i) {
           style = "selected pointer";
           if(ordfab.estatus===Global.TEP){
@@ -254,7 +255,7 @@ export default class Ordenesfabricacion extends Component {
         }
         
         return (
-          <tr key={i} onClick={() => {this.selectRow(i)}}  className={style}>
+          <tr key={i} onClick={() => {this.selectRow(i)}}  className={style} title={fechaCreacion}>
             <td style={this.center} title={'Comentarios: '+ordfab.observaciones}>{this.pad(ordfab.noConsecutivo,Global.SIZE_DOC)}</td>
             <td style={this.center}>{ordfab.oc.producto.clave}</td>
             <td style={this.center}>{ordfab.lote}</td>

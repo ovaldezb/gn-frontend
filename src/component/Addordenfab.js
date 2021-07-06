@@ -6,6 +6,7 @@ import authHeader from "../services/auth-header";
 import SimpleReactValidator from 'simple-react-validator';
 import NumberFormat from 'react-number-format';
 import AuthService from '../services/auth.service';
+import Moment from 'moment';
 
 export default class Addordenfab extends Component {
   loteRef = React.createRef();
@@ -120,6 +121,7 @@ export default class Addordenfab extends Component {
       ordenFabTmp.oc = {id:this.state.ordenfab.oc.id}
       ordenFabTmp.estatus=Global.TEP;
       ordenFabTmp.piezas=this.state.piezasLote; 
+      ordenFabTmp.fechaCreacion = Moment(new Date()).format('YYYY-MM-DD HH:mm:ss.sss');
       
       Axios.post(Global.url+'ordenfab',ordenFabTmp,{ headers: authHeader() })
       .then(res=>{

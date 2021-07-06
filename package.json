@@ -2,7 +2,7 @@
   "name": "gn-frontend",
   "version": "0.1.0",
   "private": true,
-  "homepage": "http://nordan.store/nordan/",
+  "homepage": "http://ready2solve.club/nordan/",
   "dependencies": {
     "@emotion/react": "^11.1.4",
     "@emotion/styled": "^11.0.0",

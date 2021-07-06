@@ -57,6 +57,14 @@ export default class Menu extends Component {
                   </Link> 
                 </li>
                 <li>
+                  <Link to={"/bases"}>
+                  <span>
+                    <FontAwesomeIcon icon={faFillDrip} size="1x" className="icon-menu"/>
+                  </span>
+                  Bases
+                  </Link>
+                </li>
+                <li>
                   <Link to={"/proddispon"} onClick={()=>{this.click(1)}} className={this.state.lstActive[1] ? 'selected':''} >
                     <span><FontAwesomeIcon icon={faReceipt} size="1x" className="icon-menu" /></span>
                     Producto Disponible
@@ -81,12 +89,6 @@ export default class Menu extends Component {
                    Orden de Fabricación
                    </Link> 
                 </li>
-                <li>
-                  <Link to={"/bases"}>
-                  <span><FontAwesomeIcon icon={faFillDrip} size="1x" className="icon-menu"/></span>Bases
-                  </Link>
-                </li>
-
                 <li>
                   <Link to={"/prodterminado"} >
                     <span>

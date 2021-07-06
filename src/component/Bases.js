@@ -120,7 +120,7 @@ export default class Bases extends Component {
     base.aprobado = true;
     base.comentarios = this.state.comentarios;
     base.rendimiento = this.state.rendimiento;
-    Axios.put(Global.url+'bases/'+this.state.lstBases[this.state.idSelBase].id,base,{ headers: authHeader() })
+    Axios.put(Global.url+'bases/complete/'+this.state.lstBases[this.state.idSelBase].id,base,{ headers: authHeader() })
     .then(res =>{
       swal('Se completó exitosamente la Base');
       this.setState({

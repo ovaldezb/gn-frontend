@@ -44,7 +44,6 @@ export default class Lotes extends Component {
           lt.ordencompra = lt.oc.oc;
           return lt;
         });
-        console.log(lstLtTmp);
         this.setState({
           lstLotes:lstLtTmp,
           idSelLt:-1

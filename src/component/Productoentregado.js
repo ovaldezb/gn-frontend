@@ -40,9 +40,11 @@ export default class Productoentregado extends Component {
     Axios.get(Global.url+'prodent',{ headers: authHeader() })
       .then(res=>{
         let pef = res.data.map((pe,i)=>{
-          //delete pe.id;
-          pe.estatus_codigo = pe.estatus.codigo;
-          delete pe.estatus.id;
+          console.log(pe.estatus);
+          if(pe.estatus !== null){
+            delete pe.estatus.id;
+            pe.estatus_codigo = pe.estatus.codigo;
+          }
           delete pe.cliente.id;
           return pe;
         });
@@ -52,6 +54,7 @@ export default class Productoentregado extends Component {
         });
       })
       .catch(err=>{
+        console.log(err);
         AuthService.isExpired(err.message);
       });
   }
