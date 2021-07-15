@@ -18,6 +18,7 @@ export default class Addordencompra extends Component {
   piezasRef = React.createRef();
   obsRef =React.createRef();
   tipoPresRef = React.createRef();
+  prdDispRef = React.createRef();
   btnName = 'Guardar';
   isErrorInit = true;
   right = {textAlign:"right"}
@@ -30,6 +31,7 @@ export default class Addordencompra extends Component {
       },
       lstMatPrim:[],
       lstMatPrimResp:[],
+      lstCvePrdDisp:[],
       lstErr:[],
       lstCliente:[],
       lstCliPro:[],
@@ -68,7 +70,6 @@ export default class Addordencompra extends Component {
         });
       })
       .catch(err=>{  
-        console.log(err);
         AuthService.isExpired(err.message); });
     }else if(this.clienteRef.current.value !==''){
       Axios.get(Global.url+'cliente/'+this.clienteRef.current.value.toUpperCase(),{ headers: authHeader() })
@@ -101,9 +102,9 @@ export default class Addordencompra extends Component {
   }
 
   existeOC = () =>{
-    Axios.get(Global.url+'ordencompra/oc/'+this.state.ordencompra.oc,{ headers: authHeader() })
+    Axios.get(Global.url+'ordencompra/clave/'+this.state.ordencompra.oc,{ headers: authHeader() })
     .then(res=>{
-      if(res.data.length > 0){
+      if(res.data){
         swal('La OC: '+this.state.ordencompra.oc+' ya existe');
         let oc = this.state.ordencompra;
         oc.oc = '';
@@ -118,29 +119,53 @@ export default class Addordencompra extends Component {
   }
 
   busProductoClave = (event) =>{
+    console.log('BUsca producto');
     if(this.state.ordencompra.clave === ''){
       return;
     }
-    if(event.keyCode === 13 || event._reactName === 'onBlur'){
-      Axios.get(Global.url+'prodisp/'+this.state.ordencompra.clave,{ headers: authHeader() })
-          .then(res=>{
-            let oc = this.state.ordencompra;
-            if(res.data !== null){     
-              oc.clave = res.data.clave;
-              oc.producto = res.data;              
-              this.setState({
-                ordencompra:oc,
-                lstMatPrim:res.data.materiaPrimaUsada,
-                lstCliPro:[]
-              });
-            }else{
-              swal('Producto no encontrado',this.state.ordencompra.clave,'error');
-            }
-          })
-          .catch(err=>{
-            AuthService.isExpired(err.message);
-          });
+    if(event.keyCode === 13 ){ //|| event._reactName === 'onBlur' || event._reactName === 'onChange'
+      this.getProdDisp();
     }
+  }
+
+  getProdDisp = () =>{
+    Axios.get(Global.url+'prodisp/'+this.state.ordencompra.clave,{ headers: authHeader() })
+    .then(res=>{
+      let oc = this.state.ordencompra;
+      if(res.data.length > 1){   
+        oc.clave = res.data[0].clave;
+        oc.producto = res.data[0];     
+        this.setState({
+          ordencompra:oc,
+          lstCliPro:[],
+          lstCvePrdDisp:res.data
+        });
+      }else if(res.data.length === 1){
+        oc.clave = res.data[0].clave;
+        oc.producto = res.data[0];   
+        this.setState({
+          ordencompra:oc,
+          lstCliPro:[],
+          lstCvePrdDisp:res.data
+        });
+      }else{
+        swal('Producto no encontrado',this.state.ordencompra.clave,'error');
+        return;
+      }
+    })
+    .catch(err=>{
+      //AuthService.isExpired(err.message);
+      console.log(err);
+    });
+  }
+
+  selectProdDisp = () =>{
+    let oc = this.state.ordencompra;
+    oc.clave = this.state.lstCvePrdDisp[this.prdDispRef.current.value].clave;
+    oc.producto = this.state.lstCvePrdDisp[this.prdDispRef.current.value];   
+    this.setState({
+      ordencompra:oc,
+    });
   }
 
   guardaOC = () =>{
@@ -271,7 +296,7 @@ export default class Addordencompra extends Component {
         clave: this.state.lstCliPro[index].clave
       }
     }
-    
+    this.getProdDisp();
     this.setState({
       ordencompra:oc,
       lstCliPro:[]
@@ -363,12 +388,24 @@ export default class Addordencompra extends Component {
               </div>
               <div className="form-control grid-1-2">
                 <div>
-                  <input type="text" name="clave" placeholder="Clave Prod Disp" onKeyUp={this.busProductoClave} ref={this.claveRef} value={ordencompra.clave} onBlur={this.busProductoClave} onChange={this.occhange}/>
+                  <input type="text" name="clave" placeholder="Clave Prod Disp" onKeyUp={this.busProductoClave} ref={this.claveRef} value={ordencompra.clave}  onChange={this.buscaoc}/>
                   {this.validator.message('clave',ordencompra.clave,'required')}
                 </div>
                 <div>
-                  {ordencompra.producto && 
-                  <legend><b>{ordencompra.producto.nombre}</b></legend>
+                  {this.state.lstCvePrdDisp.length > 1 && 
+                    <select ref={this.prdDispRef} onChange={this.selectProdDisp}>
+                      {this.state.lstCvePrdDisp.map((pd,i)=>{
+                          return(
+                          <option value={i} key={i}>
+                             {pd.nombre +' - '+pd.formula}
+                          </option>
+                          );
+                        })
+                      }
+                    </select>
+                  }
+                  {this.state.lstCvePrdDisp.length === 1 &&
+                    <strong>{this.state.lstCvePrdDisp[0].nombre}</strong>
                   }
                 </div>
               </div>

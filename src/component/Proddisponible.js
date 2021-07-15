@@ -170,6 +170,7 @@ export default class Proddisponible extends Component {
                     <td style={{textAlign:'center'}}>{proddisp.clave}</td>
                     <td style={{textAlign:'center'}}>{proddisp.prodxcaja}</td>
                     <td style={{textAlign:'center'}}>{proddisp.tipoProducto === 'P'? 'Producto' :'Base'}</td>
+                    <td style={{textAlign:'center'}}>{proddisp.formula}</td>
                 </tr>
             );
         });
@@ -224,10 +225,11 @@ export default class Proddisponible extends Component {
                         </div>
                         <table className="table table-bordered">
                           <colgroup>
-                              <col width="10%"/>
+                              <col width="5%"/>
                               <col width="40%"/>
-                              <col width="20%"/>
                               <col width="15%"/>
+                              <col width="15%"/>
+                              <col width="10%"/>
                               <col width="15%"/>
                             </colgroup>
                           <thead className="thead-dark">
@@ -237,16 +239,18 @@ export default class Proddisponible extends Component {
                                 <th scope="col" style={{textAlign:'center'}}>Clave</th>
                                 <th scope="col" style={{textAlign:'center'}}>Piezas x Caja</th>
                                 <th scope="col" style={{textAlign:'center'}}>Tipo</th>
+                                <th scope="col" style={{textAlign:'center'}}>Fórmula</th>
                             </tr>
                           </thead>
                         </table>
                         <div className="table-ovfl-mp tbl-lesshead">
                           <table className="table table-hover" style={{cursor:'pointer'}} id="proddisponible">
                             <colgroup>
-                              <col width="10%"/>
+                              <col width="5%"/>
                               <col width="40%"/>
-                              <col width="20%"/>
                               <col width="15%"/>
+                              <col width="15%"/>
+                              <col width="10%"/>
                               <col width="15%"/>
                             </colgroup>
                             <tbody>{lstMp}</tbody>

@@ -31,6 +31,7 @@ export default class Addproddisp extends Component {
     isReset = false;
     idPrdDisp = '';
     isUpdt=false;
+    isUpdtMP=false;
     state = {
         codigo:'',
         desc:'',
@@ -45,6 +46,7 @@ export default class Addproddisp extends Component {
         sumaPorcentaje:0,
         tipoProducto:'P',
         prodxcaja:'',
+        formula:''
   };
 
   constructor(){
@@ -124,7 +126,7 @@ export default class Addproddisp extends Component {
   addMatPrima = (e) =>{
     let lstMpTmp;
     var res = this.state.lstMatPrim.filter(x => {
-        return (x.codigo === this.state.codigo)
+        return (x.materiaprimadisponible.codigo === this.state.codigo)
     });
     var matprima = {
         porcentaje:Number(this.porcentajeRef.current.value).toFixed(2),
@@ -132,10 +134,10 @@ export default class Addproddisp extends Component {
             codigo:this.codigoRef.current.value,    
             descripcion:this.descRef.current.value,
             tipo:this.state.tipo,
-
         }
     }
-    if(res.length > 0){
+    if(res.length > 0 && !this.isUpdtMP){
+      this.isUpdtMP = false;
         swal('No se pueden agregar dos materiales del mismo codigo',this.state.codigo,'error');
         this.setState({
             codigo:'',
@@ -164,19 +166,25 @@ export default class Addproddisp extends Component {
         desc:'',
         porcentaje:0,
         idSelPd:-1,
-        sumaPorcentaje:Number(sumPor).toFixed(2)
+        sumaPorcentaje:Number(sumPor).toFixed(2),
     });
   }
 
   delMatPrim = () =>{
-      var code = this.state.lstMatPrim[this.state.idSelPd].materiaprimadisponible.codigo;
-      var lstTmp = this.state.lstMatPrim.filter((md) =>{
-          return  (code !== md.materiaprimadisponible.codigo)
-        });
+    var code = this.state.lstMatPrim[this.state.idSelPd].materiaprimadisponible.codigo;
+    let sumPor = 0;
+    var lstTmp = this.state.lstMatPrim.filter((md) =>{
+      if(code !== md.materiaprimadisponible.codigo){
+        sumPor += Number(Number(md.porcentaje).toFixed(2));  
+      }
+      return  (code !== md.materiaprimadisponible.codigo)
+    });
       
-      this.setState({
-          lstMatPrim:lstTmp
-      });
+    this.setState({
+      lstMatPrim:lstTmp,
+      idSelPd:-1,
+      sumaPorcentaje:Number(sumPor).toFixed(2),
+    });
   }
 
   onSubmit = (e) =>{
@@ -194,14 +202,18 @@ export default class Addproddisp extends Component {
   }
 
   saveProdDisp = () =>{
-      var prdDispSave = {
-          nombre:this.state.nombre,
-          clave:this.state.clave,
-          tipo:'vacio',
-          materiaPrimaUsada: this.state.lstMatPrim,
-          prodxcaja:this.state.prodxcaja,
-          tipoProducto:this.state.tipoProducto
-      };
+    var formBase = this.state.lstMatPrim.filter((mp) =>{
+      return mp.materiaprimadisponible.tipo === 'B';
+    });
+    var prdDispSave = {
+        nombre:this.state.nombre,
+        clave:this.state.clave,
+        tipo:'vacio',
+        materiaPrimaUsada: this.state.lstMatPrim,
+        prodxcaja:this.state.prodxcaja,
+        tipoProducto:this.state.tipoProducto,
+        formula: formBase.length > 0 ? Global.BASE : Global.MP
+    };
       if(this.validator.allValid()){
         if(this.props.tipo){
           Axios.post(Global.url+'prodisp',prdDispSave,{ headers: authHeader() })
@@ -211,6 +223,9 @@ export default class Addproddisp extends Component {
               Bitacora(Global.ADD_PRDDISP,'',JSON.stringify(prdDispSave));
             })
             .catch(err=>{
+              if(err.message.includes('409')){
+                swal("Ya existe un producto con la clave ["+prdDispSave.clave+"] y formula ["+prdDispSave.formula+"]");
+              }
               AuthService.isExpired(err.message);
             });
         }else{
@@ -278,10 +293,10 @@ export default class Addproddisp extends Component {
         tipoProducto:this.tipoProdRef.current.value
       });
     }
-    console.log(this.state);
   }
 
   selUpdtMatPrim = (i) =>{
+    this.isUpdtMP = true;
     this.setState({
         codigo:this.state.lstMatPrim[i].materiaprimadisponible.codigo,
         desc:this.state.lstMatPrim[i].materiaprimadisponible.descripcion,
@@ -359,7 +374,7 @@ export default class Addproddisp extends Component {
                 {this.validator.message('nombre',this.state.nombre,'required')}
               </div>
               <div className="form-control">
-                <input type="text" name="clave"  className="center" placeholder="Clave" ref={this.claveRef} defaultValue={this.state.clave} onBlur={this.validaClave} onChange={this.descChange}/>
+                <input type="text" name="clave"  className="center" placeholder="Clave" ref={this.claveRef} defaultValue={this.state.clave} onChange={this.descChange}/>
                 {this.validator.message('clave',this.state.clave,'required')}
               </div>
             </div>

@@ -1,20 +1,20 @@
 var Global = {
-    url:'http://localhost:8085/api/',
+    //url:'http://localhost:8085/api/',
     //url:'http://nordan.store:8085/api/',
-    //url:'http://ready2solve.club:8085/api/',
+    url:'http://ready2solve.club:8085/api/',
     JWT_NAME:'USER',
     ADD_USER:'ADD_USER',
     UPDT_USER:'UPDT_USER',
     DEL_USER:'DEL_USER',
     ADD_MATPRIM:'ADD_MATPRIM',
-	  UPDT_MATPRIM:'UPDT_MATPRIM',
-	  DEL_MATPRIM:'DEL_MATPRIM',
-	  ADD_OF:'ADD_OF',
-	  UPDT_OF:'UPDT_OF',
+	UPDT_MATPRIM:'UPDT_MATPRIM',
+	DEL_MATPRIM:'DEL_MATPRIM',
+	ADD_OF:'ADD_OF',
+	UPDT_OF:'UPDT_OF',
     DEL_OF:'DEL_OF',
     ADD_PRDDISP:'ADD_PRDDISP',
-	  UPDT_PRDDISP:'UPDT_PRDDISP',
-	  DEL_PRDDISP:'DEL_PRDDISP',
+	UPDT_PRDDISP:'UPDT_PRDDISP',
+	DEL_PRDDISP:'DEL_PRDDISP',
     HTTP_OK:200,
     OK:'OK',
     ERROR:'ERROR',
@@ -45,7 +45,9 @@ var Global = {
     GUARDAR:'Guardar',
     ACTUALIZAR:'Actualizar',
     CANCELAR:'Cancelar',
-    COMPLETAR:'Completar'
+    COMPLETAR:'Completar',
+    BASE:'Base',
+    MP:'Materia Prima'
 };
 
 export default Global
