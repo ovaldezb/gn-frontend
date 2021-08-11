@@ -9,7 +9,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faPlusCircle, faMinusCircle,  faEraser} from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import Bitacora from '../services/bitacora-service';
-
 export default class Addproddisp extends Component {
     style = {};
     styleBusSel={}
@@ -32,6 +31,7 @@ export default class Addproddisp extends Component {
     idPrdDisp = '';
     isUpdt=false;
     isUpdtMP=false;
+    
     state = {
         codigo:'',
         desc:'',
@@ -73,18 +73,10 @@ export default class Addproddisp extends Component {
           clave:prddisp.clave,
           lstMatPrim:prddisp.materiaPrimaUsada,
           prodxcaja:prddisp.prodxcaja,
+          tipoProducto:prddisp.tipoProducto,
           sumaPorcentaje:Number(sumPor).toFixed(2)
       });
     }
-    /*Axios.get(Global.url+'utils/unidad/Kilos',{ headers: authHeader() })
-    .then(res=>{
-      console.log(res.data);
-      this.setState({
-        umKg:res.data
-      });
-    }).catch(err=>{
-      AuthService.isExpired(err.message);
-    });*/
   }
   
   busquedaDesc = (e)=>{
@@ -114,7 +106,8 @@ export default class Addproddisp extends Component {
         .then( res =>{
             this.setState({
                 codigo:res.data.codigo,
-                desc:res.data.descripcion
+                desc:res.data.descripcion,
+                tipo:res.data.tipo
             });
         })
         .catch(err =>{
@@ -380,7 +373,7 @@ export default class Addproddisp extends Component {
             </div>
             <div className="grid-3">
               <div>
-                <select className="custom-select" ref={this.tipoProdRef} onChange={this.cambiaTipoProd}>
+                <select className="custom-select" ref={this.tipoProdRef} onChange={this.cambiaTipoProd} value={this.state.tipoProducto}>
                   <option value="P">Producto</option>
                   <option value="B">Base</option>
                 </select>

@@ -148,6 +148,7 @@ export default class Addlote extends Component {
             }
           })
           .catch(err=>{
+            //validar si la respuesta es un 400, para mandar el mensaje de que hay lotes de MP duplicados
             AuthService.isExpired(err.message);
           });
         }else{
