@@ -1,7 +1,6 @@
 var Global = {
     //url:'http://localhost:8085/api/',
     url:'http://nordan.store:8085/api/',
-    //url:'http://ready2solve.club:8085/api/',
     JWT_NAME:'USER',
     ADD_USER:'ADD_USER',
     UPDT_USER:'UPDT_USER',
@@ -28,6 +27,7 @@ var Global = {
     EEP:'EEP',
     CANCEL:'CANCEL',
     DISP:'DISP',
+    PCLOSE:'PCLOSE',
     SIZE_DOC:8,
     SIZE_DOC_RED:6,
     PORCENTAJE_MAX:'100.00',

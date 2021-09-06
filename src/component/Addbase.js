@@ -31,6 +31,7 @@ export default class Addbase extends Component {
     nombreRef = React.createRef();
     loteRef = React.createRef();
     cantProdRef = React.createRef();
+    loteAguaRef = React.createRef();
     isErrorInit = false;
     isReset = false;
     idPrdDisp = '';
@@ -46,7 +47,8 @@ export default class Addbase extends Component {
       lote:'',
       tipoProducto:'P',
       cantProd:'',
-      proddisp:{}
+      proddisp:{},
+      loteAgua:''
   };
 
   async componentDidMount(){
@@ -70,8 +72,13 @@ export default class Addbase extends Component {
     this.setState({
         codigo:this.codigoRef.current.value.toUpperCase(),
         lote:this.loteRef.current.value.toUpperCase(),
-        cantProd:this.cantProdRef.current.value
+        cantProd:this.cantProdRef.current.value,
     }); 
+    if(this.loteAguaRef.current){
+      this.setState({
+        loteAgua: this.loteAguaRef.current.value
+      });
+    }
     this.loteRef.current.value = this.loteRef.current.value.toUpperCase();
   }
 
@@ -109,6 +116,12 @@ export default class Addbase extends Component {
   }
 
   guardarBase =()=>{
+
+    if(this.state.loteAgua ===''){
+      swal('Es necesario agregar un lote al Agua');
+      return;
+    }
+
     let base = {
       codigo: this.state.codigo,
       nombre: this.state.proddisp.nombre,
@@ -140,6 +153,24 @@ export default class Addbase extends Component {
       })
       .catch(err=>{
         AuthService.isExpired(err.message);
+      });
+    }
+  }
+
+  updateFolioAgua = (index,loteAgua) =>{
+    if(this.state.lstMatPrimResp[index].codigo === Global.CODIGO_AGUA){
+      let mpArray = this.state.lstMatPrimResp.map((mp,j)=>{
+        if(index === j){
+          mp.loteAgua = true;
+          return mp;
+        }else{
+          mp.loteAgua = false;
+          return mp;
+        }
+      });
+      this.setState({
+        lstMatPrimResp:mpArray,
+        loteAgua:loteAgua
       });
     }
   }
@@ -204,6 +235,18 @@ export default class Addbase extends Component {
         }
       );
     }
+  }
+
+  updtRowLote = (i) =>{
+    let mpArray = this.state.lstMatPrimResp;
+    if(this.loteAguaRef.current){
+      mpArray[i].lote = this.loteAguaRef.current.value;
+    }    
+    mpArray[i].loteAgua = false;
+    this.setState({
+      lstMatPrimResp:mpArray,
+      loteAgua:mpArray[i].lote
+    });
   }
 
   descChange = () =>{
@@ -293,8 +336,13 @@ export default class Addbase extends Component {
                   <tr key={i} onClick={() => {this.selectRow(i); }} className={this.style}>
                     <td>{matprimres.codigo}</td>
                     <td>{matprimres.nombre}</td>
-                    <td><NumberFormat value={Number(matprimres.cantidad).toFixed(2)} displayType={'text'} thousandSeparator={true} />Kgs</td>
-                    <td>{matprimres.lote}</td>
+                    <td><NumberFormat value={Number(matprimres.cantidad).toFixed(2)} displayType={'text'} thousandSeparator={true} /> Kgs</td>
+                    {( matprimres.loteAgua===undefined || matprimres.loteAgua===false) &&
+                      <td onClick={()=>{this.updateFolioAgua(i,this.state.loteAgua)}}>{matprimres.lote}</td>
+                    }
+                    {( matprimres.loteAgua===true) &&
+                      <td><input type="text" className="valor" ref={this.loteAguaRef} defaultValue={this.state.loteAgua} onBlur={() => this.updtRowLote(i)}/></td>
+                    }
                     <td className={style} style={this.center} title={matprimres.comentarios}>{matprimres.estatus}</td>
                   </tr>
                 );

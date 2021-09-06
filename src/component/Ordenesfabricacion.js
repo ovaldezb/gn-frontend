@@ -34,7 +34,8 @@ export default class Ordenesfabricacion extends Component {
     idSelOf: -1,
     ordenfab:{},
     selected:false,
-    oc:{}
+    oc:{},
+    lstPrint:[]
   };
 
   componentDidMount() {
@@ -139,10 +140,6 @@ export default class Ordenesfabricacion extends Component {
   }
 
   printOf = () =>{
-    if(this.state.idSelOf === -1){
-      swal("Debe seleccionar una Orden de Fabricación");
-      return;
-    }
     let printwind = window.open("");
     let estilos = '<style> '+
     '@media print{'+
@@ -196,6 +193,7 @@ export default class Ordenesfabricacion extends Component {
       printwind.print();
       printwind.close();
     }
+    this.setState({idSelOf:-1});
   }
 
   filtrado=()=>{
@@ -224,11 +222,24 @@ export default class Ordenesfabricacion extends Component {
     }else{
       this.isActive = true;
     }
+    this.getDataPrint(i);
     this.setState({
       idSelOf: i
     });
   };
 
+  getDataPrint = (i) =>{
+    axios.get(Global.url+'ordenfab/'+this.state.lstOF[i].id+'/print',{ headers: authHeader() })
+    .then(res => {
+      this.setState({lstPrint:res.data});
+    })
+    .catch(err =>{
+      console.log(err);
+    })
+    
+
+      
+  }
 
   pad(num, size) {
     num = num.toString();
@@ -241,6 +252,31 @@ export default class Ordenesfabricacion extends Component {
     const OF = this.state.lstOF[this.state.idSelOf];
     var style = {};
     if (this.state.lstOF.length > 0) {
+      if(this.state.lstPrint.length >0){
+        var lstRowsLotes = this.state.lstPrint.map((elem,i) =>{
+          cantidadTotal += elem.cantidad;
+          return (
+            <tr key={i}>
+              <td className="left right bottom font12">{elem.nombre}</td>
+              <td className="right center bottom font12">{Number(elem.delta).toFixed(4)}</td>
+              <td className="right center bottom font12">{Number(elem.delta * 100).toFixed(2)}</td>
+              <td className="right center bottom font12">{elem.cantidad}</td>
+              <td className="right bottom center font12">{elem.codigo}</td>
+              <td className="right center bottom font12">{elem.lote}</td>
+              <td className="right bottom">
+                <table style={{border:'2px solid black',width:'100%'}}>
+                  <tbody>
+                    <tr>
+                      <td>&nbsp;</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+          );
+        });
+      }
+      
       var lstOrdFabPI = this.state.lstOF.map((ordfab, i) => {
         const fechaCreacion = momento(ordfab.fechaCreacion,'YYYY-MM-DD HH:mm:ss.SSS').format('DD MMM YYYY HH:mm');
         if (this.state.idSelOf === i) {
@@ -283,7 +319,7 @@ export default class Ordenesfabricacion extends Component {
                   <ul>
                     <li>Filtro:</li>
                     <li><input className="input"  type="text"  name="filtro" ref={this.filterRef} onKeyUp={this.filtrado}/></li>
-                    <li><input type="checkbox" ref={this.selAllRef} onChange={this.selectType} /></li>
+                    <li>Historial:<input type="checkbox" ref={this.selAllRef} onChange={this.selectType} /></li>
                   </ul>
                   <h2>Orden de Fabricación</h2>
                   <nav>
@@ -435,16 +471,16 @@ export default class Ordenesfabricacion extends Component {
                   <tr>
                     <td>
                       <table style={{width: '100%',borderCollapse:'separate', borderSpacing:'0em'}}>
-                          <colgroup>
-                              <col width="20%"/>
-                              <col width="15%"/>
-                              <col width="15%"/>
-                              <col width="15%"/>
-                              <col width="20%"/>
-                              <col width="10%"/>
-                              <col width="5%"/>
-                          </colgroup>
-                          <tbody>
+                        <colgroup>
+                            <col width="20%"/>
+                            <col width="15%"/>
+                            <col width="15%"/>
+                            <col width="15%"/>
+                            <col width="20%"/>
+                            <col width="10%"/>
+                            <col width="5%"/>
+                        </colgroup>
+                        <tbody>
                           <tr>
                               <td className="top bottom left right">Integracion de Materia Prima</td>
                               <td className="top bottom right center">&nbsp;</td>
@@ -454,29 +490,8 @@ export default class Ordenesfabricacion extends Component {
                               <td className="top bottom right center">LOTE</td>
                               <td className="top bottom right center">&nbsp;</td>
                           </tr>
-                          {
-                            OF.matprima.map((mp,i)=>{
-                              var mpObjetoFormula = OF.oc.producto.materiaPrimaUsada.filter(mpu => mpu.materiaprimadisponible.codigo===mp.codigo);
-                              cantidadTotal += mp.cantidad;
-                              return(
-                                <tr key={i}>
-                                  <td className="left right bottom font12">{mp.nombre}</td>
-                                  <td className="right center bottom font12"><NumberFormat value={Number(mpObjetoFormula[0].porcentaje/100)} format="#####" displayType={'text'}/></td>
-                                  <td className="right center bottom font12">{Number(mpObjetoFormula[0].porcentaje).toFixed(2)}</td>
-                                  <td className="right center bottom font12">{Number(mp.cantidad).toFixed(2)}</td>
-                                  <td className="right bottom center font12">{mp.codigo}</td>
-                                  <td className="right center bottom font12">{mp.lote}</td>
-                                  <td className="right bottom">
-                                    <table style={{border:'2px solid black',width:'100%'}}>
-                                      <tr>
-                                        <td>&nbsp;</td>
-                                      </tr>
-                                    </table>
-                                  </td>
-                                </tr>
-                              );
-                            })
-                          }  
+                          
+                          {lstRowsLotes}
                           <tr>
                               <td className="left right bottom">Total</td>
                               <td className="right  bottom center">1</td>
@@ -485,7 +500,7 @@ export default class Ordenesfabricacion extends Component {
                               <td className="right  bottom">&nbsp;</td>                              
                               <td className="right  bottom font12" colSpan="2">Tamaños del Lote</td>
                           </tr> 
-                          </tbody>               
+                        </tbody>               
                       </table>
                     </td>
                   </tr>

@@ -117,7 +117,7 @@ export default class Addordenfab extends Component {
     this.isErrorInit = true;
     var ordenFabTmp = this.state.ordenfab;
     ordenFabTmp.matprima=this.state.lstMatPrimResp;
-    if(this.btnEnviar === 'Guardar'){
+    if(this.btnEnviar === Global.GUARDAR){
       ordenFabTmp.oc = {id:this.state.ordenfab.oc.id}
       ordenFabTmp.estatus=Global.TEP;
       ordenFabTmp.piezas=this.state.piezasLote; 
@@ -232,7 +232,6 @@ export default class Addordenfab extends Component {
     }
   }
 
-  //|| e._reactName === 'onBlur'
   validaLote = (e) =>{
     if(e.keyCode === 13 ){
       Axios.get(Global.url+'lote/val/'+(this.state.ordenfab.lote===undefined?'vacio':this.state.ordenfab.lote===''?'vacio':this.state.ordenfab.lote),{ headers: authHeader() })

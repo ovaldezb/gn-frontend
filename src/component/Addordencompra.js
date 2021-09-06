@@ -154,8 +154,7 @@ export default class Addordencompra extends Component {
       }
     })
     .catch(err=>{
-      //AuthService.isExpired(err.message);
-      console.log(err);
+      AuthService.isExpired(err.message);
     });
   }
 
@@ -411,6 +410,23 @@ export default class Addordencompra extends Component {
               </div>
               {this.state.lstCliPro.length > 0 &&
                     <div style={{width:'100%'}}>
+                      <table style={{width:'100%',border:'0'}}>
+                        <colgroup>
+                          <col width='20%'/>
+                          <col width='70%'/>
+                          <col width='10%'/>
+                        </colgroup>
+                        <thead>
+                          <tr>
+                            <td style={{textAlign:'center'}}><strong>Clave</strong></td>
+                            <td style={{textAlign:'center'}}><strong>Producto</strong></td>
+                            <td style={{textAlign:'right'}}>
+                              <FontAwesomeIcon icon={faTimesCircle} title="Cerrar" onClick={this.closeCliProdList} style={{cursor:'pointer'}} />
+                            </td>
+                          </tr>
+                        </thead>
+                      </table>
+                      <div style={{height:'200px',overflow:'auto'}}>
                       <table style={{width:'100%'}}>
                         <tbody>
                           <tr>
@@ -428,12 +444,10 @@ export default class Addordencompra extends Component {
                                 </tbody>
                               </table>
                             </td>
-                            <td>
-                            <FontAwesomeIcon icon={faTimesCircle} title="Cerrar" onClick={this.closeCliProdList} style={{cursor:'pointer'}} />
-                            </td>
                           </tr>
                         </tbody>
                       </table>
+                      </div>
                     </div>
                   }
             </div>
