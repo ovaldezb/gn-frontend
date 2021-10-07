@@ -35,7 +35,6 @@ export default class Lotes extends Component {
     Axios
     .get(Global.url+'lote/'+buscaTodos,{ headers: authHeader() })
     .then(res=>{
-      //console.log(res.data);
       
       if(res.data.length > 0){
         let lstLtTmp = res.data.map(lt=>{
@@ -62,6 +61,15 @@ export default class Lotes extends Component {
     this.displayAdd = true;
     this.forceUpdate();
   }
+
+  editLote = () => {
+    console.log(this.state.lstLotes[this.state.idSelLt]);
+    this.isAdd = false;
+    this.setState({lote:this.state.lstLotes[this.state.idSelLt]});
+    this.displayAdd = true;
+    this.forceUpdate();
+  }
+
   cancelarAdd = ()=>{
     this.displayAdd = false;
     this.loadLotes(false);
@@ -168,42 +176,42 @@ export default class Lotes extends Component {
                 <ul>
                   <li>
                     <Link to="#" onClick={this.addLote}>
-                      <FontAwesomeIcon icon={faPlusSquare} />
+                      <FontAwesomeIcon icon={faPlusSquare} title="Agregar un Lote"/>
                     </Link>
                   </li>
                   <li>
                     {(this.state.idSelLt === -1 || this.state.lstLotes[this.state.idSelLt].estatus !== Global.OPEN) &&
                     <Link to="#" >
-                      <FontAwesomeIcon icon={faEdit} style={{color:'grey'}} />
+                      <FontAwesomeIcon icon={faEdit} style={{color:'grey'}} title="Editar el Lote seleccionado"/>
                     </Link>
                     }
                     {(this.state.idSelLt !== -1 && this.state.lstLotes[this.state.idSelLt].estatus === Global.OPEN) &&
                     <Link to="#" onClick={this.editLote}>
-                      <FontAwesomeIcon icon={faEdit} />
+                      <FontAwesomeIcon icon={faEdit} title="Editar el Lote seleccionado" />
                     </Link>
                     }
                   </li>
                   <li>
                     {(this.state.idSelLt === -1 || this.state.lstLotes[this.state.idSelLt].estatus !== Global.OPEN) &&
                     <Link to="#" >
-                    <FontAwesomeIcon icon={faTrash} style={{color:'grey'}}/>
+                    <FontAwesomeIcon icon={faTrash} style={{color:'grey'}} title="Eliminar el Lote"/>
                     </Link>
                     }
                     {(this.state.idSelLt !== -1 && this.state.lstLotes[this.state.idSelLt].estatus === Global.OPEN) &&
                     <Link to="#" onClick={this.deleteLote}>
-                    <FontAwesomeIcon icon={faTrash}/>
+                    <FontAwesomeIcon icon={faTrash} title="Eliminar el Lote"/>
                     </Link>
                     }
                   </li>
                   <li>
                     {(this.state.idSelLt === -1 || this.state.lstLotes[this.state.idSelLt].estatus !== Global.OPEN) && 
                     <Link to="#" >
-                      <FontAwesomeIcon icon={faCheckDouble} style={{color:'grey'}} />
+                      <FontAwesomeIcon icon={faCheckDouble} style={{color:'grey'}} title="Aprobar el Lote" />
                     </Link>
                     }
                     {(this.state.idSelLt !== -1 && this.state.lstLotes[this.state.idSelLt].estatus === Global.OPEN) && 
                     <Link to="#" onClick={this.changeSttus} >
-                      <FontAwesomeIcon icon={faCheckDouble} />
+                      <FontAwesomeIcon icon={faCheckDouble} title="Aprobar el Lote"/>
                     </Link>
                     }
                   </li>
@@ -267,7 +275,7 @@ export default class Lotes extends Component {
         </React.Fragment>
       )
     }else if(this.displayAdd){
-        return  <Addlote cancelar={this.cancelarAdd} ordencompra={this.state.lote} tipo={this.isAdd} />
+        return  <Addlote cancelar={this.cancelarAdd} lote={this.state.lote} tipo={this.isAdd} />
     }else{
       return(
       <React.Fragment>

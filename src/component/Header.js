@@ -10,6 +10,7 @@ import Clock from 'react-live-clock';
 
 export default class Header extends Component {
 
+   version = "1.0.1";
 
   state = {
     currentUser: AuthService.getCurrentUser(),
@@ -37,6 +38,9 @@ export default class Header extends Component {
                 <div className="info-user">
                     <Clock format={'dddd DD MMMM YYYY hh:mm A'} ticking={true}  />
                   </div>
+                </div>
+                <div className="info-user" style={{fontSize:'12px',marginRight:'30px'}}>
+                  <strong>Ver.</strong>{this.version}
                 </div>
 
                 <form className="grid-3">

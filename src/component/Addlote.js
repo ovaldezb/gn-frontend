@@ -50,7 +50,9 @@ export default class Addlote extends Component {
       
       this.setState({
           lote: this.props.lote,
-          lstMatPrim:this.props.lote.oc.producto.materiaPrimaUsada
+          oc:this.props.lote.oc,
+          lstMatPrim:this.props.lote.oc.producto.materiaPrimaUsada,
+          lstMatPrimResp:this.props.lote.materiaprima
         });
     }
   }
@@ -85,6 +87,7 @@ export default class Addlote extends Component {
   }
 
   validarLote = ()=>{
+    console.log('Validar')
     if(this.state.lote.piezasLote !== ''){
       if(this.state.lote.oc.oc!=='' && this.state.lote.piezasLote!=='' && this.state.oc.clave ){
         this.isErrorInit = true;
@@ -210,7 +213,7 @@ export default class Addlote extends Component {
               {this.validator.message('oc',lote.oc.oc,'required')}
               <input type="number" name="piezas" className="center" placeholder="Piezas a fabricar"  ref={this.noPiezasRef} defaultValue={lote.piezasLote}/>
               {this.validator.message('piezas',lote.piezasLote,'required')}
-              <input type="text" name="lote" placeholder="Lote"  ref={this.numeroRef} className="center"/>
+              <input type="text" name="lote" placeholder="Lote"  ref={this.numeroRef} className="center" defaultValue={lote.lote}/>
               {this.validator.message('lote',lote.numero,'required')}
             </div>
             
